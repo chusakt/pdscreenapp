@@ -79,7 +79,7 @@ def readjson():
     if request.is_json:
         req = request.get_json()
         read_feature = req['feature']
-        return("patient name: "+read_feature[0])
+        return("patient name: "+read_feature.values)
 
 
 @app.route('/simpleML', methods=['POST'])  
