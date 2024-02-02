@@ -8,19 +8,19 @@ import numpy as np
 from numpy import mean, sqrt, square, arange
 from   numpy import genfromtxt
 from flask import request, Response, send_file, redirect, safe_join, abort
-from scipy.signal import butter, lfilter, freqz, filtfilt
-from scipy.signal import welch, hann
+# from scipy.signal import butter, lfilter, freqz, filtfilt
+# from scipy.signal import welch, hann
 
 import pandas as pd
 
-import matplotlib as mpl
-mpl.use('Agg')
-import matplotlib.pyplot as plt
-import matplotlib.ticker as mtick
-import matplotlib.dates as mdates
-from matplotlib.patches import Ellipse
-import matplotlib.transforms as transforms
-import PIL
+# import matplotlib as mpl
+# mpl.use('Agg')
+# import matplotlib.pyplot as plt
+# import matplotlib.ticker as mtick
+# import matplotlib.dates as mdates
+# from matplotlib.patches import Ellipse
+# import matplotlib.transforms as transforms
+# import PIL
 
 import re
 import os
