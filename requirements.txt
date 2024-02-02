@@ -4,7 +4,7 @@ gunicorn==20.0.4
 itsdangerous==1.1.0
 Jinja2==2.11.3
 MarkupSafe==1.1.1
-Werkzeug>=3.0.0
+Werkzeug
 pandas==1.5.2
 scipy==1.12.0
 
