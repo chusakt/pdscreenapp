@@ -47,7 +47,7 @@ import traceback
 import joblib
 
 ENCODING = 'utf-8'
-# loaded_model = joblib.load('./mymodelNovalue.joblib')
+loaded_model = joblib.load('./model_only_va.joblib')
 
 
 app = Flask(__name__)
@@ -83,9 +83,9 @@ def simpleML():
 
         feature = req['feature']
         df = pd.DataFrame([feature])
-        predictions_ = loaded_model.predict(df.values)
-        returnPredict = predictions_[0]
-        return("prediction output: "+ returnPredict )
+        # predictions_ = loaded_model.predict(df.values)
+        # returnPredict = predictions_[0]
+        return("prediction output: "+ df.values )
 
 @app.route('/getcwd', methods=['POST'])  
 def getcwd():
