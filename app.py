@@ -71,7 +71,11 @@ def readjson():
         read_pName = req['patientName']
         return("patient name: "+read_pName)
 
- 
+@app.route('/readjson2', methods=['POST'])  
+def readjson2():
+    # --- load model ---
+    return(os.getcwd())
+
 
 # predictions_ = loaded_model.predict(X_test)
 # acc = accuracy_score(y_test, predictions_)
