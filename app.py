@@ -48,6 +48,15 @@ import joblib
 
 ENCODING = 'utf-8'
 # loaded_model = joblib.load('./model_only_va.joblib')
+import pickle
+# save the iris classification model as a pickle file
+model_pkl_file = "Model_pickle_1.pkl"  
+# with open(model_pkl_file, 'wb') as file:  
+#     pickle.dump(rnd_clf, file)
+# --- load model ---
+with open(model_pkl_file, 'rb') as file:  
+    loaded_model = pickle.load(file)
+
 
 
 app = Flask(__name__)
