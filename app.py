@@ -82,10 +82,10 @@ def simpleML():
         # req = json.loads(z)
 
         feature = req['feature']
-        df = pd.DataFrame([feature])
+        # df = pd.DataFrame([feature])
         # predictions_ = loaded_model.predict(df.values)
         # returnPredict = predictions_[0]
-        return("prediction output: "+ df.values )
+        return("prediction output: " )
 
 @app.route('/getcwd', methods=['POST'])  
 def getcwd():
