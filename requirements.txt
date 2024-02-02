@@ -11,3 +11,4 @@ numpy
 Pillow
 requests
 scikit-learn
+joblib
