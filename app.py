@@ -10,6 +10,20 @@ from scipy.signal import butter, lfilter, freqz, filtfilt
 from scipy.signal import welch, hann
 import requests
 
+from sklearn.model_selection import StratifiedShuffleSplit
+from sklearn.model_selection import train_test_split
+from sklearn.impute import SimpleImputer
+from sklearn.preprocessing import OrdinalEncoder
+from sklearn.preprocessing import OneHotEncoder
+from sklearn.base import BaseEstimator, TransformerMixin
+from sklearn.ensemble import RandomForestRegressor
+from sklearn.metrics import accuracy_score
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.model_selection import cross_validate
+from sklearn.pipeline import Pipeline
+import pickle
+
+
 # built-in lib
 import time, threading, csv, random, json
 from datetime import datetime, timedelta
