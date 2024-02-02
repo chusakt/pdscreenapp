@@ -62,35 +62,35 @@ def saysomething():
     return ("now what ------------777788")
 
 
-@app.route('/readjson', methods=['POST'])  
-def readjson():
-    # --- load model ---
-    # modelfile = "model_questionaire2.joblib"
-    # loaded_model = joblib.load("model_questionaire2.joblib")
-    if request.is_json:
-        req = request.get_json()
-        read_pName = req['patientName']
-        return("patient name: "+read_pName)
+# @app.route('/readjson', methods=['POST'])  
+# def readjson():
+#     # --- load model ---
+#     # modelfile = "model_questionaire2.joblib"
+#     # loaded_model = joblib.load("model_questionaire2.joblib")
+#     if request.is_json:
+#         req = request.get_json()
+#         read_pName = req['patientName']
+#         return("patient name: "+read_pName)
 
 
-@app.route('/simpleML', methods=['POST'])  
-def simpleML():
-    if request.is_json:
-        req = request.get_json()
-        # feature = req['feature']
-        # return("feature "+feature[0]+" "+feature[19])
-        # req = json.loads(z)
+# @app.route('/simpleML', methods=['POST'])  
+# def simpleML():
+#     if request.is_json:
+#         req = request.get_json()
+#         # feature = req['feature']
+#         # return("feature "+feature[0]+" "+feature[19])
+#         # req = json.loads(z)
 
-        feature = req['feature']
-        # df = pd.DataFrame([feature])
-        # predictions_ = loaded_model.predict(df.values)
-        # returnPredict = predictions_[0]
-        return("prediction output: " )
+#         feature = req['feature']
+#         # df = pd.DataFrame([feature])
+#         # predictions_ = loaded_model.predict(df.values)
+#         # returnPredict = predictions_[0]
+#         return("prediction output: " )
 
-@app.route('/getcwd', methods=['POST'])  
-def getcwd():
-    # --- load model ---
-    return(os.getcwd())
+# @app.route('/getcwd', methods=['POST'])  
+# def getcwd():
+#     # --- load model ---
+#     return(os.getcwd())
 
 
 # predictions_ = loaded_model.predict(X_test)
