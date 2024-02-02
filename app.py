@@ -43,12 +43,14 @@ import zipfile
 from zipfile import ZipFile 
 import urllib.parse
 import logging
+import joblib
 
 ENCODING = 'utf-8'
 
 
 
 app = Flask(__name__)
+
 
 
 @app.route('/api/add_message/<uuid>', methods=['GET', 'POST'])
@@ -61,7 +63,24 @@ def saysomething():
 
 @app.route('/readjson', methods=['POST'])  
 def readjson():
+    # --- load model ---
+    modelfile = joblib.load("./model_questionaire2.pkl")
+    loaded_model = joblib.load(modelfile)
     if request.is_json:
         req = request.get_json()
         read_pName = req['patientName']
         return("patient name: "+read_pName)
+
+ 
+
+# predictions_ = loaded_model.predict(X_test)
+# acc = accuracy_score(y_test, predictions_)
+# print('test load model and predict: accuracy: ',acc)
+
+# print('test sub set')
+# X_test_sub =  X_test.iloc[[20]]
+# y_test_sub = y_test.iloc[[20]]
+# predictions_ = loaded_model.predict(X_test_sub)
+# acc = accuracy_score(y_test_sub, predictions_)
+# print('test load model and predict: accuracy: ',acc)
+
