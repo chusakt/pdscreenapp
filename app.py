@@ -94,7 +94,7 @@ def simpleML():
         # df = pd.DataFrame([feature])
         # predictions_ = loaded_model.predict(df.values)
         # returnPredict = predictions_[0]
-        return("prediction output: "+feature )
+        return("prediction output: xxxxxxxxxxxxxxxxx" )
 
 # @app.route('/getcwd', methods=['POST'])  
 # def getcwd():
