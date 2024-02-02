@@ -78,8 +78,10 @@ def readjson():
     # loaded_model = joblib.load("model_questionaire2.joblib")
     if request.is_json:
         req = request.get_json()
-        read_feature = req['feature']
-        return("patient name: "+read_feature.values)
+        read_feature = req['feature'] #if read a list
+        df3 = pd.DataFrame([read_feature])
+        df4 = df3.values[0]
+        return("read_feature: "+df4)
 
 
 @app.route('/simpleML', methods=['POST'])  
