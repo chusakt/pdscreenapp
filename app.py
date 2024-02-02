@@ -55,34 +55,36 @@ app = Flask(__name__)
 def add_message(uuid):
     return jsonify({"uuid":uuid})
 
+
 @app.route('/')
 def saysomething():
     return ("now what ------------777788")
 
-@app.route('/readjson', methods=['POST'])  
-def readjson():
-    # --- load model ---
-    # modelfile = "model_questionaire2.joblib"
-    # loaded_model = joblib.load("model_questionaire2.joblib")
-    if request.is_json:
-        req = request.get_json()
-        read_pName = req['patientName']
-        return("patient name: "+read_pName)
 
-@app.route('/readjson2', methods=['POST'])  
-def readjson2():
-    # --- load model ---
-    return(os.getcwd())
+# @app.route('/readjson', methods=['POST'])  
+# def readjson():
+#     # --- load model ---
+#     # modelfile = "model_questionaire2.joblib"
+#     # loaded_model = joblib.load("model_questionaire2.joblib")
+#     if request.is_json:
+#         req = request.get_json()
+#         read_pName = req['patientName']
+#         return("patient name: "+read_pName)
+
+# @app.route('/readjson2', methods=['POST'])  
+# def readjson2():
+#     # --- load model ---
+#     return(os.getcwd())
 
 
-# predictions_ = loaded_model.predict(X_test)
-# acc = accuracy_score(y_test, predictions_)
-# print('test load model and predict: accuracy: ',acc)
+# # predictions_ = loaded_model.predict(X_test)
+# # acc = accuracy_score(y_test, predictions_)
+# # print('test load model and predict: accuracy: ',acc)
 
-# print('test sub set')
-# X_test_sub =  X_test.iloc[[20]]
-# y_test_sub = y_test.iloc[[20]]
-# predictions_ = loaded_model.predict(X_test_sub)
-# acc = accuracy_score(y_test_sub, predictions_)
-# print('test load model and predict: accuracy: ',acc)
+# # print('test sub set')
+# # X_test_sub =  X_test.iloc[[20]]
+# # y_test_sub = y_test.iloc[[20]]
+# # predictions_ = loaded_model.predict(X_test_sub)
+# # acc = accuracy_score(y_test_sub, predictions_)
+# # print('test load model and predict: accuracy: ',acc)
 
