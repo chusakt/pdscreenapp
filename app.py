@@ -82,19 +82,19 @@ def saysomething():
 #         return("patient name: "+read_pName)
 
 
-# @app.route('/simpleML', methods=['POST'])  
-# def simpleML():
-#     if request.is_json:
-#         req = request.get_json()
-#         # feature = req['feature']
-#         # return("feature "+feature[0]+" "+feature[19])
-#         # req = json.loads(z)
+@app.route('/simpleML', methods=['POST'])  
+def simpleML():
+    if request.is_json:
+        req = request.get_json()
+        # feature = req['feature']
+        # return("feature "+feature[0]+" "+feature[19])
+        # req = json.loads(z)
 
-#         feature = req['feature']
-#         # df = pd.DataFrame([feature])
-#         # predictions_ = loaded_model.predict(df.values)
-#         # returnPredict = predictions_[0]
-#         return("prediction output: " )
+        feature = req['feature']
+        # df = pd.DataFrame([feature])
+        # predictions_ = loaded_model.predict(df.values)
+        # returnPredict = predictions_[0]
+        return("prediction output: "+feature )
 
 # @app.route('/getcwd', methods=['POST'])  
 # def getcwd():
