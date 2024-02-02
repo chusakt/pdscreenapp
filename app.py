@@ -55,7 +55,7 @@ model_pkl_file = "Model_pickle_1.pkl"
 #     pickle.dump(rnd_clf, file)
 # --- load model ---
 with open(model_pkl_file, 'rb') as file:  
-    loaded_model = pickle.load(file)
+    loaded_model = pickle.load(file) 
 
 
 
