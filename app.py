@@ -63,21 +63,13 @@ def saysomething():
  
  
 @app.route('/walking6min', methods=['POST'])  
-def walking6min(DOWNSMP_OF_RAW=2): #def postRR(DOWNSMP_OF_RAW=4):
+def walking6min():
+    # def walking6min(DOWNSMP_OF_RAW=2): #def postRR(DOWNSMP_OF_RAW=4):
     smoothfactor            = 3    # filter smooth average
     TimeFunctionCalled = ((datetime.datetime.now()+ timedelta(hours=7)).strftime("%H%M%S"))
-
-    visitorIP   =  request.environ.get('HTTP_X_REAL_IP', request.remote_addr) 
-    url         = 'http://ipinfo.io/{}/json/'.format(visitorIP)
-    r           = requests.get(url)
-    j           = json.loads(r.text)
-    city        = j['city']
-    country     = j['country']
-
-    
     if request.is_json:
         return ('... received Json ... ')
-        req = request.get_json()
+        # req = request.get_json()
 
 
 #         inputSecretCode = req['secretCode']
