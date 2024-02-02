@@ -64,7 +64,7 @@ def saysomething():
 @app.route('/readjson', methods=['POST'])  
 def readjson():
     # --- load model ---
-    modelfile = joblib.load("/app/model_questionaire2.pkl")
+    modelfile = joblib.load("./model_questionaire2.pkl")
     loaded_model = joblib.load(modelfile)
     if request.is_json:
         req = request.get_json()
