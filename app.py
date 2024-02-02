@@ -44,5 +44,5 @@ def add_message(uuid):
 
 @app.route('/')
 def saysomething():
-    return ("now what -------------2")
+    return ("now what ------------0000")
 
