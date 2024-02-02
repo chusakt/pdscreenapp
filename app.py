@@ -23,9 +23,9 @@ from zipfile import ZipFile
 import urllib.parse
 
 
-import numpy as np
-from numpy import mean, sqrt, square, arange
-from numpy import genfromtxt
+# import numpy as np
+# from numpy import mean, sqrt, square, arange
+# from numpy import genfromtxt
 
 from scipy.signal import butter, lfilter, freqz, filtfilt
 from scipy.signal import welch, hann
