@@ -1,7 +1,7 @@
 # lib need to install, in requirement.txt
 from flask import Flask, jsonify
 from flask import render_template
-# from flask import request, Response, send_file, redirect, safe_join, abort
+from flask import request, Response, send_file, redirect, safe_join, abort
 import pandas as pd
 import numpy as np
 from numpy import mean, sqrt, square, arange
@@ -46,5 +46,6 @@ def saysomething():
     return ("now what ------------7777")
 
 @app.route('/readjson', methods=['POST'])  
-def readjson():
-    return ("receive json.....")
+def walking6min():
+    if request.is_json:
+        return ("receive json.....")
