@@ -52,7 +52,7 @@ ENCODING = 'utf-8'
 
 app = Flask(__name__)
 
-
+loaded_model = joblib.load("model_questionaire2.joblib")
 
 @app.route('/api/add_message/<uuid>', methods=['GET', 'POST'])
 def add_message(uuid):
@@ -66,7 +66,7 @@ def saysomething():
 def readjson():
     # --- load model ---
     # modelfile = "model_questionaire2.joblib"
-    loaded_model = joblib.load("model_questionaire2.joblib")
+    # loaded_model = joblib.load("model_questionaire2.joblib")
     if request.is_json:
         req = request.get_json()
         read_pName = req['patientName']
