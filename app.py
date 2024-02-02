@@ -71,15 +71,15 @@ def saysomething():
     return ("now what ------------777788")
 
 
-# @app.route('/readjson', methods=['POST'])  
-# def readjson():
-#     # --- load model ---
-#     # modelfile = "model_questionaire2.joblib"
-#     # loaded_model = joblib.load("model_questionaire2.joblib")
-#     if request.is_json:
-#         req = request.get_json()
-#         read_pName = req['patientName']
-#         return("patient name: "+read_pName)
+@app.route('/readjson', methods=['POST'])  
+def readjson():
+    # --- load model ---
+    # modelfile = "model_questionaire2.joblib"
+    # loaded_model = joblib.load("model_questionaire2.joblib")
+    if request.is_json:
+        req = request.get_json()
+        read_feature = req['feature']
+        return("patient name: "+read_feature)
 
 
 @app.route('/simpleML', methods=['POST'])  
