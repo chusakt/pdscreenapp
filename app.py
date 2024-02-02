@@ -85,7 +85,7 @@ def saysomething():
 @app.route('/simpleML', methods=['POST'])  
 def simpleML():
     if request.is_json:
-        req = request.get_json()
+        req = request.get_json() 
         # feature = req['feature']
         # return("feature "+feature[0]+" "+feature[19])
         # req = json.loads(z)
