@@ -48,4 +48,4 @@ def saysomething():
 @app.route('/readjson', methods=['POST'])  
 def walking6min():
     if request.is_json:
-        return ("receive json")
+        return ("receive json...")
