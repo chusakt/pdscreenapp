@@ -46,6 +46,5 @@ def saysomething():
     return ("now what ------------7777")
 
 @app.route('/readjson', methods=['POST'])  
-def walking6min():
-    if request.is_json:
-        return ("receive json.....")
+def readjson():
+    return ("receive json.....")
