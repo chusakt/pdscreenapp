@@ -48,11 +48,12 @@ import joblib
 
 ENCODING = 'utf-8'
 
+loaded_model = joblib.load("model_questionaire2.joblib")
+
+
 
 
 app = Flask(__name__)
-
-loaded_model = joblib.load("model_questionaire2.joblib")
 
 @app.route('/api/add_message/<uuid>', methods=['GET', 'POST'])
 def add_message(uuid):
