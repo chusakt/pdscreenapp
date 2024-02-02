@@ -49,6 +49,7 @@ import joblib
 ENCODING = 'utf-8'
 loaded_model = joblib.load('./mymodel1.joblib')
 
+
 app = Flask(__name__)
 
 @app.route('/api/add_message/<uuid>', methods=['GET', 'POST'])
@@ -76,9 +77,15 @@ def readjson():
 def simpleML():
     if request.is_json:
         req = request.get_json()
+        # feature = req['feature']
+        # return("feature "+feature[0]+" "+feature[19])
+        # req = json.loads(z)
+
         feature = req['feature']
-        return("feature "+feature[0]+" "+feature[19])
-    
+        df = pd.DataFrame([feature])
+        predictions_ = loaded_model.predict(df.values)
+        returnPredict = predictions_[0]
+        return("prediction output: "+ returnPredict )
 
 @app.route('/getcwd', methods=['POST'])  
 def getcwd():
