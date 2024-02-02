@@ -47,7 +47,7 @@ import traceback
 import joblib
 
 ENCODING = 'utf-8'
-loaded_model = joblib.load('./model_questionaire2.joblib')
+loaded_model = joblib.load('./mymodel1.joblib')
 
 app = Flask(__name__)
 
