@@ -22,10 +22,10 @@ from sklearn.ensemble import RandomForestClassifier
 from sklearn.model_selection import cross_validate
 from sklearn.pipeline import Pipeline
 import pickle
-import joblib
+
 
 # built-in lib
-import time, threading, csv, random, json,sys
+import time, threading, csv, random, json
 from datetime import datetime, timedelta
 import unicodedata
 import re
@@ -44,8 +44,7 @@ from zipfile import ZipFile
 import urllib.parse
 import logging
 import traceback
-
-
+import joblib
 
 ENCODING = 'utf-8'
 
@@ -66,20 +65,8 @@ def saysomething():
 @app.route('/readjson', methods=['POST'])  
 def readjson():
     # --- load model ---
-    modelfile = "model_questionaire2.pkl"
-    # loaded_model = joblib.load(modelfile)
-
-    try:
-        loaded_model = joblib.load(modelfile)
-    except IOError as (errno, strerror):
-        return("I/O error({0}): {1}".format(errno, strerror))
-    except ValueError:
-        return("Could not convert data to an integer.")
-    except:
-        return("Unexpected error:", sys.exc_info()[0])
-        raise
-
-
+    # modelfile = "model_questionaire2.joblib"
+    loaded_model = joblib.load("model_questionaire2.joblib")
     if request.is_json:
         req = request.get_json()
         read_pName = req['patientName']
