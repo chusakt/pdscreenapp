@@ -81,7 +81,7 @@ def readjson():
         read_feature = req['feature'] #if read a list
         df3 = pd.DataFrame([read_feature])
         df4 = df3.values[0]
-        return("read_feature: "+df4)
+        return("read_feature type: "+type(df4))
 
 
 @app.route('/simpleML', methods=['POST'])  
