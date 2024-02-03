@@ -105,7 +105,7 @@ def readjson_feat_do2():
         req = request.get_json()
         read_feat = req['feature'] #if read a list
         df3 = pd.DataFrame([read_feat])
-        jsondf3 = pd.DataFrame.to_json() 
+        jsondf3 = df3.to_json() 
         return(jsondf3)
 
 
