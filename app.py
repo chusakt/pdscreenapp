@@ -261,6 +261,116 @@ def predict_dualtap_featureprepare():
     
 
 
+@app.route('/predict_dualtap_featureprepare_and_predict', methods=['POST'])  
+def predict_dualtap_featureprepare():
+    if request.is_json:
+        data = request.get_json()
+        i = data['score']
+        aScor = i
+
+        TapCount = []
+        j = data['recording']['taps']
+        for jj in j:
+            da = jj['data']
+            # print(len(da))
+            TapCount.append(len(da))
+
+        maxTapCount  = np.max(TapCount)
+        meanTapCount = np.mean(TapCount)
+        stdTapCount  = np.std(TapCount)
+
+        # row = []
+        
+
+        # --------------  about circle ---------------
+        jL = data['recording']['circleL']
+        jR = data['recording']['circleR']
+        cLx,cLy = jL['x'],jL['y']
+        cRx,cRy = jR['x'],jR['y']
+        cRadius = jL['r']
+
+        # --- check touched points in or out as proportional 
+        distancEachPoint = []
+        inLeft = 0
+        inRight = 0
+        jf = data['recording']['taps']
+        ts_instroke_mean = []
+        for jstroke in jf:
+            jjj = jstroke['data']
+            ts_instroke = [] 
+            for jjjj in jjj:
+                xpo,ypo,ts_ = jjjj['x'],jjjj['y'],jjjj['ts']
+                ts_instroke.append(ts_)
+                # compare to L and R, then decide which side
+                if (xpo-cLx) >= (cRx-xpo):
+                    # point is in the right:
+                    inRight +=1
+                    dispo = math.sqrt((xpo-cRx)*(xpo-cRx) + (ypo-cRy)*(ypo-cRy))
+                    distancEachPoint.append(dispo)
+                else:
+                    # point is in the left:
+                    inLeft += 1
+                    dispo = math.sqrt((xpo-cLx)*(xpo-cLx) + (ypo-cLy)*(ypo-cLy))
+                    distancEachPoint.append(dispo)
+
+                # print(da['x'],da['y'],dispo)
+            ts_instroke_mean.append(mean(ts_instroke))
+            # ts_instroke_mean = mean(ts_instroke)
+        countinside = sum(map(lambda x : x < cRadius, distancEachPoint))
+        countall = len(distancEachPoint)
+        # print(countinside, countall)
+        ppInsideToAll = countinside/countall
+        try:
+            if inLeft/inRight > 1:
+                ppLeftToRight =inRight/inLeft
+            else:
+                ppLeftToRight = inLeft/inRight
+        except:
+            ppLeftToRight = 0
+
+        # about time diff
+        tDiff = list()
+        for item1, item2 in zip(ts_instroke_mean[1:], ts_instroke_mean[0:-1]):
+            item = item1 - item2
+            tDiff.append(item)        
+        tDiff_mean = mean(tDiff)
+        tDiff_max = max(tDiff)
+        tDiff_min = min(tDiff)
+
+        E0 = '%.5f'%(aScor)   
+        E1 = '%.5f'%(maxTapCount)           
+        E2 = '%.5f'%(meanTapCount)                     
+        E3 = '%.5f'%(stdTapCount)
+        E4 = '%.5f'%(countall)
+        E5 = '%.5f'%(ppInsideToAll)
+        E6 = '%.5f'%(ppLeftToRight)   
+        E7 = '%.5f'%(tDiff_mean)
+        E8 = '%.5f'%(tDiff_max)
+        E9 = '%.5f'%(tDiff_min)
+        rowx = [E0,E1,E2,E3,E4,E5,E6,E7,E8,E9]
+        df3 = pd.DataFrame([rowx])
+        predictions_ = loaded_model_d.predict(df3.values)
+        # return ("predictin: "+predictions_[0])
+        return jsonify({"prediction":str(predictions_[0])}) 
+        # return ("predictin: "+str(predictions_[0]))
+    
+
+
+        return jsonify({"aScor":E0,
+                        "maxTapCount":E1,
+                        "meanTapCount":E2,
+                        "stdTapCount":E3,
+                        "countall":E4,
+                        "ppInsideToAll":E5,
+                        "ppLeftToRight":E6,
+                        "tDiff_mean":E7,
+                        "tDiff_max":E8,
+                        "tDiff_min":E9                        
+                        }) 
+        # return ("predictin: "+str(predictions_[0]))
+    
+
+
 
 @app.route('/readjson_feat2', methods=['POST'])  
 def readjson_feat2():
