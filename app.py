@@ -176,7 +176,7 @@ def predict_dualtap_featureprepare():
         meanTapCount = np.mean(TapCount)
         stdTapCount  = np.std(TapCount)
 
-        row = []
+        # row = []
         
 
         # --------------  about circle ---------------
@@ -244,9 +244,19 @@ def predict_dualtap_featureprepare():
         E7 = '%.5f'%(tDiff_mean)
         E8 = '%.5f'%(tDiff_max)
         E9 = '%.5f'%(tDiff_min)
-        rowx = [E0,E1,E2,E3,E4,E5,E6,E7,E8,E9]
+        # rowx = [E0,E1,E2,E3,E4,E5,E6,E7,E8,E9]
 
-        return jsonify({"aScor":E0},{"sometig2":E1}) 
+        return jsonify({"aScor":E0,
+                        "maxTapCount":E1,
+                        "meanTapCount":E2,
+                        "stdTapCount":E3,
+                        "countall":E4,
+                        "ppInsideToAll":E5,
+                        "ppLeftToRight":E6,
+                        "tDiff_mean":E7,
+                        "tDiff_max":E8,
+                        "tDiff_min":E9                        
+                        }) 
         # return ("predictin: "+str(predictions_[0]))
     
 
