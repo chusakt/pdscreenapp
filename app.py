@@ -98,6 +98,12 @@ def readjson_feat():
         read_feat = req['feature'] #if read a list
         return("read_feat : "+read_feat)
 
+@app.route('/readjson_feat_type', methods=['POST'])  
+def readjson_feat_type():
+    if request.is_json:
+        req = request.get_json()
+        read_feat = req['feature'] #if read a list
+        return("read_feat type: "+type(read_feat))
 
 @app.route('/readjson_feat_do2', methods=['POST'])  
 def readjson_feat_do2():
