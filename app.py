@@ -280,8 +280,6 @@ def predict_dualtap_featureprepare():
         stdTapCount  = np.std(TapCount)
 
         # row = []
-        
-
         # --------------  about circle ---------------
         jL = data['recording']['circleL']
         jR = data['recording']['circleR']
@@ -352,24 +350,6 @@ def predict_dualtap_featureprepare():
         predictions_ = loaded_model_d.predict(df3.values)
         # return ("predictin: "+predictions_[0])
         return jsonify({"prediction":str(predictions_[0])}) 
-        # return ("predictin: "+str(predictions_[0]))
-    
-
-
-        return jsonify({"aScor":E0,
-                        "maxTapCount":E1,
-                        "meanTapCount":E2,
-                        "stdTapCount":E3,
-                        "countall":E4,
-                        "ppInsideToAll":E5,
-                        "ppLeftToRight":E6,
-                        "tDiff_mean":E7,
-                        "tDiff_max":E8,
-                        "tDiff_min":E9                        
-                        }) 
-        # return ("predictin: "+str(predictions_[0]))
-    
-
 
 
 @app.route('/readjson_feat2', methods=['POST'])  
