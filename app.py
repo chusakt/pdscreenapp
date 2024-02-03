@@ -75,6 +75,13 @@ with open(model_pkl_file, 'rb') as file:
 model_pkl_file = "Model_pickle_pinchtosize_1_only_va.pkl"  
 with open(model_pkl_file, 'rb') as file:  
     loaded_model_p = pickle.load(file) 
+# --- load model ---
+model_pkl_file = "Model_pickle_tremor_rest_1.pkl"  
+with open(model_pkl_file, 'rb') as file:  
+    loaded_model_tr = pickle.load(file) 
+
+
+
 
 app = Flask(__name__)
 
@@ -640,25 +647,119 @@ def predict_tremor_rest():
             E16 = '%.5f'%(np.percentile(testsig_filt, 25))
             E17 = '%.5f'%(np.percentile(testsig_filt, 50))
             E18 = '%.5f'%(np.percentile(testsig_filt, 75))
-            # zero_crossing
-            E19 = '%.5f'%(len(np.where(np.diff(np.sign(testsig)))[0]))
+            # # zero_crossing
+            # E19 = '%.5f'%(len(np.where(np.diff(np.sign(testsig)))[0]))
 
-            rowx = [E1,E2,E3,E4,E5,E6,E7,E8,E9,E10,E11,E12,E13,E14,E15,E16,E17,E18,E19]
+            rowx = [E1,E2,E3,E4,E5,E6,E7,E8,E9,E10,E11,E12,E13,E14,E15,E16,E17,E18]
             row = row + rowx
 
         df3 = pd.DataFrame([row])
         # predictions_ = loaded_model_p.predict(df3.values)
-        return jsonify({"E1":E1,
-                        "E2":E2,
-                        "E4":E4,
-                        "E6":E6,
-                        "E8":E8,
-                        "E11":E11,
-                        "E12":E12,
-                        "E13":E13,
-                        "E19":E19                      
+        return jsonify({"aa1":rowx[0],"aa2":rowx[1],"aa3":rowx[2],"aa6":rowx[3],
+                        "ab1":rowx[0],"aa2":rowx[1],"aa3":rowx[2],"aa6":rowx[3],
+                        "ac1":rowx[0],"aa2":rowx[1],"aa3":rowx[2],"aa6":rowx[3],
+                        "ga1":rowx[0],"ga2":rowx[1],"ga3":rowx[2],"ga6":rowx[3]
                         }) 
         # return jsonify({"prediction":str(predictions_[0])}) 
+    
+
+
+
+@app.route('/predict_tremor_rest_withpredict', methods=['POST'])  
+def predict_tremor_rest_withpredict():
+    if request.is_json:
+        data = request.get_json()
+        tStamp = []
+        acX = []
+        acY = []
+        acZ = []
+        agX = []
+        agY = []
+        agZ = []
+
+        for i in data['recording']['recordedData']:
+            tsC = i['ts']
+            tStamp.append(tsC)
+            acXC = i['data'][0]
+            acYC = i['data'][1]
+            acZC = i['data'][2]    
+            acX.append(acXC)
+            acY.append(acYC)
+            acZ.append(acZC) 
+
+            agXC = i['data'][3]
+            agYC = i['data'][4]
+            agZC = i['data'][5]    
+            agX.append(agXC)
+            agY.append(agYC)
+            agZ.append(agZC) 
+
+        tst = [item - tStamp[0] for item in tStamp]
+
+        # ------------  handle the oversampling to 200 samples in 20 sec
+        if len(acX) > 200:
+            toBeSamp = 200
+            # print('----> ' + str(filepath))
+            acX, x1 = signal.resample(acX,toBeSamp,np.arange(len(acX)))  # resampled at 200
+            acY, x1 = signal.resample(acY,toBeSamp,np.arange(len(acY)))  # resampled 
+            acZ, x1 = signal.resample(acZ,toBeSamp,np.arange(len(acZ)))  # resampled 
+            agX, x1 = signal.resample(agX,toBeSamp,np.arange(len(agX)))  # resampled 
+            agY, x1 = signal.resample(agY,toBeSamp,np.arange(len(agY)))  # resampled
+            agZ, x1 = signal.resample(agZ,toBeSamp,np.arange(len(agZ)))  # resampled
+
+
+        row = []
+        for testsig in (acX,acY,acZ,agX,agY,agZ):
+            testsig_filt = signal.sosfilt(sos, testsig)
+            res = np.array(testsig_filt)
+            fourier = fft(testsig_filt)
+            fab = np.abs(fourier)[0:100]
+            # ------------ 
+            Esum = sum(np.square(fab))
+
+            F1 = sum(np.square(fab[0:25]))
+            F2 = sum(np.square(fab[25:50]))
+            F3 = sum(np.square(fab[50:75]))
+            F4 = sum(np.square(fab[75:80]))
+
+
+            kur = kurtosis(testsig_filt, fisher=True)
+            ske = skew(testsig_filt, bias=False)
+            resdif = res[1:]-res[0:-1]
+            Mobi = np.sqrt(np.var(resdif)/np.var(res))
+            resdif2 = resdif[1:]-resdif[0:-1]
+            compx = np.sqrt(np.var(resdif2)*np.var(res)/(np.var(resdif)*np.var(resdif)))
+            
+            # E1 = '%.5f'%(F1/Esum)
+            E1 = '%.5f'%(np.std(testsig_filt))           
+            E2 = '%.5f'%(np.mean(testsig_filt))                     
+            E3 = '%.5f'%(kur)
+            E4 = '%.5f'%(ske)
+            E5 = '%.5f'%(Mobi)   
+            E6 = '%.5f'%(compx)                              
+            E7 = '%.5f'%(F1) 
+            E8 = '%.5f'%(F2) 
+            E9 = '%.5f'%(F3) 
+            E10 = '%.5f'%(F4) 
+            E11 = '%.5f'%(F2/Esum)
+            E12 = '%.5f'%(F3/Esum)
+            Samp, Phi1, Phi2 = EH.SampEn(res, m = 2, tau = 2)
+            E13 = '%.5f'%(Samp[0])
+            E14 = '%.5f'%(Samp[1])
+            E15 = '%.5f'%(Samp[2])
+            E16 = '%.5f'%(np.percentile(testsig_filt, 25))
+            E17 = '%.5f'%(np.percentile(testsig_filt, 50))
+            E18 = '%.5f'%(np.percentile(testsig_filt, 75))
+            # # zero_crossing
+            # E19 = '%.5f'%(len(np.where(np.diff(np.sign(testsig)))[0]))
+
+            rowx = [E1,E2,E3,E4,E5,E6,E7,E8,E9,E10,E11,E12,E13,E14,E15,E16,E17,E18]
+            row = row + rowx
+        
+        data_X_df = pd.DataFrame(row)
+        X = np.array(data_X_df)
+        predictions_ = loaded_model_tr.predict(X)
+        return jsonify({"prediction":str(predictions_[0])}) 
     
 
 
