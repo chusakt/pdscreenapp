@@ -50,7 +50,7 @@ ENCODING = 'utf-8'
 # loaded_model = joblib.load('./model_only_va.joblib')
 import pickle
 # save the iris classification model as a pickle file
-model_pkl_file = "Model_pickle_1.pkl"  
+model_pkl_file = "Model_pickle_questionaire_1_only_va.pkl"  
 # with open(model_pkl_file, 'wb') as file:  
 #     pickle.dump(rnd_clf, file)
 # --- load model ---
@@ -98,12 +98,14 @@ def readjson_feat():
         read_feat = req['feature'] #if read a list
         return("read_feat : "+read_feat)
 
-@app.route('/readjson_feat_type', methods=['POST'])  
-def readjson_feat_type():
+@app.route('/ML_questionaire', methods=['POST'])  
+def ML_questionaire():
     if request.is_json:
         req = request.get_json()
-        read_feat = req['feature'] #if read a list
-        return("read_feat type: "+type(read_feat))
+        read_feat = req['feature'] #readin as string, need convert to list of float
+        df3 = pd.DataFrame([read_feat])
+        predictions_ = loaded_model.predict(df3.values)
+        return predictions_
 
 @app.route('/readjson_feat_do2', methods=['POST'])  
 def readjson_feat_do2():
