@@ -84,6 +84,14 @@ def saysomething():
 #         return("read_feature type: "+type(read_feature)+":"+len(read_feature)+" "+type(df3)+":"+len(df3)+" "+type(df4))+":"+len(df4)
 
 
+@app.route('/readjson_patientName', methods=['POST'])  
+def readjsonpatientName():
+    if request.is_json:
+        req = request.get_json()
+        read_patientName = req['patientName'] #if read a list
+        return("patientName type: "+read_patientName)
+
+
 
 @app.route('/readjson', methods=['POST'])  
 def readjson():
@@ -93,7 +101,11 @@ def readjson():
             read_feature = req['feature'] #if read a list
             df3 = pd.DataFrame([read_feature])
             df4 = df3.values[0]
-            return("read_feature type: "+type(read_feature)+":"+len(read_feature)+" "+type(df3)+":"+len(df3)+" "+type(df4))+":"+len(df4)
+            return("read_feature type: "+
+                   type(read_feature)+":"+len(read_feature)+" "+
+                   type(df3)+":"+len(df3)+" "+
+                   type(df4)+":"+len(df4)
+                   )
     except BaseException:
         return(logging.exception("An exception was thrown!"))
 
