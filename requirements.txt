@@ -12,3 +12,4 @@ Pillow
 requests
 scikit-learn==1.2.2
 joblib
+EntropyHub
