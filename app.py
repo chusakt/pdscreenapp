@@ -151,6 +151,14 @@ def ML_questionaireORI3():
         # return jsonify({"uuid":uuid})
     
 
+@app.route('/ML_questionaireORI4', methods=['POST'])  
+def ML_questionaireORI4():
+    return jsonify({"prediction":0}) 
+
+@app.route('/ML_questionaireORI5', methods=['POST'])  
+def ML_questionaireORI5():
+    return jsonify({"prediction":"0"})   
+
 
 @app.route('/readjson_feat2', methods=['POST'])  
 def readjson_feat2():
