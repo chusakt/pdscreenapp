@@ -132,6 +132,24 @@ def ML_questionaireORI2():
         return ("predictin: "+str(predictions_))
     
 
+@app.route('/ML_questionaireORI3', methods=['POST'])  
+def ML_questionaireORI3():
+    if request.is_json:
+        req = request.get_json()
+        #read the request as web read in --------------------------------
+        read_feat = req['feature'] #readin as string, need convert to list of float
+        # handle to list of float
+        list_of_integers = [
+            float(item) if item.isdigit() else item
+            for item in read_feat.split(',')
+        ]
+        df3 = pd.DataFrame([list_of_integers])
+        predictions_ = loaded_model.predict(df3.values)
+        # print(predictions_[0])
+        # return ("predictin: "+predictions_[0])
+        return jsonify({"prediction":predictions_[0]}) 
+    
+
 
 @app.route('/readjson_feat2', methods=['POST'])  
 def readjson_feat2():
