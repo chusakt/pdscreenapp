@@ -1080,7 +1080,7 @@ def readjson():
             return("read_feature type: "+
                    type(read_feature)+":"+len(read_feature)+" "+
                    type(df3)+":"+len(df3)+" "+
-                   type(df4)+":"+len(df4)
+                   type(df4)+":"+len(df4) 
                    )
     except BaseException:
         return(logging.exception("An exception was thrown!"))
