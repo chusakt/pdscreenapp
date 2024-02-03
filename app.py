@@ -62,7 +62,10 @@ with open(model_pkl_file, 'rb') as file:
 model_pkl_file = "Model_pickle_dualtap_1_only_va.pkl"  
 with open(model_pkl_file, 'rb') as file:  
     loaded_model_d = pickle.load(file) 
-
+# --- load model ---
+model_pkl_file = "Model_pickle_pinchtosize_1_only_va.pkl"  
+with open(model_pkl_file, 'rb') as file:  
+    loaded_model_p = pickle.load(file) 
 
 app = Flask(__name__)
 
@@ -357,7 +360,7 @@ def predict_dualtap_featureprepare_and_predict():
 
 
 
-@app.route('/predict_pinchtosize_featureprepare', methods=['POST'])  
+@app.route('/predict_pinchtosize', methods=['POST'])  
 def predict_pinchtosize_featureprepare():
     if request.is_json:
         data = request.get_json()
@@ -526,18 +529,19 @@ def predict_pinchtosize_featureprepare():
         E14 = '%.5f'%(mts_start_max)
 
         rowx = [E0,E2,E4,E6,E8,E11,E12,E13,E14]
-        return jsonify({"mdia_std":E0,
-                        "mx1_std":E2,
-                        "mx2_std":E4,
-                        "my1_std":E6,
-                        "my2_std":E8,
-                        "allSignSwitchCount":E11,
-                        "mts_start_mean":E12,
-                        "mts_range_max":E13,
-                        "mts_start_max":E14                      
-                        }) 
-        # return ("predictin: "+str(predictions_[0]))
-    
+        df3 = pd.DataFrame([rowx])
+        predictions_ = loaded_model_d.predict(df3.values)
+        # return jsonify({"mdia_std":E0,
+        #                 "mx1_std":E2,
+        #                 "mx2_std":E4,
+        #                 "my1_std":E6,
+        #                 "my2_std":E8,
+        #                 "allSignSwitchCount":E11,
+        #                 "mts_start_mean":E12,
+        #                 "mts_range_max":E13,
+        #                 "mts_start_max":E14                      
+        #                 }) 
+        return jsonify({"prediction":str(predictions_[0])}) 
 
 
 
