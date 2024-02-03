@@ -98,8 +98,8 @@ def readjson_feat():
         read_feat = req['feature'] #if read a list
         return("read_feat : "+read_feat)
 
-@app.route('/ML_questionaireORI', methods=['POST'])  
-def ML_questionaireORI():
+@app.route('/predict_questionaire', methods=['POST'])  
+def predict_questionaire():
     if request.is_json:
         req = request.get_json()
         #read the request as web read in --------------------------------
@@ -111,53 +111,9 @@ def ML_questionaireORI():
         ]
         df3 = pd.DataFrame([list_of_integers])
         predictions_ = loaded_model.predict(df3.values)
-        # print(predictions_[0])
-        return ("predictin: 00000")
-
-
-@app.route('/ML_questionaireORI2', methods=['POST'])  
-def ML_questionaireORI2():
-    if request.is_json:
-        req = request.get_json()
-        #read the request as web read in --------------------------------
-        read_feat = req['feature'] #readin as string, need convert to list of float
-        # handle to list of float
-        list_of_integers = [
-            float(item) if item.isdigit() else item
-            for item in read_feat.split(',')
-        ]
-        df3 = pd.DataFrame([list_of_integers])
-        predictions_ = loaded_model.predict(df3.values)
-        # print(predictions_[0])
-        return ("predictin: "+str(predictions_[0]))
-    
-
-@app.route('/ML_questionaireORI3', methods=['POST'])  
-def ML_questionaireORI3():
-    if request.is_json:
-        req = request.get_json()
-        #read the request as web read in --------------------------------
-        read_feat = req['feature'] #readin as string, need convert to list of float
-        # handle to list of float
-        list_of_integers = [
-            float(item) if item.isdigit() else item
-            for item in read_feat.split(',')
-        ]
-        df3 = pd.DataFrame([list_of_integers])
-        predictions_ = loaded_model.predict(df3.values)
-        # print(predictions_[0])
         # return ("predictin: "+predictions_[0])
         return jsonify({"prediction":str(predictions_[0])}) 
-        # return jsonify({"uuid":uuid})
-    
-
-@app.route('/ML_questionaireORI4', methods=['POST'])  
-def ML_questionaireORI4():
-    return jsonify({"prediction":0}) 
-
-@app.route('/ML_questionaireORI5', methods=['POST'])  
-def ML_questionaireORI5():
-    return jsonify({"prediction":"0"})   
+        # return ("predictin: "+str(predictions_[0]))
 
 
 @app.route('/readjson_feat2', methods=['POST'])  
