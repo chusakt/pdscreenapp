@@ -112,7 +112,7 @@ def ML_questionaireORI():
         df3 = pd.DataFrame([list_of_integers])
         predictions_ = loaded_model.predict(df3.values)
         # print(predictions_[0])
-        return predictions_[0]
+        return (predictions_[0])
 
 @app.route('/ML_questionaire', methods=['POST'])  
 def ML_questionaire():
@@ -126,9 +126,9 @@ def ML_questionaire():
         #     for item in read_feat.split(',')
         # ]
         # df3 = pd.DataFrame([list_of_integers])
-        # df3 = pd.DataFrame([[1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1]])
+        df3 = pd.DataFrame([[1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1]])
         # predictions_ = loaded_model.predict(df3.values)
-        return 0
+        return (0)
     
 
 @app.route('/readjson_feat_do2', methods=['POST'])  
