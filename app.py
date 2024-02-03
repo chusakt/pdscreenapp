@@ -50,13 +50,14 @@ ENCODING = 'utf-8'
 # loaded_model = joblib.load('./model_only_va.joblib')
 import pickle
 # save the iris classification model as a pickle file
-model_pkl_file = "Model_pickle_questionaire_1_only_va.pkl"  
-# with open(model_pkl_file, 'wb') as file:  
-#     pickle.dump(rnd_clf, file)
 # --- load model ---
+model_pkl_file = "Model_pickle_questionaire_1_only_va.pkl"  
 with open(model_pkl_file, 'rb') as file:  
-    loaded_model = pickle.load(file) 
-
+    loaded_model_q = pickle.load(file) 
+# --- load model ---
+model_pkl_file = "Model_pickle_dualtap_1_only_va.pkl"  
+with open(model_pkl_file, 'rb') as file:  
+    loaded_model_d = pickle.load(file) 
 
 
 app = Flask(__name__)
@@ -110,10 +111,32 @@ def predict_questionaire():
             for item in read_feat.split(',')
         ]
         df3 = pd.DataFrame([list_of_integers])
-        predictions_ = loaded_model.predict(df3.values)
+        predictions_ = loaded_model_q.predict(df3.values)
         # return ("predictin: "+predictions_[0])
         return jsonify({"prediction":str(predictions_[0])}) 
         # return ("predictin: "+str(predictions_[0]))
+
+
+
+
+@app.route('/predict_dualtap', methods=['POST'])  
+def predict_dualtap():
+    if request.is_json:
+        req = request.get_json()
+        #read the request as web read in --------------------------------
+        read_feat = req['feature'] #readin as string, need convert to list of float
+        # handle to list of float
+        list_of_integers = [
+            float(item) if item.isdigit() else item
+            for item in read_feat.split(',')
+        ]
+        df3 = pd.DataFrame([list_of_integers])
+        predictions_ = loaded_model_d.predict(df3.values)
+        # return ("predictin: "+predictions_[0])
+        return jsonify({"prediction":str(predictions_[0])}) 
+        # return ("predictin: "+str(predictions_[0]))
+    
+
 
 
 @app.route('/readjson_feat2', methods=['POST'])  
