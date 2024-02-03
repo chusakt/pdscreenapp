@@ -262,7 +262,7 @@ def predict_dualtap_featureprepare():
 
 
 @app.route('/predict_dualtap_featureprepare_and_predict', methods=['POST'])  
-def predict_dualtap_featureprepare():
+def predict_dualtap_featureprepare_and_predict():
     if request.is_json:
         data = request.get_json()
         i = data['score']
