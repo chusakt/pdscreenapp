@@ -96,10 +96,7 @@ def readjson_feat():
     if request.is_json:
         req = request.get_json()
         read_feat = req['feature'] #if read a list
-        df3 = pd.DataFrame([read_feat])
-
-        return("read_feat : "+read_feat+type(read_feat)+"\n"+
-               str(df3))
+        return("read_feat : "+read_feat+", type:"+type(read_feat))
 
 @app.route('/readjson', methods=['POST'])  
 def readjson():
