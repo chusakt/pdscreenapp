@@ -119,6 +119,26 @@ def predict_questionaire():
 
 
 
+@app.route('/predict_dualtap_fromFeature', methods=['POST'])  
+def predict_dualtap_fromFeature():
+    if request.is_json:
+        req = request.get_json()
+        #read the request as web read in --------------------------------
+        read_feat = req['feature'] #readin as string, need convert to list of float
+        # handle to list of float
+        list_of_integers = [
+            float(item) if item.isdigit() else item
+            for item in read_feat.split(',')
+        ]
+        df3 = pd.DataFrame([list_of_integers])
+        predictions_ = loaded_model_d.predict(df3.values)
+        # return ("predictin: "+predictions_[0])
+        return jsonify({"prediction":str(predictions_[0])}) 
+        # return ("predictin: "+str(predictions_[0]))
+    
+
+
+
 @app.route('/predict_dualtap', methods=['POST'])  
 def predict_dualtap():
     if request.is_json:
@@ -134,6 +154,16 @@ def predict_dualtap():
         predictions_ = loaded_model_d.predict(df3.values)
         # return ("predictin: "+predictions_[0])
         return jsonify({"prediction":str(predictions_[0])}) 
+        # return ("predictin: "+str(predictions_[0]))
+    
+
+@app.route('/predict_dualtap_featureprepare', methods=['POST'])  
+def predict_dualtap_featureprepare():
+    if request.is_json:
+        data = request.get_json()
+        i = data['score']
+        aScor = i
+        return jsonify({"aScor":str(aScor)}) 
         # return ("predictin: "+str(predictions_[0]))
     
 
