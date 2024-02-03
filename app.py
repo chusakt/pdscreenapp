@@ -47,6 +47,9 @@ import traceback
 import joblib
 import math 
 
+def moving_average(x, w):
+    return np.convolve(x, np.ones(w), 'valid') / w
+
 ENCODING = 'utf-8'
 # loaded_model = joblib.load('./model_only_va.joblib')
 import pickle
@@ -350,6 +353,192 @@ def predict_dualtap_featureprepare_and_predict():
         predictions_ = loaded_model_d.predict(df3.values)
         # return ("predictin: "+predictions_[0])
         return jsonify({"prediction":str(predictions_[0])}) 
+
+
+
+
+@app.route('/predict_pinchtosize_featureprepare', methods=['POST'])  
+def predict_pinchtosize_featureprepare():
+    if request.is_json:
+        data = request.get_json()
+        CountAllHandOff = 0
+        allSignSwitchCount = 0
+        mdiaOuter = []
+
+        x_mts_start_stack = []
+        x_mts_end_stack = []
+
+        x_norm_std_stack = []
+        x_norm_mean_stack = []
+
+        x_mx1_std_stack = []
+        x_mx1_mean_stack = []
+
+        x_mx2_std_stack = []
+        x_mx2_mean_stack = []
+
+        x_my1_std_stack = []
+        x_my1_mean_stack = []
+        
+        x_my2_std_stack = []
+        x_my2_mean_stack = []
+        
+
+        i = data['data']
+        for indata in i:
+            j_meta = indata['meta']
+            print('----- each meta------')
+            # print('fr : ',fr)
+            # print('target : ',j_meta['target'])
+            j_indata = indata['data']
+            # fig, ax = plt.subplots()
+            # mts,mx1,mx2,my1,my2,mdia,mcx,mcy=[],[],[],[],[],[],[],[]
+            for k_injdata in j_indata:
+                CountAllHandOff += 1
+                # print('count  : ',len(k_injdata))
+                mts,mx1,mx2,my1,my2,mdia,mcx,mcy=[],[],[],[],[],[],[],[]
+                print('   --> each data  ')
+                for m_inkdata in k_injdata:
+                    mts.append(m_inkdata['timestamp'])
+                    mx1.append(m_inkdata['x1'])
+                    mx2.append(m_inkdata['x2'])
+                    my1.append(m_inkdata['y1'])
+                    my2.append(m_inkdata['y2'])
+                    mdia.append(m_inkdata['diameter'])
+                    mcx.append(m_inkdata['center']['x'])
+                    mcy.append(m_inkdata['center']['y'])
+                # -- try some smooth
+                mvWindow = 25
+                if len(mdia) > mvWindow+1:
+                    # fig, ax = plt.subplots()
+                    # fig.set_size_inches(3, 3)
+                    mav = moving_average(mdia, 25)
+                    # -- count sign change of comparison
+                    signSwitchCount = 0
+                    for idx,dat_ in enumerate(mav):
+                        if idx == 0:
+                            mvToRaw_a = (dat_>mdia[idx])
+                        else:
+                            mvToRaw_b = (dat_>mdia[idx])
+                            if mvToRaw_b != mvToRaw_a:
+                                signSwitchCount +=1
+                                mvToRaw_a = mvToRaw_b
+                    allSignSwitchCount = allSignSwitchCount + signSwitchCount
+
+            mts_ar = np.array(mts)
+            mts_start = np.array(mts[0])
+            mts_end = np.array(mts[-1])
+            print(mts_start, mts_end)
+
+            mdia_ar = np.array(mdia)
+            x_norm_ar = (mdia_ar-np.min(mdia_ar))/(np.max(mdia_ar)-np.min(mdia_ar))
+            x_norm_std = np.std(x_norm_ar)
+            x_norm_mean = np.mean(x_norm_ar)
+            # x_norm_std = np.std(mdia_ar)
+            # x_norm_mean = np.mean(mdia_ar)
+
+            mdia_ar = np.array(mx1)
+            x_norm_ar = (mdia_ar-np.min(mdia_ar))/(np.max(mdia_ar)-np.min(mdia_ar))
+            x_mx1_std = np.std(x_norm_ar)
+            x_mx1_mean = np.mean(x_norm_ar)
+            # x_mx1_std = np.std(mdia_ar)
+            # x_mx1_mean = np.mean(mdia_ar)                
+
+            mdia_ar = np.array(mx2)
+            x_norm_ar = (mdia_ar-np.min(mdia_ar))/(np.max(mdia_ar)-np.min(mdia_ar))
+            x_mx2_std = np.std(x_norm_ar)
+            x_mx2_mean = np.mean(x_norm_ar)
+            # x_mx2_std = np.std(mdia_ar)
+            # x_mx2_mean = np.mean(mdia_ar)
+
+            mdia_ar = np.array(my1)
+            x_norm_ar = (mdia_ar-np.min(mdia_ar))/(np.max(mdia_ar)-np.min(mdia_ar))
+            x_my1_std = np.std(x_norm_ar)
+            x_my1_mean = np.mean(x_norm_ar)
+            # x_my1_std = np.std(mdia_ar)
+            # x_my1_mean = np.mean(mdia_ar)
+
+            mdia_ar = np.array(my2)
+            x_norm_ar = (mdia_ar-np.min(mdia_ar))/(np.max(mdia_ar)-np.min(mdia_ar))
+            x_my2_std = np.std(x_norm_ar)
+            x_my2_mean = np.mean(x_norm_ar)
+            # x_my2_std = np.std(mdia_ar)
+            # x_my2_mean = np.mean(mdia_ar)
+
+            # ----------- append to create over all  -----------
+            x_mts_start_stack.append(mts_start)
+            x_mts_end_stack.append(mts_end)
+
+            x_norm_std_stack.append(x_norm_std)
+            x_norm_mean_stack.append(x_norm_mean)
+
+            x_mx1_std_stack.append(x_mx1_std)
+            x_mx1_mean_stack.append(x_mx1_mean)
+
+            x_mx2_std_stack.append(x_mx2_std)
+            x_mx2_mean_stack.append(x_mx2_mean)
+
+            x_my1_std_stack.append(x_my1_std)
+            x_my1_mean_stack.append(x_my1_mean)
+            
+            x_my2_std_stack.append(x_my2_std)
+            x_my2_mean_stack.append(x_my2_mean)
+                                                            
+
+        # in each file: record ...
+        mts_start_mean = np.mean(x_mts_start_stack)
+        mts_start_max = np.max(x_mts_start_stack)
+        mts_range_max = np.max(x_mts_end_stack)
+
+        mdia_std = np.mean(x_norm_std_stack)
+        # mdia_mean = np.mean(x_norm_mean_stack)
+
+        mx1_std = np.mean(x_mx1_std_stack)
+        # mx1_mean = np.mean(x_mx1_mean_stack)
+
+        mx2_std = np.mean(x_mx2_std_stack)
+        # mx2_mean = np.mean(x_mx2_mean_stack)
+
+        my1_std = np.mean(x_my1_std_stack)
+        # my1_mean = np.mean(x_my1_mean_stack)
+
+        my2_std = np.mean(x_my2_std_stack)
+        # my2_mean = np.mean(x_my2_mean_stack)
+
+
+        # mdiaOuter.append(x_norm_std)
+        row = []
+
+        E0 = '%.5f'%(mdia_std)
+        # E1 = '%.5f'%(mdia_mean)
+        E2 = '%.5f'%(mx1_std)
+        # E3 = '%.5f'%(mx1_mean)
+        E4 = '%.5f'%(mx2_std)
+        # E5 = '%.5f'%(mx2_mean)
+        E6 = '%.5f'%(my1_std)
+        # E7 = '%.5f'%(my1_mean)
+        E8 = '%.5f'%(my2_std)
+        # E9 = '%.5f'%(my2_mean)
+        # E10 = '%.5f'%(CountAllHandOff)
+        E11 = '%.5f'%(allSignSwitchCount)
+        E12 = '%.5f'%(mts_start_mean)
+        E13 = '%.5f'%(mts_range_max)
+        E14 = '%.5f'%(mts_start_max)
+
+        rowx = [E0,E2,E4,E6,E8,E11,E12,E13,E14]
+        return jsonify({"mdia_std":E0,
+                        "mx1_std":E2,
+                        "mx2_std":E4,
+                        "my1_std":E6,
+                        "my2_std":E8,
+                        "allSignSwitchCount":E11,
+                        "mts_start_mean":E12,
+                        "mts_range_max":E13,
+                        "mts_start_max":E14                      
+                        }) 
+        # return ("predictin: "+str(predictions_[0]))
+    
+
 
 
 @app.route('/readjson_feat2', methods=['POST'])  
