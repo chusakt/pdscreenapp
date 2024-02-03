@@ -87,7 +87,10 @@ with open(model_pkl_file, 'rb') as file:
 model_pkl_file = "Model_pickle_gait_stab_1.pkl"  
 with open(model_pkl_file, 'rb') as file:  
     loaded_model_gs = pickle.load(file) 
-
+# --- load model ---
+model_pkl_file = "Model_pickle_gait_walk_1.pkl"  
+with open(model_pkl_file, 'rb') as file:  
+    loaded_model_gw = pickle.load(file) 
 
 app = Flask(__name__)
 
@@ -846,6 +849,95 @@ def predict_gait_stab():
         predictions_ = loaded_model_gs.predict(X)        
         return jsonify({"prediction":str(predictions_[0])}) 
     
+
+
+@app.route('/predict_gait_walk', methods=['POST'])  
+def predict_gait_walk():
+    if request.is_json:
+        data = request.get_json()
+        tStamp = []
+        acX = []
+        acY = []
+        acZ = []
+        agX = []
+        agY = []
+        agZ = []
+
+        for i in data['motion']:
+            # tsC = i['ts']
+            # tStamp.append(tsC)
+            acXC = i['data'][0]
+            acYC = i['data'][1]
+            acZC = i['data'][2]    
+            acX.append(acXC)
+            acY.append(acYC)
+            acZ.append(acZC) 
+
+            agXC = i['data'][3]
+            agYC = i['data'][4]
+            agZC = i['data'][5]    
+            agX.append(agXC)
+            agY.append(agYC)
+            agZ.append(agZC) 
+
+        tst = [item - tStamp[0] for item in tStamp]
+
+        # ------------  handle the oversampling to 200 samples in 20 sec
+        if len(acX) > 200:
+            toBeSamp = 200
+            # print('----> ' + str(filepath))
+            acX, x1 = signal.resample(acX,toBeSamp,np.arange(len(acX)))  # resampled at 200
+            acY, x1 = signal.resample(acY,toBeSamp,np.arange(len(acY)))  # resampled 
+            acZ, x1 = signal.resample(acZ,toBeSamp,np.arange(len(acZ)))  # resampled 
+            agX, x1 = signal.resample(agX,toBeSamp,np.arange(len(agX)))  # resampled 
+            agY, x1 = signal.resample(agY,toBeSamp,np.arange(len(agY)))  # resampled
+            agZ, x1 = signal.resample(agZ,toBeSamp,np.arange(len(agZ)))  # resampled
+
+        row = []
+        for testsig in (acX,acY,acZ,agX,agY,agZ):
+        # for testsig in (acX,acY,acZ):
+            testsig_filt = signal.sosfilt(sos, testsig)
+            res = np.array(testsig_filt)
+            fourier = fft(testsig_filt)
+            fab = np.abs(fourier)[0:100]
+            # ------------ 
+            Esum = sum(np.square(fab))
+            # Esum = 1.0
+            # base = 2  # work in units of bits
+            F1 = sum(np.square(fab[0:25]))
+            F2 = sum(np.square(fab[25:50]))
+            F3 = sum(np.square(fab[50:75]))
+            F4 = sum(np.square(fab[75:80]))
+
+            kur = kurtosis(testsig_filt, fisher=True)
+            ske = skew(testsig_filt, bias=False)
+            resdif = res[1:]-res[0:-1]
+            Mobi = np.sqrt(np.var(resdif)/np.var(res))
+            resdif2 = resdif[1:]-resdif[0:-1]
+            compx = np.sqrt(np.var(resdif2)*np.var(res)/(np.var(resdif)*np.var(resdif)))
+
+            E1 = '%.5f'%(np.std(testsig_filt))           
+            E2 = '%.5f'%(np.mean(testsig_filt))                     
+            E3 = '%.5f'%(kur)
+            E4 = '%.5f'%(ske)
+            E5 = '%.5f'%(Mobi)   
+            E6 = '%.5f'%(compx)                              
+            E7 = '%.5f'%(F1) 
+            E8 = '%.5f'%(F2) 
+            E9 = '%.5f'%(F3) 
+            E10 = '%.5f'%(F4) 
+            E11 = '%.5f'%(F2/Esum)
+            E12 = '%.5f'%(F3/Esum)
+            E13 = '%.5f'%(np.var(resdif2))
+            rowx = [E1,E2,E3,E4,E5,E6,E7,E8,E9,E10,E11,E12,E13]
+            row = row + rowx
+        
+        toListofNumber = [float(x) for x in row]
+        X = np.array([toListofNumber])
+        predictions_ = loaded_model_gw.predict(X)        
+        return jsonify({"prediction":str(predictions_[0])}) 
+    
+
 
 
 
