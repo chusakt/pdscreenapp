@@ -147,7 +147,7 @@ def ML_questionaireORI3():
         predictions_ = loaded_model.predict(df3.values)
         # print(predictions_[0])
         # return ("predictin: "+predictions_[0])
-        return jsonify({"prediction":predictions_[0]}) 
+        return jsonify({"prediction":str(predictions_[0])}) 
         # return jsonify({"uuid":uuid})
     
 
