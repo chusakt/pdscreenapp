@@ -750,15 +750,13 @@ def predict_tremor_rest_withpredict():
             E16 = '%.5f'%(np.percentile(testsig_filt, 25))
             E17 = '%.5f'%(np.percentile(testsig_filt, 50))
             E18 = '%.5f'%(np.percentile(testsig_filt, 75))
-            # # zero_crossing
-            # E19 = '%.5f'%(len(np.where(np.diff(np.sign(testsig)))[0]))
 
             rowx = [E1,E2,E3,E4,E5,E6,E7,E8,E9,E10,E11,E12,E13,E14,E15,E16,E17,E18]
             row = row + rowx
         
-        data_X_df = pd.DataFrame(row)
-        X = np.array(data_X_df)
-        predictions_ = loaded_model_tr.predict(X)
+        toListofNumber = [float(x) for x in row]
+        X = np.array([toListofNumber])
+        predictions_ = loaded_model_tr.predict(X)        
         return jsonify({"prediction":str(predictions_[0])}) 
     
 
