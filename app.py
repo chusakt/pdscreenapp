@@ -146,8 +146,8 @@ def predict_dualtap_fromFeature():
 
 
 
-@app.route('/predict_dualtap', methods=['POST'])  
-def predict_dualtap():
+@app.route('/predict_dualtap_fromFeature', methods=['POST'])  
+def predict_dualtap_fromFeature():
     if request.is_json:
         req = request.get_json()
         #read the request as web read in --------------------------------
@@ -267,8 +267,8 @@ def predict_dualtap_featureprepare():
     
 
 
-@app.route('/predict_dualtap_featureprepare_and_predict', methods=['POST'])  
-def predict_dualtap_featureprepare_and_predict():
+@app.route('/predict_dualtap', methods=['POST'])  
+def predict_dualtap():
     if request.is_json:
         data = request.get_json()
         i = data['score']
