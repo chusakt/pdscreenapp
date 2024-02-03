@@ -133,9 +133,9 @@ def readjson_feat2():
     if request.is_json:
         req = request.get_json()
         read_feat = req['feature'] #if read a list
-        return(1000000)
+        return(read_feat)
     
-    
+
 
 @app.route('/readjson_feat_do2', methods=['POST'])  
 def readjson_feat_do2():
