@@ -71,17 +71,34 @@ def saysomething():
     return ("now what ------------777788")
 
 
+# @app.route('/readjson', methods=['POST'])  
+# def readjson():
+#     # --- load model ---
+#     # modelfile = "model_questionaire2.joblib"
+#     # loaded_model = joblib.load("model_questionaire2.joblib")
+#     if request.is_json:
+#         req = request.get_json()
+#         read_feature = req['feature'] #if read a list
+#         df3 = pd.DataFrame([read_feature])
+#         df4 = df3.values[0]
+#         return("read_feature type: "+type(read_feature)+":"+len(read_feature)+" "+type(df3)+":"+len(df3)+" "+type(df4))+":"+len(df4)
+
+
+
 @app.route('/readjson', methods=['POST'])  
 def readjson():
-    # --- load model ---
-    # modelfile = "model_questionaire2.joblib"
-    # loaded_model = joblib.load("model_questionaire2.joblib")
-    if request.is_json:
-        req = request.get_json()
-        read_feature = req['feature'] #if read a list
-        df3 = pd.DataFrame([read_feature])
-        df4 = df3.values[0]
-        return("read_feature type: "+type(df4))
+    try:
+        if request.is_json:
+            req = request.get_json()
+            read_feature = req['feature'] #if read a list
+            df3 = pd.DataFrame([read_feature])
+            df4 = df3.values[0]
+            return("read_feature type: "+type(read_feature)+":"+len(read_feature)+" "+type(df3)+":"+len(df3)+" "+type(df4))+":"+len(df4)
+    except BaseException:
+        return(logging.exception("An exception was thrown!"))
+
+
+
 
 
 @app.route('/simpleML', methods=['POST'])  
