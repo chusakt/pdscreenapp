@@ -126,7 +126,7 @@ def ML_questionaire():
         #     for item in read_feat.split(',')
         # ]
         # df3 = pd.DataFrame([list_of_integers])
-        df3 = pd.DataFrame([[1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1]])
+        # df3 = pd.DataFrame([[1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1]])
         # predictions_ = loaded_model.predict(df3.values)
         return 0
     
