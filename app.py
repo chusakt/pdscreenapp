@@ -146,22 +146,22 @@ def predict_dualtap_fromFeature():
 
 
 
-@app.route('/predict_dualtap_fromFeature', methods=['POST'])  
-def predict_dualtap_fromFeature():
-    if request.is_json:
-        req = request.get_json()
-        #read the request as web read in --------------------------------
-        read_feat = req['feature'] #readin as string, need convert to list of float
-        # handle to list of float
-        list_of_integers = [
-            float(item) if item.isdigit() else item
-            for item in read_feat.split(',')
-        ]
-        df3 = pd.DataFrame([list_of_integers])
-        predictions_ = loaded_model_d.predict(df3.values)
-        # return ("predictin: "+predictions_[0])
-        return jsonify({"prediction":str(predictions_[0])}) 
-        # return ("predictin: "+str(predictions_[0]))
+# @app.route('/predict_dualtap_fromFeature', methods=['POST'])  
+# def predict_dualtap_fromFeature():
+#     if request.is_json:
+#         req = request.get_json()
+#         #read the request as web read in --------------------------------
+#         read_feat = req['feature'] #readin as string, need convert to list of float
+#         # handle to list of float
+#         list_of_integers = [
+#             float(item) if item.isdigit() else item
+#             for item in read_feat.split(',')
+#         ]
+#         df3 = pd.DataFrame([list_of_integers])
+#         predictions_ = loaded_model_d.predict(df3.values)
+#         # return ("predictin: "+predictions_[0])
+#         return jsonify({"prediction":str(predictions_[0])}) 
+#         # return ("predictin: "+str(predictions_[0]))
     
 
 @app.route('/predict_dualtap_featureprepare', methods=['POST'])  
