@@ -129,7 +129,7 @@ def ML_questionaireORI2():
         df3 = pd.DataFrame([list_of_integers])
         predictions_ = loaded_model.predict(df3.values)
         # print(predictions_[0])
-        return ("predictin: "+str(predictions_))
+        return ("predictin: "+str(predictions_[0]))
     
 
 @app.route('/ML_questionaireORI3', methods=['POST'])  
@@ -148,6 +148,7 @@ def ML_questionaireORI3():
         # print(predictions_[0])
         # return ("predictin: "+predictions_[0])
         return jsonify({"prediction":predictions_[0]}) 
+        # return jsonify({"uuid":uuid})
     
 
 
