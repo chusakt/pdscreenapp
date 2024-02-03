@@ -89,9 +89,14 @@ def readjsonpatientName():
     if request.is_json:
         req = request.get_json()
         read_patientName = req['patientName'] #if read a list
-        return("patientName type: "+read_patientName)
+        return("patientName : "+read_patientName)
 
-
+@app.route('/readjson_feat', methods=['POST'])  
+def readjson_feat():
+    if request.is_json:
+        req = request.get_json()
+        read_feat = req['feature'] #if read a list
+        return("read_feat : "+read_feat)
 
 @app.route('/readjson', methods=['POST'])  
 def readjson():
