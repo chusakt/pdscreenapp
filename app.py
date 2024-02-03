@@ -102,10 +102,21 @@ def readjson_feat():
 def ML_questionaire():
     if request.is_json:
         req = request.get_json()
+        #read the request as web read in --------------------------------
         read_feat = req['feature'] #readin as string, need convert to list of float
-        df3 = pd.DataFrame([read_feat])
+        # handle to list of float
+        list_of_integers = [
+            float(item) if item.isdigit() else item
+            for item in read_feat.split(',')
+        ]
+        print(list_of_integers)  # 👉️ [1, 2, 3, 4]
+
+        df3 = pd.DataFrame([list_of_integers])
+        # jsondf3 = df3.to_json() 
+        # print(jsondf3)
         predictions_ = loaded_model.predict(df3.values)
-        return predictions_
+        # print(predictions_[0])
+        return predictions_[0]
 
 @app.route('/readjson_feat_do2', methods=['POST'])  
 def readjson_feat_do2():
