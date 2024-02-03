@@ -1033,8 +1033,6 @@ def predict_gait_walk():
     
 
 
-
-
 @app.route('/readjson_feat2', methods=['POST'])  
 def readjson_feat2():
     # if request.is_json:
