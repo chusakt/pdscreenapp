@@ -361,7 +361,7 @@ def predict_dualtap_featureprepare_and_predict():
 
 
 @app.route('/predict_pinchtosize', methods=['POST'])  
-def predict_pinchtosize_featureprepare():
+def predict_pinchtosize():
     if request.is_json:
         data = request.get_json()
         CountAllHandOff = 0
@@ -530,7 +530,7 @@ def predict_pinchtosize_featureprepare():
 
         rowx = [E0,E2,E4,E6,E8,E11,E12,E13,E14]
         df3 = pd.DataFrame([rowx])
-        predictions_ = loaded_model_d.predict(df3.values)
+        predictions_ = loaded_model_p.predict(df3.values)
         # return jsonify({"mdia_std":E0,
         #                 "mx1_std":E2,
         #                 "mx2_std":E4,
