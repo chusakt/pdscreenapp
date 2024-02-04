@@ -99,6 +99,11 @@ with open(model_pkl_file, 'rb') as file:
 model_pkl_file = "Model_pickle_gait_walk_1.pkl"  
 with open(model_pkl_file, 'rb') as file:  
     loaded_model_gw = pickle.load(file) 
+# --- load model ---
+model_pkl_file = "Model_pickle_voice_ahh_1.pkl"  
+with open(model_pkl_file, 'rb') as file:  
+    loaded_model_va = pickle.load(file) 
+
 
 app = Flask(__name__)
 
@@ -1136,9 +1141,11 @@ def predict_voice_ahh():
         xsquaredsum = (0.5 ** 2) + (1.5 ** 2) + (2.5 ** 2) + (3.5 ** 2)
         df['delta_f'] = xysum / xsquaredsum
         df['vtl_delta_f'] = 35000 / (2 * df['delta_f'])
-
-        # predictions_ = loaded_model_gw.predict(X)        
-        return jsonify({"show something":str('this is something')}) 
+        data_X_df = df.drop(['duration'],axis=1)
+        X = np.array(data_X_df)
+        predictions_ = loaded_model_va.predict(X)        
+        # return jsonify({"show something":str('this is something')}) 
+        return jsonify({"prediction":str(predictions_[0])}) 
 
 
 
