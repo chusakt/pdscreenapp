@@ -103,7 +103,10 @@ with open(model_pkl_file, 'rb') as file:
 model_pkl_file = "Model_pickle_voice_ahh_1.pkl"  
 with open(model_pkl_file, 'rb') as file:  
     loaded_model_va = pickle.load(file) 
-
+# --- load model ---
+model_pkl_file = "Model_pickle_voice_ypl_1.pkl"  
+with open(model_pkl_file, 'rb') as file:  
+    loaded_model_vy = pickle.load(file) 
 
 app = Flask(__name__)
 
