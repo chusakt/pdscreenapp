@@ -1073,7 +1073,7 @@ def predict_voice_ahh():
     if request.is_json:
         jsonData = request.get_json()
         pName = jsonData["patientName"]
-        voicebase64 = jsonData["voice"]
+        voicebase64 = jsonData["data"]
         wavFilename = pName+"_temp.wav"
         wavFile= open(wavFilename, "wb")
         voicedecoded = base64.b64decode(voicebase64)
@@ -1185,7 +1185,7 @@ def predict_voice_ypl():
     if request.is_json:
         jsonData = request.get_json()
         pName = jsonData["patientName"]
-        voicebase64 = jsonData["voice"]
+        voicebase64 = jsonData["data"]
         wavFilename = pName+"_temp.wav"
         wavFile= open(wavFilename, "wb")
         voicedecoded = base64.b64decode(voicebase64)
