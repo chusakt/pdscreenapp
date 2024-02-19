@@ -239,7 +239,7 @@ def predict_questionaire():
         if request.is_json:
             req = request.get_json()
             #read the request as web read in --------------------------------
-            read_feat = req['feature'] #readin as string, need convert to list of float
+            read_feat = req['data'] #readin as string, need convert to list of float
             # handle to list of float
             list_of_integers = [
                 float(item) if item.isdigit() else item
