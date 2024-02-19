@@ -1373,3 +1373,33 @@ def simpleML():
 # acc = accuracy_score(y_test_sub, predictions_)
 # print('test load model and predict: accuracy: ',acc)
 
+
+
+
+# +++++++++++++++++++++++++++++++++
+#
+# +++++++++++++++++++++++++++++++++
+@app.route('/predict_voting', methods=['POST'])  
+def predict_voting():
+    filenamecombination = 'listof_best_combination.csv'
+    # create lists to put the results
+    try:
+        if request.is_json:
+            jsonData = request.get_json()
+            test_available = jsonData["test_available"]     
+            test_result = jsonData["test_result"] 
+            # test_available = ['ques', 'voiS', 'voiA', 'post', '', '', 'stbl', '', '']
+            # test_result = ['0', '1', '1', '1', '-1', '-1', '0', '-1', '-1']
+            with open(filenamecombination) as file_obj: 
+                reader_obj = csv.reader(file_obj) 
+                # Iterate over each row in the csv  
+                for row in reader_obj: 
+                    phrase_to_list = row[0].split("\t")
+                    if (phrase_to_list==test_available):
+                        test_result_number = [ int(x) for x in test_result ]
+                        if test_result_number.count(1) >= test_result_number.count(0):
+                            return jsonify({"prediction":str(1)}) 
+                        else:
+                            return jsonify({"prediction":str(0)}) 
+    except:
+        return jsonify({"prediction":str(2)}) 
