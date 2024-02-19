@@ -1396,10 +1396,11 @@ def predict_voting():
                 for row in reader_obj: 
                     phrase_to_list = row[0].split("\t")
                     if (phrase_to_list==test_available):
-                        test_result_number = [ int(x) for x in test_result ]
-                        if test_result_number.count(1) >= test_result_number.count(0):
-                            return jsonify({"prediction":str(1)}) 
-                        else:
-                            return jsonify({"prediction":str(0)}) 
+                        return jsonify({"prediction":str(1)}) 
+                        # test_result_number = [ int(x) for x in test_result ]
+                        # if test_result_number.count(1) >= test_result_number.count(0):
+                        #     return jsonify({"prediction":str(1)}) 
+                        # else:
+                        #     return jsonify({"prediction":str(0)}) 
     except:
         return jsonify({"prediction":str(2)}) 
