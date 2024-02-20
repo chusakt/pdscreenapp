@@ -1410,7 +1410,7 @@ def predict_voting():
 #
 # +++++++++++++++++++++++++++++++++
 @app.route('/predict_voting2', methods=['POST'])  
-def predict_voting():
+def predict_voting2():
     filenamecombination = 'listof_best_combination.csv'
     # create lists to put the results
     try:
