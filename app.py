@@ -1504,7 +1504,7 @@ def checkEn2():
 #
 # +++++++++++++++++++++++++++++++++
 @app.route('/predict_questionaire_chk', methods=['POST'])  
-def predict_questionaire():
+def predict_questionaire_chk():
    
     try:
         f = open("readke", mode="rb")
