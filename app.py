@@ -1452,12 +1452,7 @@ def checkEn():
         key = file.read().rstrip()
     fernet = Fernet(key)
 
-    if request.is_json:
-        jsonData = request.get_json()
-        encrypted = jsonData["mocking"]
-        
-    decrypted = fernet.decrypt(encrypted).decode()
-    return jsonify({decrypted}) 
+    return jsonify({key}) 
 
 
 
@@ -1475,7 +1470,7 @@ def checkEn2():
         encrypted = jsonData["mocking"]
         
     decrypted = fernet.decrypt(encrypted).decode()
-    if decrypted == "B-fKY3u5qQbq1kE1_UxI-2KKIve3ow8kVjKOHe4arg=":
+    if decrypted == "thisisaoriginalstring":
         return jsonify({"good to go"}) 
     else:
         return jsonify({"prediction":str(2)}) 
