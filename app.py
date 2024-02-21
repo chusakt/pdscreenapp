@@ -37,6 +37,8 @@ from sklearn.pipeline import Pipeline
 import pickle
 import EntropyHub as EH
 
+from cryptography.fernet import Fernet
+
 # built-in lib
 import time, threading, csv, random, json
 from datetime import datetime, timedelta
@@ -1441,3 +1443,18 @@ def predict_voting():
         return jsonify({"prediction":str(2)}) 
 
 
+# +++++++++++++++++++++++++++++++++
+#
+# +++++++++++++++++++++++++++++++++
+@app.route('/checkEn', methods=['POST'])  
+def checkEn():
+    with open('readmeK.txt', 'r') as file:
+        key = file.read().rstrip()
+    fernet = Fernet(key)
+
+    if request.is_json:
+        jsonData = request.get_json()
+        encrypted = jsonData["encrypted"]
+        
+    decrypted = fernet.decrypt(encrypted).decode()
+    return jsonify(decrypted) 
