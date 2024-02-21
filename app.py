@@ -1456,10 +1456,10 @@ def checkEn():
         f = open("readke", mode="rb")
         data = f.read()
         f.close()
-        fernet = Fernet(data)
-        decMessage = fernet.decrypt(encMessage).decode()
+        # fernet = Fernet(data)
+        # decMessage = fernet.decrypt(encMessage).decode()
 
-        return jsonify({decMessage}) 
+        return jsonify({"prediction":str(2)}) 
 
 
 
