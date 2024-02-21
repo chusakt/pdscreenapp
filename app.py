@@ -1477,7 +1477,7 @@ def checkEn3():
         fernet = Fernet(data)
         decMessage = fernet.decrypt(encMessage).decode()
 
-        return jsonify({"prediction":"1"}) 
+        return jsonify({"prediction":str(decMessage)}) 
 
 # +++++++++++++++++++++++++++++++++
 #
@@ -1493,7 +1493,7 @@ def checkEn2():
         encrypted = jsonData["mocking"]
         
     decrypted = fernet.decrypt(encrypted).decode()
-    if decrypted == "thisisaoriginalstring":
+    if str(decrypted) == "thisisaoriginalstring":
         return jsonify({"good to go"}) 
     else:
         return jsonify({"prediction":str(2)}) 
