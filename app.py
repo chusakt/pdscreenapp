@@ -1471,13 +1471,13 @@ def checkEn3():
         encrypted = jsonData["mocking"]
         encMessage = str.encode(encrypted)
 
-        # f = open("readke", mode="rb")
-        # data = f.read()
-        # f.close()
-        # fernet = Fernet(data)
-        # decMessage = fernet.decrypt(encMessage).decode()
+        f = open("readke", mode="rb")
+        data = f.read()
+        f.close()
+        fernet = Fernet(data)
+        decMessage = fernet.decrypt(encMessage).decode()
 
-        return jsonify({"prediction":encMessage}) 
+        return jsonify({"prediction":"1"}) 
 
 # +++++++++++++++++++++++++++++++++
 #
