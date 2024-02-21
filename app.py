@@ -68,6 +68,11 @@ def moving_average(x, w):
 # design hipass filter
 sos = signal.butter(0, 1, 'hp', fs=10, output='sos')
 
+# load key
+f = open("readke", mode="rb")
+masterkey = f.read()
+f.close() 
+
 
 ENCODING = 'utf-8'
 # loaded_model = joblib.load('./model_only_va.joblib')
@@ -1443,29 +1448,29 @@ def predict_voting():
         return jsonify({"prediction":str(2)}) 
 
 
+# # +++++++++++++++++++++++++++++++++
+# #
+# # +++++++++++++++++++++++++++++++++
+# @app.route('/checkEn', methods=['POST'])  
+# def checkEn():
+#     if request.is_json:
+#         jsonData = request.get_json()
+#         encrypted = jsonData["mocking"]
+#         encMessage = str.encode(encrypted)
+
+#         f = open("readke", mode="rb")
+#         data = f.read()
+#         f.close()
+#         # fernet = Fernet(data)
+#         # decMessage = fernet.decrypt(encMessage).decode()
+
+#         return jsonify({"prediction":str(2)}) 
+
 # +++++++++++++++++++++++++++++++++
 #
 # +++++++++++++++++++++++++++++++++
 @app.route('/checkEn', methods=['POST'])  
 def checkEn():
-    if request.is_json:
-        jsonData = request.get_json()
-        encrypted = jsonData["mocking"]
-        encMessage = str.encode(encrypted)
-
-        f = open("readke", mode="rb")
-        data = f.read()
-        f.close()
-        # fernet = Fernet(data)
-        # decMessage = fernet.decrypt(encMessage).decode()
-
-        return jsonify({"prediction":str(2)}) 
-
-# +++++++++++++++++++++++++++++++++
-#
-# +++++++++++++++++++++++++++++++++
-@app.route('/checkEn3', methods=['POST'])  
-def checkEn3():
     if request.is_json:
         jsonData = request.get_json()
         encrypted = jsonData["mocking"]
@@ -1482,41 +1487,14 @@ def checkEn3():
 # +++++++++++++++++++++++++++++++++
 #
 # +++++++++++++++++++++++++++++++++
-@app.route('/checkEn2', methods=['POST'])  
-def checkEn2():
-    with open('readmeK.txt', 'r') as file:
-        key = file.read().rstrip()
-    fernet = Fernet(key)
-
-    if request.is_json:
-        jsonData = request.get_json()
-        encrypted = jsonData["mocking"]
-        
-    decrypted = fernet.decrypt(encrypted).decode()
-    if str(decrypted) == "thisisaoriginalstring":
-        return jsonify({"good to go"}) 
-    else:
-        return jsonify({"prediction":str(2)}) 
-    
-
-
-# +++++++++++++++++++++++++++++++++
-#
-# +++++++++++++++++++++++++++++++++
 @app.route('/predict_questionaire_chk', methods=['POST'])  
 def predict_questionaire_chk():
-   
     try:
-        f = open("readke", mode="rb")
-        data = f.read()
-        f.close() 
-
         if request.is_json:
             req = request.get_json()
-           
-            encrypted = req["mocking"]
+            encrypted = req['mocking']
             encMessage = str.encode(encrypted)
-            fernet = Fernet(data)
+            fernet = Fernet(masterkey)
             decMessage = str(fernet.decrypt(encMessage).decode())
             if (decMessage == "thisisaoriginalstring"):
                 read_feat = req['data'] #readin as string, need convert to list of float
