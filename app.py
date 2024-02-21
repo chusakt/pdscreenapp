@@ -1457,6 +1457,24 @@ def checkEn():
         encrypted = jsonData["mocking"]
         
     decrypted = fernet.decrypt(encrypted).decode()
+    return jsonify({decrypted}) 
+
+
+
+# +++++++++++++++++++++++++++++++++
+#
+# +++++++++++++++++++++++++++++++++
+@app.route('/checkEn2', methods=['POST'])  
+def checkEn2():
+    with open('readmeK.txt', 'r') as file:
+        key = file.read().rstrip()
+    fernet = Fernet(key)
+
+    if request.is_json:
+        jsonData = request.get_json()
+        encrypted = jsonData["mocking"]
+        
+    decrypted = fernet.decrypt(encrypted).decode()
     if decrypted == "B-fKY3u5qQbq1kE1_UxI-2KKIve3ow8kVjKOHe4arg=":
         return jsonify({"good to go"}) 
     else:
