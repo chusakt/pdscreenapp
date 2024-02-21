@@ -1451,12 +1451,13 @@ def checkEn():
     if request.is_json:
         jsonData = request.get_json()
         encrypted = jsonData["mocking"]
+        encMessage = str.encode(encrypted)
 
         f = open("readke", mode="rb")
         data = f.read()
         f.close()
         fernet = Fernet(data)
-        decMessage = fernet.decrypt(encrypted).decode()
+        decMessage = fernet.decrypt(encMessage).decode()
 
         return jsonify({decMessage}) 
 
