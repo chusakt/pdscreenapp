@@ -1497,3 +1497,47 @@ def checkEn2():
         return jsonify({"good to go"}) 
     else:
         return jsonify({"prediction":str(2)}) 
+    
+
+
+# +++++++++++++++++++++++++++++++++
+#
+# +++++++++++++++++++++++++++++++++
+@app.route('/predict_questionaire_chk', methods=['POST'])  
+def predict_questionaire():
+   
+    try:
+        f = open("readke", mode="rb")
+        data = f.read()
+        f.close() 
+
+        if request.is_json:
+            req = request.get_json()
+           
+            encrypted = req["mocking"]
+            encMessage = str.encode(encrypted)
+            fernet = Fernet(data)
+            decMessage = str(fernet.decrypt(encMessage).decode())
+            if (decMessage == "thisisaoriginalstring"):
+                read_feat = req['data'] #readin as string, need convert to list of float
+                # handle to list of float
+                list_of_integers = [
+                    float(item) if item.isdigit() else item
+                    for item in read_feat.split(',')
+                ]
+                df3 = pd.DataFrame([list_of_integers])
+                predictions_ = loaded_model_q.predict(df3.values)
+                # return ("predictin: "+predictions_[0])
+                return jsonify({"prediction":str(predictions_[0])}) 
+                # return ("predictin: "+str(predictions_[0]))
+            else:
+                return jsonify({"prediction":str(2)}) 
+    except:
+        return jsonify({"prediction":str(2)}) 
+    
+
+
+
+
+        return jsonify({"prediction":str(decMessage)}) 
+    
