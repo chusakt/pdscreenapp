@@ -1461,7 +1461,23 @@ def checkEn():
 
         return jsonify({"prediction":str(2)}) 
 
+# +++++++++++++++++++++++++++++++++
+#
+# +++++++++++++++++++++++++++++++++
+@app.route('/checkEn3', methods=['POST'])  
+def checkEn3():
+    if request.is_json:
+        jsonData = request.get_json()
+        encrypted = jsonData["mocking"]
+        encMessage = str.encode(encrypted)
 
+        # f = open("readke", mode="rb")
+        # data = f.read()
+        # f.close()
+        # fernet = Fernet(data)
+        # decMessage = fernet.decrypt(encMessage).decode()
+
+        return jsonify({"prediction":encMessage}) 
 
 # +++++++++++++++++++++++++++++++++
 #
