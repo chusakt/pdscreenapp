@@ -1448,11 +1448,17 @@ def predict_voting():
 # +++++++++++++++++++++++++++++++++
 @app.route('/checkEn', methods=['POST'])  
 def checkEn():
-    with open('readmeK.txt', 'r') as file:
-        key = file.read().rstrip()
-    fernet = Fernet(key)
+    if request.is_json:
+        jsonData = request.get_json()
+        encrypted = jsonData["mocking"]
 
-    return jsonify({key}) 
+        f = open("readke", mode="rb")
+        data = f.read()
+        f.close()
+        fernet = Fernet(data)
+        decMessage = fernet.decrypt(encrypted).decode()
+
+        return jsonify({decMessage}) 
 
 
 
