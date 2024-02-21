@@ -1454,7 +1454,10 @@ def checkEn():
 
     if request.is_json:
         jsonData = request.get_json()
-        encrypted = jsonData["encrypted"]
+        encrypted = jsonData["mocking"]
         
     decrypted = fernet.decrypt(encrypted).decode()
-    return jsonify(decrypted) 
+    if decrypted == "B-fKY3u5qQbq1kE1_UxI-2KKIve3ow8kVjKOHe4arg=":
+        return jsonify({"good to go"}) 
+    else:
+        return jsonify({"prediction":str(2)}) 
