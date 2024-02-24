@@ -107,7 +107,7 @@ model_pkl_file = "Model_pickle_gait_walk_1.pkl"
 with open(model_pkl_file, 'rb') as file:  
     loaded_model_gw = pickle.load(file) 
 # --- load model ---
-model_pkl_file = "Model_pickle_voice_ahh_1.pkl"  
+model_pkl_file = "Model_pickle_voic_ahh_15.pkl"  
 with open(model_pkl_file, 'rb') as file:  
     loaded_model_va = pickle.load(file) 
 # --- load model ---
