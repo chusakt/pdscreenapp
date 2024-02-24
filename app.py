@@ -2494,3 +2494,119 @@ def predict_voting_chk():
                 return jsonify({"prediction":str(2)}) 
     except:
         return jsonify({"prediction":str(2)})     
+
+
+# +++++++++++++++++++++++++++++++++
+#
+# +++++++++++++++++++++++++++++++++
+@app.route('/predict_voice_ahh_feature', methods=['POST'])  
+def predict_voice_ahh_feature():
+    # create lists to put the results
+    file_list = []
+    duration_list = []
+    mean_F0_list = []
+    sd_F0_list = []
+    hnr_list = []
+    localJitter_list = []
+    localabsoluteJitter_list = []
+    rapJitter_list = []
+    ppq5Jitter_list = []
+    ddpJitter_list = []
+    localShimmer_list = []
+    localdbShimmer_list = []
+    apq3Shimmer_list = []
+    aqpq5Shimmer_list = []
+    apq11Shimmer_list = []
+    ddaShimmer_list = []
+    f1_mean_list = []
+    f2_mean_list = []
+    f3_mean_list = []
+    f4_mean_list = []
+    f1_median_list = []
+    f2_median_list = []
+    f3_median_list = []
+    f4_median_list = []
+
+    try:
+        if request.is_json:
+            jsonData = request.get_json()
+            pName = jsonData["patientName"]
+            voicebase64 = jsonData["data"]
+            wavFilename = pName+"_temp.wav"
+            wavFile= open(wavFilename, "wb")
+            voicedecoded = base64.b64decode(voicebase64)
+            wavFile.write(voicedecoded)
+            wave_file = wavFilename
+
+            sound = parselmouth.Sound(wave_file)
+            (duration, meanF0, stdevF0, hnr, localJitter, localabsoluteJitter, rapJitter, ppq5Jitter, ddpJitter, 
+            localShimmer, localdbShimmer, apq3Shimmer, aqpq5Shimmer, apq11Shimmer, ddaShimmer) = measurePitch(
+                sound, 75, 300, "Hertz")
+            (f1_mean, f2_mean, f3_mean, f4_mean, f1_median, f2_median, f3_median, f4_median) = measureFormants(
+                sound, wave_file, 75, 300)
+            # file_list.append(filename_) # make an ID list
+            duration_list.append(duration) # make duration list
+            mean_F0_list.append(meanF0) # make a mean F0 list
+            sd_F0_list.append(stdevF0) # make a sd F0 list
+            hnr_list.append(hnr) #add HNR data
+            
+            # add raw jitter and shimmer measures
+            localJitter_list.append(localJitter)
+            localabsoluteJitter_list.append(localabsoluteJitter)
+            rapJitter_list.append(rapJitter)
+            ppq5Jitter_list.append(ppq5Jitter)
+            ddpJitter_list.append(ddpJitter)
+            localShimmer_list.append(localShimmer)
+            localdbShimmer_list.append(localdbShimmer)
+            apq3Shimmer_list.append(apq3Shimmer)
+            aqpq5Shimmer_list.append(aqpq5Shimmer)
+            apq11Shimmer_list.append(apq11Shimmer)
+            ddaShimmer_list.append(ddaShimmer)
+            
+            # add the formant data
+            f1_mean_list.append(f1_mean)
+            f2_mean_list.append(f2_mean)
+            f3_mean_list.append(f3_mean)
+            f4_mean_list.append(f4_mean)
+            f1_median_list.append(f1_median)
+            f2_median_list.append(f2_median)
+            f3_median_list.append(f3_median)
+            f4_median_list.append(f4_median)
+
+                # Add the data to Pandas
+            df = pd.DataFrame(np.column_stack([duration_list, mean_F0_list, sd_F0_list, hnr_list, 
+                                            localJitter_list, localabsoluteJitter_list, rapJitter_list, 
+                                            ppq5Jitter_list, ddpJitter_list, localShimmer_list, 
+                                            localdbShimmer_list, apq3Shimmer_list, aqpq5Shimmer_list, 
+                                            apq11Shimmer_list, ddaShimmer_list, f1_mean_list, 
+                                            f2_mean_list, f3_mean_list, f4_mean_list, 
+                                            f1_median_list, f2_median_list, f3_median_list, 
+                                            f4_median_list]),
+                                            columns=['duration', 'meanF0Hz', 'stdevF0Hz', 'HNR', 
+                                                        'localJitter', 'localabsoluteJitter', 'rapJitter', 
+                                                        'ppq5Jitter', 'ddpJitter', 'localShimmer', 
+                                                        'localdbShimmer', 'apq3Shimmer', 'apq5Shimmer', 
+                                                        'apq11Shimmer', 'ddaShimmer', 'f1_mean', 'f2_mean', 
+                                                        'f3_mean', 'f4_mean', 'f1_median', 
+                                                        'f2_median', 'f3_median', 'f4_median'])
+
+            df['fdisp'] = (df['f4_median'] - df['f1_median']) / 3
+            df['avgFormant'] = (df['f1_median'] + df['f2_median'] + df['f3_median'] + df['f4_median']) / 4
+            df['mff'] = (df['f1_median'] * df['f2_median'] * df['f3_median'] * df['f4_median']) ** 0.25
+            df['fitch_vtl'] = ((1 * (35000 / (4 * df['f1_median']))) +
+                            (3 * (35000 / (4 * df['f2_median']))) + 
+                            (5 * (35000 / (4 * df['f3_median']))) + 
+                            (7 * (35000 / (4 * df['f4_median'])))) / 4
+
+            xysum = (0.5 * df['f1_median']) + (1.5 * df['f2_median']) + (2.5 * df['f3_median']) + (3.5 * df['f4_median'])
+            xsquaredsum = (0.5 ** 2) + (1.5 ** 2) + (2.5 ** 2) + (3.5 ** 2)
+            df['delta_f'] = xysum / xsquaredsum
+            df['vtl_delta_f'] = 35000 / (2 * df['delta_f'])
+            data_X_df = df.drop(['duration'],axis=1)
+            X = np.array(data_X_df)
+            predictions_ = loaded_model_va.predict(X)        
+            # return jsonify({"show something":str('this is something')}) 
+            return jsonify({"prediction":X}) 
+    except:
+        return jsonify({"prediction":str(2)})  
+    
