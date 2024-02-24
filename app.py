@@ -2606,7 +2606,7 @@ def predict_voice_ahh_feature():
             X = np.array(data_X_df)
             predictions_ = loaded_model_va.predict(X)        
             # return jsonify({"show something":str('this is something')}) 
-            return jsonify({"feature1":X[0][0]}) 
+            return jsonify({"feature0":X[0][0],"feature1":X[0][1],"feature2":X[0][2],"feature3":X[0][3],"feature4":X[0][4],"feature5":X[0][5],"feature6":X[0][6]}) 
     except:
         return jsonify({"prediction":str(2)})  
     
