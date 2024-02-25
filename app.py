@@ -117,7 +117,7 @@ with open(model_pkl_file, 'rb') as file:
 
 
 # --- load model --- > modified/improved model ahh voice
-model_pkl_file = "Model_pickle_voic_ahh_001.pkl"  
+model_pkl_file = "Model_pickle_voic_ahh_imp_001.pkl"  
 with open(model_pkl_file, 'rb') as file:  
     loaded_model_va_imp = pickle.load(file) 
 
