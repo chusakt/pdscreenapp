@@ -2822,6 +2822,9 @@ def predict_voice_ypl_imp():
                 sound, 75, 300, "Hertz")
             (f1_mean, f2_mean, f3_mean, f4_mean, f1_median, f2_median, f3_median, f4_median) = measureFormants(
                 sound, wave_file, 75, 300)
+            
+            os.remove(wave_file)
+
             # file_list.append(filename_) # make an ID list
             # duration_list.append(duration) # make duration list
             mean_F0_list.append(meanF0) # make a mean F0 list
