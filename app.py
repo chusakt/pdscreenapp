@@ -1249,7 +1249,9 @@ def predict_tremor_rest():
             X = np.array([toListofNumber])
             predictions_ = loaded_model_tr.predict(X)        
             return jsonify({"prediction":str(predictions_[0])}) 
-    except:
+    # except:
+    except Exception as e: 
+        print(e)
         return jsonify({"prediction":str(2)}) 
 
 
