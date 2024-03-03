@@ -1357,6 +1357,11 @@ def predict_tremor_post():
             X = np.array([toListofNumber])
             predictions_ = loaded_model_tp.predict(X)        
             return jsonify({"prediction":str(predictions_[0])}) 
-    except:
-        return jsonify({"prediction":str(2)})     
+    # except:
+    except Exception as e: 
+        print(e)
+        print('--------')
+        print(rowx)
+        print('--------')
+        return jsonify({"prediction":str(2)})   
     
