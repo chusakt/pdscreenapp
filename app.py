@@ -1252,6 +1252,9 @@ def predict_tremor_rest():
     # except:
     except Exception as e: 
         print(e)
+        print('--------')
+        print(rowx)
+        print('--------')
         return jsonify({"prediction":str(2)}) 
 
 
