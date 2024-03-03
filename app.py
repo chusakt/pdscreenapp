@@ -1376,7 +1376,9 @@ def predict_tremor_rest():
     try:
         if request.is_json:
             data = request.get_json()
-     
+            print('--------')
+            print(data)
+            print('--------')  
             return jsonify({"prediction":str(data)}) 
     # except:
     except Exception as e: 
@@ -1395,6 +1397,9 @@ def predict_tremor_post():
     try:
         if request.is_json:
             data = request.get_json()
+            print('--------')
+            print(data)
+            print('--------')            
             return jsonify({"prediction":str(data)}) 
     # except:
     except Exception as e: 
