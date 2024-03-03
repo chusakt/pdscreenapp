@@ -1385,3 +1385,22 @@ def predict_tremor_rest():
         print(data)
         print('--------')
         return jsonify({"prediction":str(2)}) 
+
+#  ----------------------------------------
+#  predict_tremor_rest -----
+#  ----------------------------------------
+    
+@app.route('/predict_tremor_post', methods=['POST'])  
+def predict_tremor_post():
+    try:
+        if request.is_json:
+            data = request.get_json()
+            return jsonify({"prediction":str(data)}) 
+    # except:
+    except Exception as e: 
+        print(e)
+        print('--------')
+        print(data)
+        print('--------')
+        return jsonify({"prediction":str(2)}) 
+        
