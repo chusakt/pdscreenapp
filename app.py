@@ -95,7 +95,7 @@ model_pkl_file = "Model_pickle_tremor_rest_1.pkl"
 with open(model_pkl_file, 'rb') as file:  
     loaded_model_tr = pickle.load(file) 
 # --- load model ---
-model_pkl_file = "Model_pickle_tremor_post_1.pkl"  
+model_pkl_file = "Model_tremor_post_a_only_001.pkl"  
 with open(model_pkl_file, 'rb') as file:  
     loaded_model_tp = pickle.load(file) 
 # --- load model ---
@@ -1280,12 +1280,12 @@ def predict_tremor_post():
                 acY.append(acYC)
                 acZ.append(acZC) 
 
-                agXC = i['data'][3]
-                agYC = i['data'][4]
-                agZC = i['data'][5]    
-                agX.append(agXC)
-                agY.append(agYC)
-                agZ.append(agZC) 
+                # agXC = i['data'][3]
+                # agYC = i['data'][4]
+                # agZC = i['data'][5]    
+                # agX.append(agXC)
+                # agY.append(agYC)
+                # agZ.append(agZC) 
 
             tst = [item - tStamp[0] for item in tStamp]
 
@@ -1296,13 +1296,14 @@ def predict_tremor_post():
                 acX, x1 = signal.resample(acX,toBeSamp,np.arange(len(acX)))  # resampled at 200
                 acY, x1 = signal.resample(acY,toBeSamp,np.arange(len(acY)))  # resampled 
                 acZ, x1 = signal.resample(acZ,toBeSamp,np.arange(len(acZ)))  # resampled 
-                agX, x1 = signal.resample(agX,toBeSamp,np.arange(len(agX)))  # resampled 
-                agY, x1 = signal.resample(agY,toBeSamp,np.arange(len(agY)))  # resampled
-                agZ, x1 = signal.resample(agZ,toBeSamp,np.arange(len(agZ)))  # resampled
+                # agX, x1 = signal.resample(agX,toBeSamp,np.arange(len(agX)))  # resampled 
+                # agY, x1 = signal.resample(agY,toBeSamp,np.arange(len(agY)))  # resampled
+                # agZ, x1 = signal.resample(agZ,toBeSamp,np.arange(len(agZ)))  # resampled
 
 
             row = []
-            for testsig in (acX,acY,acZ,agX,agY,agZ):
+            # for testsig in (acX,acY,acZ,agX,agY,agZ):
+            for testsig in (acX,acY,acZ):
                 testsig_filt = signal.sosfilt(sos, testsig)
                 res = np.array(testsig_filt)
                 fourier = fft(testsig_filt)
