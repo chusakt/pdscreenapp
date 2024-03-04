@@ -1342,9 +1342,12 @@ def predict_gait_walk():
             agY = []
             agZ = []
 
-            for i in data['motion']:
+            # for i in data['motion']:
+            for i in data['recording']['recordedData']:
                 # tsC = i['ts']
                 # tStamp.append(tsC)
+                tsC = i['ts']
+                tStamp.append(tsC)
                 acXC = i['data'][0]
                 acYC = i['data'][1]
                 acZC = i['data'][2]    
