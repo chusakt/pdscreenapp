@@ -657,10 +657,13 @@ def predict_voting():
                             return jsonify({"prediction":str(1)}) 
                         else:
                             return jsonify({"prediction":str(0)}) 
-    except:
-        return jsonify({"prediction":str(2)}) 
-
-
+    # except:
+    #     return jsonify({"prediction":str(2)}) 
+    except Exception as e: 
+        print('-xx------xx-')
+        print(e)
+        print('-xx------xx-')
+        return jsonify({"prediction":str(2)})   
 
 # +++++++++++++++++++++++++++++++++
 #
