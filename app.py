@@ -974,8 +974,8 @@ def predict_voice_ypl():
 #  predict_tremor_rest
 #  ----------------------------------------
     
-@app.route('/predict_tremor_rest_temp', methods=['POST'])  
-def predict_tremor_rest_temp():
+@app.route('/predict_tremor_rest', methods=['POST'])  
+def predict_tremor_rest():
     try:
         if request.is_json:
             data = request.get_json()
@@ -1081,8 +1081,8 @@ def predict_tremor_rest_temp():
 #  predict_tremor_post
 #  ----------------------------------------
     
-@app.route('/predict_tremor_post_temp', methods=['POST'])  
-def predict_tremor_post_temp():
+@app.route('/predict_tremor_post', methods=['POST'])  
+def predict_tremor_post():
     try:
         if request.is_json:
             data = request.get_json()
@@ -1190,8 +1190,8 @@ def predict_tremor_post_temp():
 #  predict_tremor_rest -----
 #  ----------------------------------------
     
-@app.route('/predict_tremor_rest', methods=['POST'])  
-def predict_tremor_rest():
+@app.route('/predict_tremor_rest_test', methods=['POST'])  
+def predict_tremor_rest_test():
     try:
         if request.is_json:
             data = request.get_json()
@@ -1211,8 +1211,8 @@ def predict_tremor_rest():
 #  predict_tremor_rest -----
 #  ----------------------------------------
     
-@app.route('/predict_tremor_post', methods=['POST'])  
-def predict_tremor_post():
+@app.route('/predict_tremor_post_test', methods=['POST'])  
+def predict_tremor_post_test():
     try:
         if request.is_json:
             data = request.get_json()
