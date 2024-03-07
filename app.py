@@ -87,7 +87,7 @@ model_pkl_file = "Model_pickle_dualtap_1_only_va.pkl"
 with open(model_pkl_file, 'rb') as file:  
     loaded_model_d = pickle.load(file) 
 # --- load model ---
-model_pkl_file = "Model_pickle_pinchtosize_1_only_va.pkl"  
+model_pkl_file = "Model_pinchtosize_dia_only_001.pkl"  
 with open(model_pkl_file, 'rb') as file:  
     loaded_model_p = pickle.load(file) 
 # --- load model ---
@@ -383,17 +383,17 @@ def predict_pinchtosize():
             x_norm_std_stack = []
             x_norm_mean_stack = []
 
-            x_mx1_std_stack = []
-            x_mx1_mean_stack = []
+            # x_mx1_std_stack = []
+            # x_mx1_mean_stack = []
 
-            x_mx2_std_stack = []
-            x_mx2_mean_stack = []
+            # x_mx2_std_stack = []
+            # x_mx2_mean_stack = []
 
-            x_my1_std_stack = []
-            x_my1_mean_stack = []
+            # x_my1_std_stack = []
+            # x_my1_mean_stack = []
             
-            x_my2_std_stack = []
-            x_my2_mean_stack = []
+            # x_my2_std_stack = []
+            # x_my2_mean_stack = []
             
 
             i = data['data']
@@ -412,13 +412,13 @@ def predict_pinchtosize():
                     print('   --> each data  ')
                     for m_inkdata in k_injdata:
                         mts.append(m_inkdata['timestamp'])
-                        mx1.append(m_inkdata['x1'])
-                        mx2.append(m_inkdata['x2'])
-                        my1.append(m_inkdata['y1'])
-                        my2.append(m_inkdata['y2'])
+                        # mx1.append(m_inkdata['x1'])
+                        # mx2.append(m_inkdata['x2'])
+                        # my1.append(m_inkdata['y1'])
+                        # my2.append(m_inkdata['y2'])
                         mdia.append(m_inkdata['diameter'])
-                        mcx.append(m_inkdata['center']['x'])
-                        mcy.append(m_inkdata['center']['y'])
+                        # mcx.append(m_inkdata['center']['x'])
+                        # mcy.append(m_inkdata['center']['y'])
                     # -- try some smooth
                     mvWindow = 25
                     if len(mdia) > mvWindow+1:
@@ -446,36 +446,36 @@ def predict_pinchtosize():
                 x_norm_ar = (mdia_ar-np.min(mdia_ar))/(np.max(mdia_ar)-np.min(mdia_ar))
                 x_norm_std = np.std(x_norm_ar)
                 x_norm_mean = np.mean(x_norm_ar)
-                # x_norm_std = np.std(mdia_ar)
-                # x_norm_mean = np.mean(mdia_ar)
+                # # x_norm_std = np.std(mdia_ar)
+                # # x_norm_mean = np.mean(mdia_ar)
 
-                mdia_ar = np.array(mx1)
-                x_norm_ar = (mdia_ar-np.min(mdia_ar))/(np.max(mdia_ar)-np.min(mdia_ar))
-                x_mx1_std = np.std(x_norm_ar)
-                x_mx1_mean = np.mean(x_norm_ar)
-                # x_mx1_std = np.std(mdia_ar)
-                # x_mx1_mean = np.mean(mdia_ar)                
+                # mdia_ar = np.array(mx1)
+                # x_norm_ar = (mdia_ar-np.min(mdia_ar))/(np.max(mdia_ar)-np.min(mdia_ar))
+                # x_mx1_std = np.std(x_norm_ar)
+                # x_mx1_mean = np.mean(x_norm_ar)
+                # # x_mx1_std = np.std(mdia_ar)
+                # # x_mx1_mean = np.mean(mdia_ar)                
 
-                mdia_ar = np.array(mx2)
-                x_norm_ar = (mdia_ar-np.min(mdia_ar))/(np.max(mdia_ar)-np.min(mdia_ar))
-                x_mx2_std = np.std(x_norm_ar)
-                x_mx2_mean = np.mean(x_norm_ar)
-                # x_mx2_std = np.std(mdia_ar)
-                # x_mx2_mean = np.mean(mdia_ar)
+                # mdia_ar = np.array(mx2)
+                # x_norm_ar = (mdia_ar-np.min(mdia_ar))/(np.max(mdia_ar)-np.min(mdia_ar))
+                # x_mx2_std = np.std(x_norm_ar)
+                # x_mx2_mean = np.mean(x_norm_ar)
+                # # x_mx2_std = np.std(mdia_ar)
+                # # x_mx2_mean = np.mean(mdia_ar)
 
-                mdia_ar = np.array(my1)
-                x_norm_ar = (mdia_ar-np.min(mdia_ar))/(np.max(mdia_ar)-np.min(mdia_ar))
-                x_my1_std = np.std(x_norm_ar)
-                x_my1_mean = np.mean(x_norm_ar)
-                # x_my1_std = np.std(mdia_ar)
-                # x_my1_mean = np.mean(mdia_ar)
+                # mdia_ar = np.array(my1)
+                # x_norm_ar = (mdia_ar-np.min(mdia_ar))/(np.max(mdia_ar)-np.min(mdia_ar))
+                # x_my1_std = np.std(x_norm_ar)
+                # x_my1_mean = np.mean(x_norm_ar)
+                # # x_my1_std = np.std(mdia_ar)
+                # # x_my1_mean = np.mean(mdia_ar)
 
-                mdia_ar = np.array(my2)
-                x_norm_ar = (mdia_ar-np.min(mdia_ar))/(np.max(mdia_ar)-np.min(mdia_ar))
-                x_my2_std = np.std(x_norm_ar)
-                x_my2_mean = np.mean(x_norm_ar)
-                # x_my2_std = np.std(mdia_ar)
-                # x_my2_mean = np.mean(mdia_ar)
+                # mdia_ar = np.array(my2)
+                # x_norm_ar = (mdia_ar-np.min(mdia_ar))/(np.max(mdia_ar)-np.min(mdia_ar))
+                # x_my2_std = np.std(x_norm_ar)
+                # x_my2_mean = np.mean(x_norm_ar)
+                # # x_my2_std = np.std(mdia_ar)
+                # # x_my2_mean = np.mean(mdia_ar)
 
                 # ----------- append to create over all  -----------
                 x_mts_start_stack.append(mts_start)
@@ -484,17 +484,17 @@ def predict_pinchtosize():
                 x_norm_std_stack.append(x_norm_std)
                 x_norm_mean_stack.append(x_norm_mean)
 
-                x_mx1_std_stack.append(x_mx1_std)
-                x_mx1_mean_stack.append(x_mx1_mean)
+                # x_mx1_std_stack.append(x_mx1_std)
+                # x_mx1_mean_stack.append(x_mx1_mean)
 
-                x_mx2_std_stack.append(x_mx2_std)
-                x_mx2_mean_stack.append(x_mx2_mean)
+                # x_mx2_std_stack.append(x_mx2_std)
+                # x_mx2_mean_stack.append(x_mx2_mean)
 
-                x_my1_std_stack.append(x_my1_std)
-                x_my1_mean_stack.append(x_my1_mean)
+                # x_my1_std_stack.append(x_my1_std)
+                # x_my1_mean_stack.append(x_my1_mean)
                 
-                x_my2_std_stack.append(x_my2_std)
-                x_my2_mean_stack.append(x_my2_mean)
+                # x_my2_std_stack.append(x_my2_std)
+                # x_my2_mean_stack.append(x_my2_mean)
                                                                 
 
             # in each file: record ...
@@ -503,41 +503,42 @@ def predict_pinchtosize():
             mts_range_max = np.max(x_mts_end_stack)
 
             mdia_std = np.mean(x_norm_std_stack)
-            # mdia_mean = np.mean(x_norm_mean_stack)
+            mdia_mean = np.mean(x_norm_mean_stack)
 
-            mx1_std = np.mean(x_mx1_std_stack)
-            # mx1_mean = np.mean(x_mx1_mean_stack)
+            # mx1_std = np.mean(x_mx1_std_stack)
+            # # mx1_mean = np.mean(x_mx1_mean_stack)
 
-            mx2_std = np.mean(x_mx2_std_stack)
-            # mx2_mean = np.mean(x_mx2_mean_stack)
+            # mx2_std = np.mean(x_mx2_std_stack)
+            # # mx2_mean = np.mean(x_mx2_mean_stack)
 
-            my1_std = np.mean(x_my1_std_stack)
-            # my1_mean = np.mean(x_my1_mean_stack)
+            # my1_std = np.mean(x_my1_std_stack)
+            # # my1_mean = np.mean(x_my1_mean_stack)
 
-            my2_std = np.mean(x_my2_std_stack)
-            # my2_mean = np.mean(x_my2_mean_stack)
+            # my2_std = np.mean(x_my2_std_stack)
+            # # my2_mean = np.mean(x_my2_mean_stack)
 
 
             # mdiaOuter.append(x_norm_std)
             row = []
 
             E0 = '%.5f'%(mdia_std)
-            # E1 = '%.5f'%(mdia_mean)
-            E2 = '%.5f'%(mx1_std)
-            # E3 = '%.5f'%(mx1_mean)
-            E4 = '%.5f'%(mx2_std)
-            # E5 = '%.5f'%(mx2_mean)
-            E6 = '%.5f'%(my1_std)
-            # E7 = '%.5f'%(my1_mean)
-            E8 = '%.5f'%(my2_std)
-            # E9 = '%.5f'%(my2_mean)
-            # E10 = '%.5f'%(CountAllHandOff)
+            E1 = '%.5f'%(mdia_mean)
+            # E2 = '%.5f'%(mx1_std)
+            # # E3 = '%.5f'%(mx1_mean)
+            # E4 = '%.5f'%(mx2_std)
+            # # E5 = '%.5f'%(mx2_mean)
+            # E6 = '%.5f'%(my1_std)
+            # # E7 = '%.5f'%(my1_mean)
+            # E8 = '%.5f'%(my2_std)
+            # # E9 = '%.5f'%(my2_mean)
+            E10 = '%.5f'%(CountAllHandOff)
             E11 = '%.5f'%(allSignSwitchCount)
             E12 = '%.5f'%(mts_start_mean)
             E13 = '%.5f'%(mts_range_max)
             E14 = '%.5f'%(mts_start_max)
 
-            rowx = [E0,E2,E4,E6,E8,E11,E12,E13,E14]
+            # rowx = [E0,E2,E4,E6,E8,E11,E12,E13,E14]
+            rowx = [E0,E1,E10,E11,E12,E13,E14]
             df3 = pd.DataFrame([rowx])
             predictions_ = loaded_model_p.predict(df3.values)
             # return jsonify({"mdia_std":E0,
