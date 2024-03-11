@@ -91,7 +91,7 @@ model_pkl_file = "Model_pinchtosize_dia_only_001.pkl"
 with open(model_pkl_file, 'rb') as file:  
     loaded_model_p = pickle.load(file) 
 # --- load model ---
-model_pkl_file = "Model_tremor_rest_a_only_001.pkl"  
+model_pkl_file = "Model_Tremor_Rest_aOnly_unitvar_001.pkl"  
 with open(model_pkl_file, 'rb') as file:  
     loaded_model_tr = pickle.load(file) 
 # --- load model ---
@@ -1028,6 +1028,22 @@ def predict_tremor_rest():
                 # agY, x1 = signal.resample(agY,toBeSamp,np.arange(len(agY)))  # resampled
                 # agZ, x1 = signal.resample(agZ,toBeSamp,np.arange(len(agZ)))  # resampled
 
+            # # ------------ handle preprocessing
+            acX = signal.sosfilt(sos, acX)
+            acY = signal.sosfilt(sos, acY)
+            acZ = signal.sosfilt(sos, acZ)
+            # agX = signal.sosfilt(sos, agX)
+            # agY = signal.sosfilt(sos, agY)
+            # agZ = signal.sosfilt(sos, agZ)
+
+            # # ------------ transform to unit variance
+            acX=acX-np.mean(acX)
+            acX=acX/np.std(acX)
+            acY=acY-np.mean(acY)
+            acY=acY/np.std(acY)
+            acZ=acZ-np.mean(acZ)
+            acZ=acZ/np.std(acZ)
+            
 
             row = []
             for testsig in (acX,acY,acZ):
@@ -1052,8 +1068,8 @@ def predict_tremor_rest():
                 compx = np.sqrt(np.var(resdif2)*np.var(res)/(np.var(resdif)*np.var(resdif)))
                 
                 # E1 = '%.5f'%(F1/Esum)
-                E1 = '%.5f'%(np.std(testsig_filt))           
-                E2 = '%.5f'%(np.mean(testsig_filt))                     
+                # E1 = '%.5f'%(np.std(testsig_filt))           
+                # E2 = '%.5f'%(np.mean(testsig_filt))                     
                 E3 = '%.5f'%(kur)
                 E4 = '%.5f'%(ske)
                 E5 = '%.5f'%(Mobi)   
@@ -1072,7 +1088,7 @@ def predict_tremor_rest():
                 E17 = '%.5f'%(np.percentile(testsig_filt, 50))
                 E18 = '%.5f'%(np.percentile(testsig_filt, 75))
 
-                rowx = [E1,E2,E3,E4,E5,E6,E7,E8,E9,E10,E11,E12,E13,E14,E15,E16,E17,E18]
+                rowx = [E3,E4,E5,E6,E7,E8,E9,E10,E11,E12,E13,E14,E15,E16,E17,E18]
                 row = row + rowx
             
             toListofNumber = [float(x) for x in row]
