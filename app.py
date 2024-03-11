@@ -1571,114 +1571,222 @@ def predict_gait_stab():
     try:
         if request.is_json:
             data = request.get_json()
-            tStamp = []
-            acX = []
-            acY = []
-            acZ = []
-            agX = []
-            agY = []
-            agZ = []
+            gyroIn = data['recording']['recordingFormat']
+            if "gx" in gyroIn:
+                tStamp = []
+                acX = []
+                acY = []
+                acZ = []
+                agX = []
+                agY = []
+                agZ = []
 
-            for i in data['recording']['recordedData']:
-                tsC = i['ts']
-                tStamp.append(tsC)
-                acXC = i['data'][0]
-                acYC = i['data'][1]
-                acZC = i['data'][2]    
-                acX.append(acXC)
-                acY.append(acYC)
-                acZ.append(acZC) 
+                for i in data['recording']['recordedData']:
+                    tsC = i['ts']
+                    tStamp.append(tsC)
+                    acXC = i['data'][0]
+                    acYC = i['data'][1]
+                    acZC = i['data'][2]    
+                    acX.append(acXC)
+                    acY.append(acYC)
+                    acZ.append(acZC) 
 
-                agXC = i['data'][3]
-                agYC = i['data'][4]
-                agZC = i['data'][5]    
-                agX.append(agXC)
-                agY.append(agYC)
-                agZ.append(agZC) 
+                    agXC = i['data'][3]
+                    agYC = i['data'][4]
+                    agZC = i['data'][5]    
+                    agX.append(agXC)
+                    agY.append(agYC)
+                    agZ.append(agZC) 
 
-            tst = [item - tStamp[0] for item in tStamp]
-            # ------------  handle the oversampling to 200 samples in 20 sec
-            if tst[-1] >= 10:
-                acX = acX[0:100]
-                acY = acY[0:100]
-                acZ = acZ[0:100]
-                agX = agX[0:100]
-                agY = agY[0:100]
-                agZ = agZ[0:100] 
+                tst = [item - tStamp[0] for item in tStamp]
+                # ------------  handle the oversampling to 200 samples in 20 sec
+                if tst[-1] >= 10:
+                    acX = acX[0:100]
+                    acY = acY[0:100]
+                    acZ = acZ[0:100]
+                    agX = agX[0:100]
+                    agY = agY[0:100]
+                    agZ = agZ[0:100] 
 
-                # # ------------ handle preprocessing
-                acX = signal.sosfilt(sos, acX)
-                acY = signal.sosfilt(sos, acY)
-                acZ = signal.sosfilt(sos, acZ)
-                agX = signal.sosfilt(sos, agX)
-                agY = signal.sosfilt(sos, agY)
-                agZ = signal.sosfilt(sos, agZ)
+                    # # ------------ handle preprocessing
+                    acX = signal.sosfilt(sos, acX)
+                    acY = signal.sosfilt(sos, acY)
+                    acZ = signal.sosfilt(sos, acZ)
+                    agX = signal.sosfilt(sos, agX)
+                    agY = signal.sosfilt(sos, agY)
+                    agZ = signal.sosfilt(sos, agZ)
 
-                # # ------------ transform to unit variance
-                acX=acX-np.mean(acX)
-                acX=acX/np.std(acX)
-                acY=acY-np.mean(acY)
-                acY=acY/np.std(acY)
-                acZ=acZ-np.mean(acZ)
-                acZ=acZ/np.std(acZ)
+                    # # ------------ transform to unit variance
+                    acX=acX-np.mean(acX)
+                    acX=acX/np.std(acX)
+                    acY=acY-np.mean(acY)
+                    acY=acY/np.std(acY)
+                    acZ=acZ-np.mean(acZ)
+                    acZ=acZ/np.std(acZ)
 
-                agX=agX-np.mean(agX)
-                agX=agX/np.std(agX)
-                agY=agY-np.mean(agY)
-                agY=agY/np.std(agY)
-                agZ=agZ-np.mean(agZ)
-                agZ=agZ/np.std(agZ)
-                # ------------ 
+                    agX=agX-np.mean(agX)
+                    agX=agX/np.std(agX)
+                    agY=agY-np.mean(agY)
+                    agY=agY/np.std(agY)
+                    agZ=agZ-np.mean(agZ)
+                    agZ=agZ/np.std(agZ)
+                    # ------------ 
 
 
-            row = []
-            for testsig in (acX,acY,acZ,agX,agY,agZ):
-            # for testsig in (acX,acY,acZ):
-                testsig_filt = signal.sosfilt(sos, testsig)
-                res = np.array(testsig_filt)
-                fourier = fft(testsig_filt)
-                fab = np.abs(fourier)[0:100]
-                # ------------ 
-                Esum = sum(np.square(fab))
-                F1 = sum(np.square(fab[0:25]))
-                F2 = sum(np.square(fab[25:50]))
-                F3 = sum(np.square(fab[50:75]))
-                F4 = sum(np.square(fab[75:80]))
-                kur = kurtosis(testsig_filt, fisher=True)
-                ske = skew(testsig_filt, bias=False)
-                resdif = res[1:]-res[0:-1]
-                Mobi = np.sqrt(np.var(resdif)/np.var(res))
-                resdif2 = resdif[1:]-resdif[0:-1]
-                compx = np.sqrt(np.var(resdif2)*np.var(res)/(np.var(resdif)*np.var(resdif)))
+                row = []
+                for testsig in (acX,acY,acZ,agX,agY,agZ):
+                # for testsig in (acX,acY,acZ):
+                    testsig_filt = signal.sosfilt(sos, testsig)
+                    res = np.array(testsig_filt)
+                    fourier = fft(testsig_filt)
+                    fab = np.abs(fourier)[0:100]
+                    # ------------ 
+                    Esum = sum(np.square(fab))
+                    F1 = sum(np.square(fab[0:25]))
+                    F2 = sum(np.square(fab[25:50]))
+                    F3 = sum(np.square(fab[50:75]))
+                    F4 = sum(np.square(fab[75:80]))
+                    kur = kurtosis(testsig_filt, fisher=True)
+                    ske = skew(testsig_filt, bias=False)
+                    resdif = res[1:]-res[0:-1]
+                    Mobi = np.sqrt(np.var(resdif)/np.var(res))
+                    resdif2 = resdif[1:]-resdif[0:-1]
+                    compx = np.sqrt(np.var(resdif2)*np.var(res)/(np.var(resdif)*np.var(resdif)))
+                    
+                    # E1 = '%.5f'%(F1/Esum)
+                    E1 = '%.5f'%(np.std(testsig_filt))           
+                    E2 = '%.5f'%(np.mean(testsig_filt))                     
+                    E3 = '%.5f'%(kur)
+                    E4 = '%.5f'%(ske)
+                    E5 = '%.5f'%(Mobi)   
+                    E6 = '%.5f'%(compx)                              
+                    E7 = '%.5f'%(F1) 
+                    E8 = '%.5f'%(F2) 
+                    E9 = '%.5f'%(F3) 
+                    E10 = '%.5f'%(F4) 
+                    E11 = '%.5f'%(F2/Esum)
+                    E12 = '%.5f'%(F3/Esum)
+                    E13 = '%.5f'%(np.var(resdif2))
+
+                    # zero_crossing
+                    # E19 = '%.5f'%(len(np.where(np.diff(np.sign(testsig)))[0]))
+
+                    rowx = [E3,E4,E5,E6,E7,E8,E9,E10,E11,E12,E13]
+                    row = row + rowx
                 
-                # E1 = '%.5f'%(F1/Esum)
-                E1 = '%.5f'%(np.std(testsig_filt))           
-                E2 = '%.5f'%(np.mean(testsig_filt))                     
-                E3 = '%.5f'%(kur)
-                E4 = '%.5f'%(ske)
-                E5 = '%.5f'%(Mobi)   
-                E6 = '%.5f'%(compx)                              
-                E7 = '%.5f'%(F1) 
-                E8 = '%.5f'%(F2) 
-                E9 = '%.5f'%(F3) 
-                E10 = '%.5f'%(F4) 
-                E11 = '%.5f'%(F2/Esum)
-                E12 = '%.5f'%(F3/Esum)
-                E13 = '%.5f'%(np.var(resdif2))
+                toListofNumber = [float(x) for x in row]
+                X = np.array([toListofNumber])
+                predictions_ = loaded_model_gs_ag.predict(X)        
+                return jsonify({"prediction":str(predictions_[0])}) 
+            else:
+                tStamp = []
+                acX = []
+                acY = []
+                acZ = []
+                agX = []
+                agY = []
+                agZ = []
 
-                # zero_crossing
-                # E19 = '%.5f'%(len(np.where(np.diff(np.sign(testsig)))[0]))
+                for i in data['recording']['recordedData']:
+                    tsC = i['ts']
+                    tStamp.append(tsC)
+                    acXC = i['data'][0]
+                    acYC = i['data'][1]
+                    acZC = i['data'][2]    
+                    acX.append(acXC)
+                    acY.append(acYC)
+                    acZ.append(acZC) 
 
-                rowx = [E3,E4,E5,E6,E7,E8,E9,E10,E11,E12,E13]
-                row = row + rowx
-            
-            toListofNumber = [float(x) for x in row]
-            X = np.array([toListofNumber])
-            predictions_ = loaded_model_gs_ag.predict(X)        
-            return jsonify({"prediction":str(predictions_[0])}) 
+                    # agXC = i['data'][3]
+                    # agYC = i['data'][4]
+                    # agZC = i['data'][5]    
+                    # agX.append(agXC)
+                    # agY.append(agYC)
+                    # agZ.append(agZC) 
+
+                tst = [item - tStamp[0] for item in tStamp]
+                # ------------  handle the oversampling to 200 samples in 20 sec
+                if tst[-1] >= 10:
+                    acX = acX[0:100]
+                    acY = acY[0:100]
+                    acZ = acZ[0:100]
+                    # agX = agX[0:100]
+                    # agY = agY[0:100]
+                    # agZ = agZ[0:100] 
+
+                    # # ------------ handle preprocessing
+                    acX = signal.sosfilt(sos, acX)
+                    acY = signal.sosfilt(sos, acY)
+                    acZ = signal.sosfilt(sos, acZ)
+                    # agX = signal.sosfilt(sos, agX)
+                    # agY = signal.sosfilt(sos, agY)
+                    # agZ = signal.sosfilt(sos, agZ)
+
+                    # # ------------ transform to unit variance
+                    acX=acX-np.mean(acX)
+                    acX=acX/np.std(acX)
+                    acY=acY-np.mean(acY)
+                    acY=acY/np.std(acY)
+                    acZ=acZ-np.mean(acZ)
+                    acZ=acZ/np.std(acZ)
+
+                    # agX=agX-np.mean(agX)
+                    # agX=agX/np.std(agX)
+                    # agY=agY-np.mean(agY)
+                    # agY=agY/np.std(agY)
+                    # agZ=agZ-np.mean(agZ)
+                    # agZ=agZ/np.std(agZ)
+                    # ------------ 
+
+
+                row = []
+                for testsig in (acX,acY,acZ):
+                # for testsig in (acX,acY,acZ):
+                    testsig_filt = signal.sosfilt(sos, testsig)
+                    res = np.array(testsig_filt)
+                    fourier = fft(testsig_filt)
+                    fab = np.abs(fourier)[0:100]
+                    # ------------ 
+                    Esum = sum(np.square(fab))
+                    F1 = sum(np.square(fab[0:25]))
+                    F2 = sum(np.square(fab[25:50]))
+                    F3 = sum(np.square(fab[50:75]))
+                    F4 = sum(np.square(fab[75:80]))
+                    kur = kurtosis(testsig_filt, fisher=True)
+                    ske = skew(testsig_filt, bias=False)
+                    resdif = res[1:]-res[0:-1]
+                    Mobi = np.sqrt(np.var(resdif)/np.var(res))
+                    resdif2 = resdif[1:]-resdif[0:-1]
+                    compx = np.sqrt(np.var(resdif2)*np.var(res)/(np.var(resdif)*np.var(resdif)))
+                    
+                    # E1 = '%.5f'%(F1/Esum)
+                    E1 = '%.5f'%(np.std(testsig_filt))           
+                    E2 = '%.5f'%(np.mean(testsig_filt))                     
+                    E3 = '%.5f'%(kur)
+                    E4 = '%.5f'%(ske)
+                    E5 = '%.5f'%(Mobi)   
+                    E6 = '%.5f'%(compx)                              
+                    E7 = '%.5f'%(F1) 
+                    E8 = '%.5f'%(F2) 
+                    E9 = '%.5f'%(F3) 
+                    E10 = '%.5f'%(F4) 
+                    E11 = '%.5f'%(F2/Esum)
+                    E12 = '%.5f'%(F3/Esum)
+                    E13 = '%.5f'%(np.var(resdif2))
+
+                    # zero_crossing
+                    # E19 = '%.5f'%(len(np.where(np.diff(np.sign(testsig)))[0]))
+
+                    rowx = [E3,E4,E5,E6,E7,E8,E9,E10,E11,E12,E13]
+                    row = row + rowx
+                
+                toListofNumber = [float(x) for x in row]
+                X = np.array([toListofNumber])
+                predictions_ = loaded_model_gs_a.predict(X)        
+                return jsonify({"prediction":str(predictions_[0])}) 
+
     except:
         return jsonify({"prediction":str(2)}) 
-
 
 #  ----------------------------------------
 #   
