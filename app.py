@@ -91,7 +91,7 @@ model_pkl_file = "Model_pinchtosize_dia_only_001.pkl"
 with open(model_pkl_file, 'rb') as file:  
     loaded_model_p = pickle.load(file) 
 # --- load model ---
-model_pkl_file = "Model_Tremor_Rest_aOnly_unitvar_001.pkl"  
+model_pkl_file = "Model_Tremor_Rest_aandg_unitvar_001.pkl"  
 with open(model_pkl_file, 'rb') as file:  
     loaded_model_tr = pickle.load(file) 
 # --- load model ---
@@ -1008,12 +1008,12 @@ def predict_tremor_rest():
                 acY.append(acYC)
                 acZ.append(acZC) 
 
-                # agXC = i['data'][3]
-                # agYC = i['data'][4]
-                # agZC = i['data'][5]    
-                # agX.append(agXC)
-                # agY.append(agYC)
-                # agZ.append(agZC) 
+                agXC = i['data'][3]
+                agYC = i['data'][4]
+                agZC = i['data'][5]    
+                agX.append(agXC)
+                agY.append(agYC)
+                agZ.append(agZC) 
 
             tst = [item - tStamp[0] for item in tStamp]
 
@@ -1024,17 +1024,17 @@ def predict_tremor_rest():
                 acX, x1 = signal.resample(acX,toBeSamp,np.arange(len(acX)))  # resampled at 200
                 acY, x1 = signal.resample(acY,toBeSamp,np.arange(len(acY)))  # resampled 
                 acZ, x1 = signal.resample(acZ,toBeSamp,np.arange(len(acZ)))  # resampled 
-                # agX, x1 = signal.resample(agX,toBeSamp,np.arange(len(agX)))  # resampled 
-                # agY, x1 = signal.resample(agY,toBeSamp,np.arange(len(agY)))  # resampled
-                # agZ, x1 = signal.resample(agZ,toBeSamp,np.arange(len(agZ)))  # resampled
+                agX, x1 = signal.resample(agX,toBeSamp,np.arange(len(agX)))  # resampled 
+                agY, x1 = signal.resample(agY,toBeSamp,np.arange(len(agY)))  # resampled
+                agZ, x1 = signal.resample(agZ,toBeSamp,np.arange(len(agZ)))  # resampled
 
             # # ------------ handle preprocessing
             acX = signal.sosfilt(sos, acX)
             acY = signal.sosfilt(sos, acY)
             acZ = signal.sosfilt(sos, acZ)
-            # agX = signal.sosfilt(sos, agX)
-            # agY = signal.sosfilt(sos, agY)
-            # agZ = signal.sosfilt(sos, agZ)
+            agX = signal.sosfilt(sos, agX)
+            agY = signal.sosfilt(sos, agY)
+            agZ = signal.sosfilt(sos, agZ)
 
             # # ------------ transform to unit variance
             acX=acX-np.mean(acX)
@@ -1044,9 +1044,16 @@ def predict_tremor_rest():
             acZ=acZ-np.mean(acZ)
             acZ=acZ/np.std(acZ)
             
+            agX=agX-np.mean(agX)
+            agX=agX/np.std(agX)
+            agY=agY-np.mean(agY)
+            agY=agY/np.std(agY)
+            agZ=agZ-np.mean(agZ)
+            agZ=agZ/np.std(agZ)
+
 
             row = []
-            for testsig in (acX,acY,acZ):
+            for testsig in (acX,acY,acZ,agX,agY,agZ):
                 testsig_filt = signal.sosfilt(sos, testsig)
                 res = np.array(testsig_filt)
                 fourier = fft(testsig_filt)
