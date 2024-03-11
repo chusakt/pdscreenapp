@@ -111,14 +111,37 @@ with open(model_pkl_file, 'rb') as file:
 model_pkl_file = "Model_pinchtosize_dia_only_001.pkl"  
 with open(model_pkl_file, 'rb') as file:  
     loaded_model_p = pickle.load(file) 
+# # --- load model ---
+# model_pkl_file = "Model_gait_stab_a_only_001.pkl"  
+# with open(model_pkl_file, 'rb') as file:  
+#     loaded_model_gs = pickle.load(file) 
+# # --- load model ---
+# model_pkl_file = "Model_gait_walk_a_only_001.pkl"  
+# with open(model_pkl_file, 'rb') as file:  
+#     loaded_model_gw = pickle.load(file) 
+
+
+
+#========================================
 # --- load model ---
-model_pkl_file = "Model_gait_stab_a_only_001.pkl"  
+model_pkl_file = "model_gaitStbl_ag_wihtpreprocess002.pkl"  
 with open(model_pkl_file, 'rb') as file:  
-    loaded_model_gs = pickle.load(file) 
+    loaded_model_gs_ag = pickle.load(file) 
 # --- load model ---
-model_pkl_file = "Model_gait_walk_a_only_001.pkl"  
+model_pkl_file = "model_gaitStbl_a_only_wihtpreprocess002.pkl"  
 with open(model_pkl_file, 'rb') as file:  
-    loaded_model_gw = pickle.load(file) 
+    loaded_model_gs_a = pickle.load(file) 
+# --- load model ---
+model_pkl_file = "model_gaitWalk_ag_wihtpreprocess_002.pkl"  
+with open(model_pkl_file, 'rb') as file:  
+    loaded_model_gw_ag = pickle.load(file) 
+# --- load model ---
+model_pkl_file = "model_gaitWalk_a_only_wihtpreprocess_002.pkl"  
+with open(model_pkl_file, 'rb') as file:  
+    loaded_model_gw_a = pickle.load(file) 
+#========================================
+    
+
 # --- load model ---
 # model_pkl_file = "Model_pickle_voic_ahh_15.pkl"  
 # with open(model_pkl_file, 'rb') as file:  
@@ -1540,7 +1563,7 @@ def predict_tremor_post_test():
         
 
 #  ----------------------------------------
-#   
+#   loaded_model_gs_ag, loaded_model_gs_a
 #  ----------------------------------------
 
 @app.route('/predict_gait_stab', methods=['POST'])  
@@ -1566,28 +1589,50 @@ def predict_gait_stab():
                 acY.append(acYC)
                 acZ.append(acZC) 
 
-                # agXC = i['data'][3]
-                # agYC = i['data'][4]
-                # agZC = i['data'][5]    
-                # agX.append(agXC)
-                # agY.append(agYC)
-                # agZ.append(agZC) 
+                agXC = i['data'][3]
+                agYC = i['data'][4]
+                agZC = i['data'][5]    
+                agX.append(agXC)
+                agY.append(agYC)
+                agZ.append(agZC) 
 
             tst = [item - tStamp[0] for item in tStamp]
             # ------------  handle the oversampling to 200 samples in 20 sec
-            if len(acX) > 200:
-                toBeSamp = 200
-                # print('----> ' + str(filepath))
-                acX, x1 = signal.resample(acX,toBeSamp,np.arange(len(acX)))  # resampled at 200
-                acY, x1 = signal.resample(acY,toBeSamp,np.arange(len(acY)))  # resampled 
-                acZ, x1 = signal.resample(acZ,toBeSamp,np.arange(len(acZ)))  # resampled 
-                # agX, x1 = signal.resample(agX,toBeSamp,np.arange(len(agX)))  # resampled 
-                # agY, x1 = signal.resample(agY,toBeSamp,np.arange(len(agY)))  # resampled
-                # agZ, x1 = signal.resample(agZ,toBeSamp,np.arange(len(agZ)))  # resampled
+            if tst[-1] >= 10:
+                acX = acX[0:100]
+                acY = acY[0:100]
+                acZ = acZ[0:100]
+                agX = agX[0:100]
+                agY = agY[0:100]
+                agZ = agZ[0:100] 
+
+                # # ------------ handle preprocessing
+                acX = signal.sosfilt(sos, acX)
+                acY = signal.sosfilt(sos, acY)
+                acZ = signal.sosfilt(sos, acZ)
+                agX = signal.sosfilt(sos, agX)
+                agY = signal.sosfilt(sos, agY)
+                agZ = signal.sosfilt(sos, agZ)
+
+                # # ------------ transform to unit variance
+                acX=acX-np.mean(acX)
+                acX=acX/np.std(acX)
+                acY=acY-np.mean(acY)
+                acY=acY/np.std(acY)
+                acZ=acZ-np.mean(acZ)
+                acZ=acZ/np.std(acZ)
+
+                agX=agX-np.mean(agX)
+                agX=agX/np.std(agX)
+                agY=agY-np.mean(agY)
+                agY=agY/np.std(agY)
+                agZ=agZ-np.mean(agZ)
+                agZ=agZ/np.std(agZ)
+                # ------------ 
 
 
             row = []
-            for testsig in (acX,acY,acZ):
+            for testsig in (acX,acY,acZ,agX,agY,agZ):
             # for testsig in (acX,acY,acZ):
                 testsig_filt = signal.sosfilt(sos, testsig)
                 res = np.array(testsig_filt)
@@ -1619,17 +1664,17 @@ def predict_gait_stab():
                 E10 = '%.5f'%(F4) 
                 E11 = '%.5f'%(F2/Esum)
                 E12 = '%.5f'%(F3/Esum)
+                E13 = '%.5f'%(np.var(resdif2))
 
-                Samp, Phi1, Phi2 = EH.SampEn(res, m = 2, tau = 2)
-                E13 = '%.5f'%(Samp[0])
-                E14 = '%.5f'%(Samp[1])
-                E15 = '%.5f'%(Samp[2])
-                rowx = [E1,E2,E3,E4,E5,E6,E7,E8,E9,E10,E11,E12,E13,E14,E15]
+                # zero_crossing
+                # E19 = '%.5f'%(len(np.where(np.diff(np.sign(testsig)))[0]))
+
+                rowx = [E3,E4,E5,E6,E7,E8,E9,E10,E11,E12,E13]
                 row = row + rowx
             
             toListofNumber = [float(x) for x in row]
             X = np.array([toListofNumber])
-            predictions_ = loaded_model_gs.predict(X)        
+            predictions_ = loaded_model_gs_ag.predict(X)        
             return jsonify({"prediction":str(predictions_[0])}) 
     except:
         return jsonify({"prediction":str(2)}) 
