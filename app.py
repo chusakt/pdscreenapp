@@ -1021,8 +1021,8 @@ def predict_voice_ypl():
 #  predict_tremor_rest : loaded_model_tr_a, loaded_model_tr_ag
 #  ----------------------------------------
     
-@app.route('/predict_tremor_rest_', methods=['POST'])  
-def predict_tremor_rest_():
+@app.route('/predict_tremor_rest', methods=['POST'])  
+def predict_tremor_rest():
     try:
         if request.is_json:
             data = request.get_json()
@@ -1040,16 +1040,22 @@ def predict_tremor_rest_():
                 for i in data['recording']['recordedData']:
                     tsC = i['ts']
                     tStamp.append(tsC)
-                    acXC = i['data'][0]
-                    acYC = i['data'][1]
-                    acZC = i['data'][2]    
+                    # acXC = i['data'][0]
+                    # acYC = i['data'][1]
+                    # acZC = i['data'][2]    
+                    acXC = i['data'][3]
+                    acYC = i['data'][4]
+                    acZC = i['data'][5]                       
                     acX.append(acXC)
                     acY.append(acYC)
                     acZ.append(acZC) 
 
-                    agXC = i['data'][3]
-                    agYC = i['data'][4]
-                    agZC = i['data'][5]    
+                    # agXC = i['data'][3]
+                    # agYC = i['data'][4]
+                    # agZC = i['data'][5]    
+                    agXC = i['data'][0]
+                    agYC = i['data'][1]
+                    agZC = i['data'][2]                     
                     agX.append(agXC)
                     agY.append(agYC)
                     agZ.append(agZC) 
@@ -1523,8 +1529,8 @@ def predict_tremor_post_():
 #  predict_tremor_rest -----
 #  ----------------------------------------
     
-@app.route('/predict_tremor_rest', methods=['POST'])  
-def predict_tremor_rest():
+@app.route('/predict_tremor_rest_', methods=['POST'])  
+def predict_tremor_rest_():
     try:
         if request.is_json:
             data = request.get_json()
