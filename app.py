@@ -1271,8 +1271,8 @@ def predict_tremor_rest_():
 #  ----------------------------------------
 #  predict_tremor_post loaded_model_tp_a,loaded_model_tp_ag
 #  ----------------------------------------
-@app.route('/predict_tremor_post', methods=['POST'])  
-def predict_tremor_post():
+@app.route('/predict_tremor_post_', methods=['POST'])  
+def predict_tremor_post_():
     try:
         if request.is_json:
             data = request.get_json()
@@ -1544,8 +1544,8 @@ def predict_tremor_rest():
 #  predict_tremor_rest -----
 #  ----------------------------------------
     
-@app.route('/predict_tremor_post_test', methods=['POST'])  
-def predict_tremor_post_test():
+@app.route('/predict_tremor_post', methods=['POST'])  
+def predict_tremor_post():
     try:
         if request.is_json:
             data = request.get_json()
