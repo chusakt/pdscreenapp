@@ -1074,15 +1074,15 @@ def predict_tremor_rest():
                 tst = [item - tStamp[0] for item in tStamp]
 
                 # ------------  handle the oversampling to 200 samples in 20 sec
-                if len(acX) > 200:
-                    toBeSamp = 200
-                    # print('----> ' + str(filepath))
-                    acX, x1 = signal.resample(acX,toBeSamp,np.arange(len(acX)))  # resampled at 200
-                    acY, x1 = signal.resample(acY,toBeSamp,np.arange(len(acY)))  # resampled 
-                    acZ, x1 = signal.resample(acZ,toBeSamp,np.arange(len(acZ)))  # resampled 
-                    agX, x1 = signal.resample(agX,toBeSamp,np.arange(len(agX)))  # resampled 
-                    agY, x1 = signal.resample(agY,toBeSamp,np.arange(len(agY)))  # resampled
-                    agZ, x1 = signal.resample(agZ,toBeSamp,np.arange(len(agZ)))  # resampled
+                # if len(acX) > 200:
+                #     toBeSamp = 200
+                #     # print('----> ' + str(filepath))
+                #     acX, x1 = signal.resample(acX,toBeSamp,np.arange(len(acX)))  # resampled at 200
+                #     acY, x1 = signal.resample(acY,toBeSamp,np.arange(len(acY)))  # resampled 
+                #     acZ, x1 = signal.resample(acZ,toBeSamp,np.arange(len(acZ)))  # resampled 
+                #     agX, x1 = signal.resample(agX,toBeSamp,np.arange(len(agX)))  # resampled 
+                #     agY, x1 = signal.resample(agY,toBeSamp,np.arange(len(agY)))  # resampled
+                #     agZ, x1 = signal.resample(agZ,toBeSamp,np.arange(len(agZ)))  # resampled
 
                 # # ------------ handle preprocessing
                 # acX = signal.sosfilt(sos, acX)
