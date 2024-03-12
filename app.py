@@ -1531,7 +1531,7 @@ def predict_tremor_rest():
             print('--------')
             print(data)
             print('--------')  
-            return jsonify({"prediction":str(data)}) 
+            return jsonify({"gg":str(data)}) 
     # except:
     except Exception as e: 
         print(e)
