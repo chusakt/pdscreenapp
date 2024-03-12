@@ -1016,13 +1016,30 @@ def predict_voice_ypl():
         return jsonify({"prediction":str(2)})     
 
 
-
 #  ----------------------------------------
 #  predict_tremor_rest : loaded_model_tr_a, loaded_model_tr_ag
 #  ----------------------------------------
     
 @app.route('/predict_tremor_rest', methods=['POST'])  
 def predict_tremor_rest():
+    if request.is_json:
+        data = request.get_json()
+        gyroIn = data['recording']['recordingFormat']
+        if "gx" in gyroIn:
+            return jsonify({"prediction":str(100)}) 
+        else:
+            return jsonify({"prediction":str(200)}) 
+            
+
+
+
+
+#  ----------------------------------------
+#  predict_tremor_rest : loaded_model_tr_a, loaded_model_tr_ag
+#  ----------------------------------------
+    
+@app.route('/predict_tremor_rest__', methods=['POST'])  
+def predict_tremor_rest__():
     try:
         if request.is_json:
             data = request.get_json()
@@ -1272,6 +1289,7 @@ def predict_tremor_rest():
         print(rowx)
         print('--------')
         return jsonify({"prediction":str(2)}) 
+
 
 
 #  ----------------------------------------
