@@ -1017,11 +1017,11 @@ def predict_voice_ypl():
 
 
 #  ----------------------------------------
-#  predict_tremor_rest : loaded_model_tr_a, loaded_model_tr_ag
+#  predict_tremor_rest_checkgx : 
 #  ----------------------------------------
     
-@app.route('/predict_tremor_rest', methods=['POST'])  
-def predict_tremor_rest():
+@app.route('/predict_tremor_rest_checkgx', methods=['POST'])  
+def predict_tremor_rest_checkgx():
     if request.is_json:
         data = request.get_json()
         gyroIn = data['recording']['recordingFormat']
@@ -1038,8 +1038,8 @@ def predict_tremor_rest():
 #  predict_tremor_rest : loaded_model_tr_a, loaded_model_tr_ag
 #  ----------------------------------------
     
-@app.route('/predict_tremor_rest__', methods=['POST'])  
-def predict_tremor_rest__():
+@app.route('/predict_tremor_rest', methods=['POST'])  
+def predict_tremor_rest():
     try:
         if request.is_json:
             data = request.get_json()
@@ -1099,19 +1099,19 @@ def predict_tremor_rest__():
                 agZ = signal.sosfilt(sos, agZ)
 
                 # # ------------ transform to unit variance
-                acX=acX-np.mean(acX)
-                acX=acX/np.std(acX)
-                acY=acY-np.mean(acY)
-                acY=acY/np.std(acY)
-                acZ=acZ-np.mean(acZ)
-                acZ=acZ/np.std(acZ)
+                # acX=acX-np.mean(acX)
+                # acX=acX/np.std(acX)
+                # acY=acY-np.mean(acY)
+                # acY=acY/np.std(acY)
+                # acZ=acZ-np.mean(acZ)
+                # acZ=acZ/np.std(acZ)
                 
-                agX=agX-np.mean(agX)
-                agX=agX/np.std(agX)
-                agY=agY-np.mean(agY)
-                agY=agY/np.std(agY)
-                agZ=agZ-np.mean(agZ)
-                agZ=agZ/np.std(agZ)
+                # agX=agX-np.mean(agX)
+                # agX=agX/np.std(agX)
+                # agY=agY-np.mean(agY)
+                # agY=agY/np.std(agY)
+                # agZ=agZ-np.mean(agZ)
+                # agZ=agZ/np.std(agZ)
 
 
                 row = []
