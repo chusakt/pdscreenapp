@@ -1160,9 +1160,9 @@ def predict_tremor_rest():
                 for i in data['recording']['recordedData']:
                     tsC = i['ts']
                     tStamp.append(tsC)
-                    acXC = i['data'][0]
-                    acYC = i['data'][1]
-                    acZC = i['data'][2]    
+                    acXC = i['data'][3]
+                    acYC = i['data'][4]
+                    acZC = i['data'][5]    
                     acX.append(acXC)
                     acY.append(acYC)
                     acZ.append(acZC) 
