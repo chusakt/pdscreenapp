@@ -93,7 +93,7 @@ model_pkl_file = "model_tremorPost_a_and_g_wihtpreprocess_001.pkl"
 with open(model_pkl_file, 'rb') as file:  
     loaded_model_tp_ag = pickle.load(file) 
 # --- load model ---
-model_pkl_file = "model_tremorRest_a_and_g_wihtpreprocess_001.pkl"  
+model_pkl_file = "ModelTremorRest_fromSet2.pkl"  
 with open(model_pkl_file, 'rb') as file:  
     loaded_model_tr_ag = pickle.load(file) 
 #========================================
@@ -1057,22 +1057,16 @@ def predict_tremor_rest():
                 for i in data['recording']['recordedData']:
                     tsC = i['ts']
                     tStamp.append(tsC)
-                    # acXC = i['data'][0]
-                    # acYC = i['data'][1]
-                    # acZC = i['data'][2]    
-                    acXC = i['data'][3]
-                    acYC = i['data'][4]
-                    acZC = i['data'][5]                       
+                    acXC = i['data'][0]
+                    acYC = i['data'][1]
+                    acZC = i['data'][2]    
                     acX.append(acXC)
                     acY.append(acYC)
                     acZ.append(acZC) 
 
-                    # agXC = i['data'][3]
-                    # agYC = i['data'][4]
-                    # agZC = i['data'][5]    
-                    agXC = i['data'][0]
-                    agYC = i['data'][1]
-                    agZC = i['data'][2]                     
+                    agXC = i['data'][3]
+                    agYC = i['data'][4]
+                    agZC = i['data'][5]    
                     agX.append(agXC)
                     agY.append(agYC)
                     agZ.append(agZC) 
@@ -1091,12 +1085,12 @@ def predict_tremor_rest():
                     agZ, x1 = signal.resample(agZ,toBeSamp,np.arange(len(agZ)))  # resampled
 
                 # # ------------ handle preprocessing
-                acX = signal.sosfilt(sos, acX)
-                acY = signal.sosfilt(sos, acY)
-                acZ = signal.sosfilt(sos, acZ)
-                agX = signal.sosfilt(sos, agX)
-                agY = signal.sosfilt(sos, agY)
-                agZ = signal.sosfilt(sos, agZ)
+                # acX = signal.sosfilt(sos, acX)
+                # acY = signal.sosfilt(sos, acY)
+                # acZ = signal.sosfilt(sos, acZ)
+                # agX = signal.sosfilt(sos, agX)
+                # agY = signal.sosfilt(sos, agY)
+                # agZ = signal.sosfilt(sos, agZ)
 
                 # # ------------ transform to unit variance
                 # acX=acX-np.mean(acX)
@@ -1115,7 +1109,8 @@ def predict_tremor_rest():
 
 
                 row = []
-                for testsig in (acX,acY,acZ,agX,agY,agZ):
+                # for testsig in (acX,acY,acZ,agX,agY,agZ):
+                for testsig in (agX,agY,agZ,acX,acY,acZ):
                     testsig_filt = signal.sosfilt(sos, testsig)
                     res = np.array(testsig_filt)
                     fourier = fft(testsig_filt)
@@ -1295,8 +1290,8 @@ def predict_tremor_rest():
 #  ----------------------------------------
 #  predict_tremor_post loaded_model_tp_a,loaded_model_tp_ag
 #  ----------------------------------------
-@app.route('/predict_tremor_post_', methods=['POST'])  
-def predict_tremor_post_():
+@app.route('/predict_tremor_post', methods=['POST'])  
+def predict_tremor_post():
     try:
         if request.is_json:
             data = request.get_json()
@@ -1568,8 +1563,8 @@ def predict_tremor_rest_():
 #  predict_tremor_rest -----
 #  ----------------------------------------
     
-@app.route('/predict_tremor_post', methods=['POST'])  
-def predict_tremor_post():
+@app.route('/predict_tremor_post_', methods=['POST'])  
+def predict_tremor_post_():
     try:
         if request.is_json:
             data = request.get_json()
