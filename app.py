@@ -93,7 +93,7 @@ model_pkl_file = "model_tremorPost_a_and_g_wihtpreprocess_001.pkl"
 with open(model_pkl_file, 'rb') as file:  
     loaded_model_tp_ag = pickle.load(file) 
 # --- load model ---
-model_pkl_file = "ModelTremorRest_fromSet2.pkl"  
+model_pkl_file = "z_Mixed_Model_Tremor_aandg_set2.pkl"  
 with open(model_pkl_file, 'rb') as file:  
     loaded_model_tr_ag = pickle.load(file) 
 #========================================
@@ -1057,19 +1057,34 @@ def predict_tremor_rest():
                 for i in data['recording']['recordedData']:
                     tsC = i['ts']
                     tStamp.append(tsC)
-                    acXC = i['data'][0]
-                    acYC = i['data'][1]
-                    acZC = i['data'][2]    
-                    acX.append(acXC)
-                    acY.append(acYC)
-                    acZ.append(acZC) 
+                    if "roll" in gyroIn: #check if json from PD center
+                        acXC = i['data'][0]
+                        acYC = i['data'][1]
+                        acZC = i['data'][2]    
+                        acX.append(acXC)
+                        acY.append(acYC)
+                        acZ.append(acZC) 
 
-                    agXC = i['data'][3]
-                    agYC = i['data'][4]
-                    agZC = i['data'][5]    
-                    agX.append(agXC)
-                    agY.append(agYC)
-                    agZ.append(agZC) 
+                        agXC = i['data'][3]
+                        agYC = i['data'][4]
+                        agZC = i['data'][5]    
+                        agX.append(agXC)
+                        agY.append(agYC)
+                        agZ.append(agZC) 
+                    else:
+                        acXC = i['data'][3]
+                        acYC = i['data'][4]
+                        acZC = i['data'][5]    
+                        acX.append(acXC)
+                        acY.append(acYC)
+                        acZ.append(acZC) 
+
+                        agXC = i['data'][0]
+                        agYC = i['data'][1]
+                        agZC = i['data'][2]    
+                        agX.append(agXC)
+                        agY.append(agYC)
+                        agZ.append(agZC) 
 
                 tst = [item - tStamp[0] for item in tStamp]
 
@@ -1109,8 +1124,8 @@ def predict_tremor_rest():
 
 
                 row = []
-                # for testsig in (acX,acY,acZ,agX,agY,agZ):
-                for testsig in (agX,agY,agZ,acX,acY,acZ):
+                for testsig in (acX,acY,acZ,agX,agY,agZ):
+                # for testsig in (agX,agY,agZ,acX,acY,acZ):
                     testsig_filt = signal.sosfilt(sos, testsig)
                     res = np.array(testsig_filt)
                     fourier = fft(testsig_filt)
