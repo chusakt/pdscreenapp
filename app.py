@@ -1086,6 +1086,15 @@ def predict_tremor_rest():
                         agY.append(agYC)
                         agZ.append(agZC) 
 
+                        # ++++++++++++++++++++++++++++++++++++++++++++++++++++++
+                        acX, temp = signal.resample(acX,200,np.arange(len(acX)))
+                        acY, temp = signal.resample(acY,200,np.arange(len(acY)))
+                        acZ, temp = signal.resample(acZ,200,np.arange(len(acZ)))
+                        agX, temp = signal.resample(agX,200,np.arange(len(agX)))
+                        agY, temp = signal.resample(agY,200,np.arange(len(agY)))
+                        agZ, temp = signal.resample(agZ,200,np.arange(len(agZ)))                        
+                        # ++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
                 tst = [item - tStamp[0] for item in tStamp]
 
                 # ------------  handle the oversampling to 200 samples in 20 sec
