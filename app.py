@@ -93,7 +93,7 @@ model_pkl_file = "model_tremorPost_a_and_g_wihtpreprocess_001.pkl"
 with open(model_pkl_file, 'rb') as file:  
     loaded_model_tp_ag = pickle.load(file) 
 # --- load model ---
-model_pkl_file = "z_Mixed_Model_Tremor_aandg_set2.pkl"  
+model_pkl_file = "ModelTremorRest_fromSet2_2.pkl"  
 with open(model_pkl_file, 'rb') as file:  
     loaded_model_tr_ag = pickle.load(file) 
 #========================================
