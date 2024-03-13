@@ -1133,7 +1133,8 @@ def predict_tremor_rest():
 
 
                 row = []
-                for testsig in (acX,acY,acZ,agX,agY,agZ):
+                # for testsig in (acX,acY,acZ,agX,agY,agZ):
+                for testsig in (acX,acY,acZ):
                 # for testsig in (agX,agY,agZ,acX,acY,acZ):
                     testsig_filt = signal.sosfilt(sos, testsig)
                     res = np.array(testsig_filt)
@@ -1181,7 +1182,8 @@ def predict_tremor_rest():
                 
                 toListofNumber = [float(x) for x in row]
                 X = np.array([toListofNumber])
-                predictions_ = loaded_model_tr_ag.predict(X)        
+                # predictions_ = loaded_model_tr_ag.predict(X)   
+                predictions_ = loaded_model_tr_a.predict(X)     
                 return jsonify({"prediction":str(predictions_[0])}) 
             else:
 
