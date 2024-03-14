@@ -81,15 +81,15 @@ import pickle
 
 #========================================
 # --- load model ---
-model_pkl_file = "model_tremorPost_a_only_wihtpreprocess_001.pkl"  
-with open(model_pkl_file, 'rb') as file:  
-    loaded_model_tp_a = pickle.load(file) 
+# model_pkl_file = "model_tremorPost_a_only_wihtpreprocess_001.pkl"  
+# with open(model_pkl_file, 'rb') as file:  
+#     loaded_model_tp_a = pickle.load(file) 
+# # --- load model ---
+# model_pkl_file = "model_tremorRest_a_only_wihtpreprocess_001.pkl"  
+# with open(model_pkl_file, 'rb') as file:  
+#     loaded_model_tr_a = pickle.load(file) 
 # --- load model ---
-model_pkl_file = "model_tremorRest_a_only_wihtpreprocess_001.pkl"  
-with open(model_pkl_file, 'rb') as file:  
-    loaded_model_tr_a = pickle.load(file) 
-# --- load model ---
-model_pkl_file = "model_tremorPost_a_and_g_wihtpreprocess_001.pkl"  
+model_pkl_file = "model_tremor_post_006.pkl"  
 with open(model_pkl_file, 'rb') as file:  
     loaded_model_tp_ag = pickle.load(file) 
 # --- load model ---
@@ -1229,122 +1229,7 @@ def predict_tremor_rest():
                 # predictions_ = loaded_model_tr_a.predict(X)     
                 return jsonify({"prediction":str(predictions_[0])}) 
             else:
-
-                tStamp = []
-                acX = []
-                acY = []
-                acZ = []
-                agX = []
-                agY = []
-                agZ = []
-
-                for i in data['recording']['recordedData']:
-                    tsC = i['ts']
-                    tStamp.append(tsC)
-                    acXC = i['data'][3]
-                    acYC = i['data'][4]
-                    acZC = i['data'][5]    
-                    acX.append(acXC)
-                    acY.append(acYC)
-                    acZ.append(acZC) 
-
-                    # agXC = i['data'][3]
-                    # agYC = i['data'][4]
-                    # agZC = i['data'][5]    
-                    # agX.append(agXC)
-                    # agY.append(agYC)
-                    # agZ.append(agZC) 
-
-                tst = [item - tStamp[0] for item in tStamp]
-
-
-
-                # ------------  handle the oversampling to 200 samples in 20 sec
-                if len(acX) > 200:
-                    toBeSamp = 200
-                    # print('----> ' + str(filepath))
-                    acX, x1 = signal.resample(acX,toBeSamp,np.arange(len(acX)))  # resampled at 200
-                    acY, x1 = signal.resample(acY,toBeSamp,np.arange(len(acY)))  # resampled 
-                    acZ, x1 = signal.resample(acZ,toBeSamp,np.arange(len(acZ)))  # resampled 
-                    # agX, x1 = signal.resample(agX,toBeSamp,np.arange(len(agX)))  # resampled 
-                    # agY, x1 = signal.resample(agY,toBeSamp,np.arange(len(agY)))  # resampled
-                    # agZ, x1 = signal.resample(agZ,toBeSamp,np.arange(len(agZ)))  # resampled
-
-                # # ------------ handle preprocessing
-                acX = signal.sosfilt(sos, acX)
-                acY = signal.sosfilt(sos, acY)
-                acZ = signal.sosfilt(sos, acZ)
-                # agX = signal.sosfilt(sos, agX)
-                # agY = signal.sosfilt(sos, agY)
-                # agZ = signal.sosfilt(sos, agZ)
-
-                # # ------------ transform to unit variance
-                acX=acX-np.mean(acX)
-                acX=acX/np.std(acX)
-                acY=acY-np.mean(acY)
-                acY=acY/np.std(acY)
-                acZ=acZ-np.mean(acZ)
-                acZ=acZ/np.std(acZ)
-                
-                # agX=agX-np.mean(agX)
-                # agX=agX/np.std(agX)
-                # agY=agY-np.mean(agY)
-                # agY=agY/np.std(agY)
-                # agZ=agZ-np.mean(agZ)
-                # agZ=agZ/np.std(agZ)
-
-
-                row = []
-                for testsig in (acX,acY,acZ):
-                    testsig_filt = signal.sosfilt(sos, testsig)
-                    res = np.array(testsig_filt)
-                    fourier = fft(testsig_filt)
-                    fab = np.abs(fourier)[0:100]
-                    # ------------ 
-                    Esum = sum(np.square(fab))
-
-                    F1 = sum(np.square(fab[0:25]))
-                    F2 = sum(np.square(fab[25:50]))
-                    F3 = sum(np.square(fab[50:75]))
-                    F4 = sum(np.square(fab[75:80]))
-
-
-                    kur = kurtosis(testsig_filt, fisher=True)
-                    ske = skew(testsig_filt, bias=False)
-                    resdif = res[1:]-res[0:-1]
-                    Mobi = np.sqrt(np.var(resdif)/np.var(res))
-                    resdif2 = resdif[1:]-resdif[0:-1]
-                    compx = np.sqrt(np.var(resdif2)*np.var(res)/(np.var(resdif)*np.var(resdif)))
-                    
-                    # E1 = '%.5f'%(F1/Esum)
-                    # E1 = '%.5f'%(np.std(testsig_filt))           
-                    # E2 = '%.5f'%(np.mean(testsig_filt))                     
-                    E3 = '%.5f'%(kur)
-                    E4 = '%.5f'%(ske)
-                    E5 = '%.5f'%(Mobi)   
-                    E6 = '%.5f'%(compx)                              
-                    E7 = '%.5f'%(F1) 
-                    E8 = '%.5f'%(F2) 
-                    E9 = '%.5f'%(F3) 
-                    E10 = '%.5f'%(F4) 
-                    E11 = '%.5f'%(F2/Esum)
-                    E12 = '%.5f'%(F3/Esum)
-                    Samp, Phi1, Phi2 = EH.SampEn(res, m = 2, tau = 2)
-                    E13 = '%.5f'%(Samp[0])
-                    E14 = '%.5f'%(Samp[1])
-                    E15 = '%.5f'%(Samp[2])
-                    E16 = '%.5f'%(np.percentile(testsig_filt, 25))
-                    E17 = '%.5f'%(np.percentile(testsig_filt, 50))
-                    E18 = '%.5f'%(np.percentile(testsig_filt, 75))
-
-                    rowx = [E3,E4,E5,E6,E7,E8,E9,E10,E11,E12,E13,E14,E15,E16,E17,E18]
-                    row = row + rowx
-                
-                toListofNumber = [float(x) for x in row]
-                X = np.array([toListofNumber])
-                predictions_ = loaded_model_tr_a.predict(X)        
-                return jsonify({"prediction":str(predictions_[0])}) 
-
+                return jsonify({"prediction":str(2)}) 
 
     # except:
     except Exception as e: 
@@ -1378,126 +1263,13 @@ def predict_tremor_post():
                 for i in data['recording']['recordedData']:
                     tsC = i['ts']
                     tStamp.append(tsC)
-                    acXC = i['data'][0]
-                    acYC = i['data'][1]
-                    acZC = i['data'][2]    
-                    acX.append(acXC)
-                    acY.append(acYC)
-                    acZ.append(acZC) 
-
-                    agXC = i['data'][3]
-                    agYC = i['data'][4]
-                    agZC = i['data'][5]    
-                    agX.append(agXC)
-                    agY.append(agYC)
-                    agZ.append(agZC) 
-
-                tst = [item - tStamp[0] for item in tStamp]
-
-                # ------------  handle the oversampling to 200 samples in 20 sec
-                if len(acX) > 200:
-                    toBeSamp = 200
-                    # print('----> ' + str(filepath))
-                    acX, x1 = signal.resample(acX,toBeSamp,np.arange(len(acX)))  # resampled at 200
-                    acY, x1 = signal.resample(acY,toBeSamp,np.arange(len(acY)))  # resampled 
-                    acZ, x1 = signal.resample(acZ,toBeSamp,np.arange(len(acZ)))  # resampled 
-                    agX, x1 = signal.resample(agX,toBeSamp,np.arange(len(agX)))  # resampled 
-                    agY, x1 = signal.resample(agY,toBeSamp,np.arange(len(agY)))  # resampled
-                    agZ, x1 = signal.resample(agZ,toBeSamp,np.arange(len(agZ)))  # resampled
-
-                # # ------------ handle preprocessing
-                acX = signal.sosfilt(sos, acX)
-                acY = signal.sosfilt(sos, acY)
-                acZ = signal.sosfilt(sos, acZ)
-                agX = signal.sosfilt(sos, agX)
-                agY = signal.sosfilt(sos, agY)
-                agZ = signal.sosfilt(sos, agZ)
-
-                # # ------------ transform to unit variance
-                acX=acX-np.mean(acX)
-                acX=acX/np.std(acX)
-                acY=acY-np.mean(acY)
-                acY=acY/np.std(acY)
-                acZ=acZ-np.mean(acZ)
-                acZ=acZ/np.std(acZ)
-                
-                agX=agX-np.mean(agX)
-                agX=agX/np.std(agX)
-                agY=agY-np.mean(agY)
-                agY=agY/np.std(agY)
-                agZ=agZ-np.mean(agZ)
-                agZ=agZ/np.std(agZ)
-
-
-                row = []
-                for testsig in (acX,acY,acZ,agX,agY,agZ):
-                    testsig_filt = signal.sosfilt(sos, testsig)
-                    res = np.array(testsig_filt)
-                    fourier = fft(testsig_filt)
-                    fab = np.abs(fourier)[0:100]
-                    # ------------ 
-                    Esum = sum(np.square(fab))
-
-                    F1 = sum(np.square(fab[0:25]))
-                    F2 = sum(np.square(fab[25:50]))
-                    F3 = sum(np.square(fab[50:75]))
-                    F4 = sum(np.square(fab[75:80]))
-
-
-                    kur = kurtosis(testsig_filt, fisher=True)
-                    ske = skew(testsig_filt, bias=False)
-                    resdif = res[1:]-res[0:-1]
-                    Mobi = np.sqrt(np.var(resdif)/np.var(res))
-                    resdif2 = resdif[1:]-resdif[0:-1]
-                    compx = np.sqrt(np.var(resdif2)*np.var(res)/(np.var(resdif)*np.var(resdif)))
-                    
-                    # E1 = '%.5f'%(F1/Esum)
-                    # E1 = '%.5f'%(np.std(testsig_filt))           
-                    # E2 = '%.5f'%(np.mean(testsig_filt))                     
-                    E3 = '%.5f'%(kur)
-                    E4 = '%.5f'%(ske)
-                    E5 = '%.5f'%(Mobi)   
-                    E6 = '%.5f'%(compx)                              
-                    E7 = '%.5f'%(F1) 
-                    E8 = '%.5f'%(F2) 
-                    E9 = '%.5f'%(F3) 
-                    E10 = '%.5f'%(F4) 
-                    E11 = '%.5f'%(F2/Esum)
-                    E12 = '%.5f'%(F3/Esum)
-                    Samp, Phi1, Phi2 = EH.SampEn(res, m = 2, tau = 2)
-                    E13 = '%.5f'%(Samp[0])
-                    E14 = '%.5f'%(Samp[1])
-                    E15 = '%.5f'%(Samp[2])
-                    E16 = '%.5f'%(np.percentile(testsig_filt, 25))
-                    E17 = '%.5f'%(np.percentile(testsig_filt, 50))
-                    E18 = '%.5f'%(np.percentile(testsig_filt, 75))
-
-                    rowx = [E3,E4,E5,E6,E7,E8,E9,E10,E11,E12,E13,E14,E15,E16,E17,E18]
-                    row = row + rowx
-                
-                toListofNumber = [float(x) for x in row]
-                X = np.array([toListofNumber])
-                predictions_ = loaded_model_tp_ag.predict(X)        
-                return jsonify({"prediction":str(predictions_[0])}) 
-            else:
-
-                tStamp = []
-                acX = []
-                acY = []
-                acZ = []
-                agX = []
-                agY = []
-                agZ = []
-
-                for i in data['recording']['recordedData']:
-                    tsC = i['ts']
-                    tStamp.append(tsC)
-                    acXC = i['data'][0]
-                    acYC = i['data'][1]
-                    acZC = i['data'][2]    
-                    acX.append(acXC)
-                    acY.append(acYC)
-                    acZ.append(acZC) 
+                    # -- read from cupd dataset
+                    # acXC = i['data'][0]
+                    # acYC = i['data'][1]
+                    # acZC = i['data'][2]    
+                    # acX.append(acXC)
+                    # acY.append(acYC)
+                    # acZ.append(acZC) 
 
                     # agXC = i['data'][3]
                     # agYC = i['data'][4]
@@ -1506,59 +1278,90 @@ def predict_tremor_post():
                     # agY.append(agYC)
                     # agZ.append(agZC) 
 
+                    # -- read from cupd dataset / then
+                    # -- corrent order of accelero, gyro
+                    # --- read from zo app
+                    acXC = i['data'][3]
+                    acYC = i['data'][4]
+                    acZC = i['data'][5]    
+                    acX.append(acXC)
+                    acY.append(acYC)
+                    acZ.append(acZC) 
+
+                    agXC = i['data'][0]
+                    agYC = i['data'][1]
+                    agZC = i['data'][2]    
+                    agX.append(agXC)
+                    agY.append(agYC)
+                    agZ.append(agZC) 
+
+
                 tst = [item - tStamp[0] for item in tStamp]
-
-
-
+                # print(len(tst))
+                # f.close()
+                
+                
                 # ------------  handle the oversampling to 200 samples in 20 sec
-                if len(acX) > 200:
-                    toBeSamp = 200
-                    # print('----> ' + str(filepath))
-                    acX, x1 = signal.resample(acX,toBeSamp,np.arange(len(acX)))  # resampled at 200
-                    acY, x1 = signal.resample(acY,toBeSamp,np.arange(len(acY)))  # resampled 
-                    acZ, x1 = signal.resample(acZ,toBeSamp,np.arange(len(acZ)))  # resampled 
-                    # agX, x1 = signal.resample(agX,toBeSamp,np.arange(len(agX)))  # resampled 
-                    # agY, x1 = signal.resample(agY,toBeSamp,np.arange(len(agY)))  # resampled
-                    # agZ, x1 = signal.resample(agZ,toBeSamp,np.arange(len(agZ)))  # resampled
+                # if len(acX) > 200:
+                toBeSamp = 200
+                # print('----> ' + str(filepath))
+                acX, x1 = signal.resample(acX,toBeSamp,np.arange(len(acX)))  # resampled at 200
+                acY, x1 = signal.resample(acY,toBeSamp,np.arange(len(acY)))  # resampled 
+                acZ, x1 = signal.resample(acZ,toBeSamp,np.arange(len(acZ)))  # resampled 
+                agX, x1 = signal.resample(agX,toBeSamp,np.arange(len(agX)))  # resampled 
+                agY, x1 = signal.resample(agY,toBeSamp,np.arange(len(agY)))  # resampled
+                agZ, x1 = signal.resample(agZ,toBeSamp,np.arange(len(agZ)))  # resampled
 
-                # # ------------ handle preprocessing
+
+
+                # # # ------------ handle preprocessing
                 acX = signal.sosfilt(sos, acX)
                 acY = signal.sosfilt(sos, acY)
                 acZ = signal.sosfilt(sos, acZ)
-                # agX = signal.sosfilt(sos, agX)
-                # agY = signal.sosfilt(sos, agY)
-                # agZ = signal.sosfilt(sos, agZ)
+                agX = signal.sosfilt(sos, agX)
+                agY = signal.sosfilt(sos, agY)
+                agZ = signal.sosfilt(sos, agZ)
 
-                # # ------------ transform to unit variance
+                # # # # ------------ transform to unit variance
                 acX=acX-np.mean(acX)
-                acX=acX/np.std(acX)
+                # acX=acX/np.std(acX)
                 acY=acY-np.mean(acY)
-                acY=acY/np.std(acY)
+                # acY=acY/np.std(acY)
                 acZ=acZ-np.mean(acZ)
-                acZ=acZ/np.std(acZ)
-                
-                # agX=agX-np.mean(agX)
+                # acZ=acZ/np.std(acZ)
+
+                agX=agX-np.mean(agX)
                 # agX=agX/np.std(agX)
-                # agY=agY-np.mean(agY)
+                agY=agY-np.mean(agY)
                 # agY=agY/np.std(agY)
-                # agZ=agZ-np.mean(agZ)
+                agZ=agZ-np.mean(agZ)
                 # agZ=agZ/np.std(agZ)
-
-
+                # # ------------ 
                 row = []
-                for testsig in (acX,acY,acZ):
-                    testsig_filt = signal.sosfilt(sos, testsig)
+                for testsig_filt in (acX,acY,acZ,agX,agY,agZ):
+                # for testsig in (acX,acY,acZ):
+                    # testsig_filt = signal.sosfilt(sos, testsig)
                     res = np.array(testsig_filt)
                     fourier = fft(testsig_filt)
-                    fab = np.abs(fourier)[0:100]
+                    fab = np.abs(fourier)[105:195]
                     # ------------ 
                     Esum = sum(np.square(fab))
-
-                    F1 = sum(np.square(fab[0:25]))
-                    F2 = sum(np.square(fab[25:50]))
-                    F3 = sum(np.square(fab[50:75]))
-                    F4 = sum(np.square(fab[75:80]))
-
+                    # Esum = 1.0
+                    # base = 2  # work in units of bits
+                    F1 = sum(np.square(fab[1:13]))
+                    F2 = sum(np.square(fab[13:25]))
+                    F3 = sum(np.square(fab[25:37]))
+                    F4 = sum(np.square(fab[37:49]))
+                    F5 = sum(np.square(fab[49:61]))
+                    F6 = sum(np.square(fab[61:73]))
+                    F7 = sum(np.square(fab[73:85]))
+                    F8 = sum(np.square(fab[85:97]))
+                    # F5 = sum(np.square(fab[80:100]))
+                    # F6 = sum(np.square(fab[50:60]))
+                    # F7 = sum(np.square(fab[60:70]))
+                    # F8 = sum(np.square(fab[70:80]))
+                    # F9 = sum(np.square(fab[80:90]))
+                    # F10 = sum(np.square(fab[90:100]))
 
                     kur = kurtosis(testsig_filt, fisher=True)
                     ske = skew(testsig_filt, bias=False)
@@ -1568,8 +1371,12 @@ def predict_tremor_post():
                     compx = np.sqrt(np.var(resdif2)*np.var(res)/(np.var(resdif)*np.var(resdif)))
                     
                     # E1 = '%.5f'%(F1/Esum)
-                    # E1 = '%.5f'%(np.std(testsig_filt))           
-                    # E2 = '%.5f'%(np.mean(testsig_filt))                     
+                    E1 = '%.5f'%(np.std(testsig_filt))           
+                    E2 = '%.5f'%(np.mean(testsig_filt))                     
+                    
+                    # E1 = '%.5f'%(tst[-1])           
+                    # E2 = '%.5f'%(len(acX)) 
+                                    
                     E3 = '%.5f'%(kur)
                     E4 = '%.5f'%(ske)
                     E5 = '%.5f'%(Mobi)   
@@ -1578,24 +1385,57 @@ def predict_tremor_post():
                     E8 = '%.5f'%(F2) 
                     E9 = '%.5f'%(F3) 
                     E10 = '%.5f'%(F4) 
-                    E11 = '%.5f'%(F2/Esum)
-                    E12 = '%.5f'%(F3/Esum)
+                    E7b = '%.5f'%(F5) 
+                    E8b = '%.5f'%(F6) 
+                    E9b = '%.5f'%(F7) 
+                    E10b = '%.5f'%(F8)                 
+                    # E11 = '%.5f'%(F2/Esum)
+                    # E12 = '%.5f'%(F3/Esum)
+                    
+                    Es1 = '%.5f'%(F1/Esum)
+                    Es2 = '%.5f'%(F2/Esum)
+                    Es3 = '%.5f'%(F3/Esum)
+                    Es4 = '%.5f'%(F4/Esum)
+                    Es5 = '%.5f'%(F5/Esum)
+                    Es6 = '%.5f'%(F6/Esum)
+                    Es7 = '%.5f'%(F7/Esum)
+                    Es8 = '%.5f'%(F8/Esum)
+
+                    # E5 = '%.5f'%(np.percentile(testsig, 50))
+                    # .SampEn(X, m = 4)
+                    # xx = EH.SampEn(res,m=2)
+                    # Samp = EH.SampEn(res, m = 4)
                     Samp, Phi1, Phi2 = EH.SampEn(res, m = 2, tau = 2)
+                    # print(Samp)
                     E13 = '%.5f'%(Samp[0])
                     E14 = '%.5f'%(Samp[1])
                     E15 = '%.5f'%(Samp[2])
-                    E16 = '%.5f'%(np.percentile(testsig_filt, 25))
-                    E17 = '%.5f'%(np.percentile(testsig_filt, 50))
-                    E18 = '%.5f'%(np.percentile(testsig_filt, 75))
+                    # E16 = '%.5f'%(np.percentile(testsig_filt, 25))
+                    # E17 = '%.5f'%(np.percentile(testsig_filt, 50))
+                    # E18 = '%.5f'%(np.percentile(testsig_filt, 75))                
+                    E16 = '%.5f'%(np.percentile(testsig_filt, 12))
+                    E17 = '%.5f'%(np.percentile(testsig_filt, 30))
+                    E18 = '%.5f'%(np.percentile(testsig_filt, 45))
+                    E19 = '%.5f'%(np.percentile(testsig_filt, 60))
+                    E20 = '%.5f'%(np.percentile(testsig_filt, 75))
+                    E21 = '%.5f'%(np.percentile(testsig_filt, 90))
+                    # zero_crossing
+                    # E19 = '%.5f'%(len(np.where(np.diff(np.sign(testsig)))[0]))
 
-                    rowx = [E3,E4,E5,E6,E7,E8,E9,E10,E11,E12,E13,E14,E15,E16,E17,E18]
+
+                    # rowx = [tStamp[-1]-tStamp[0],len(tst),len(acX),E3,E4,E5,E6,E7,E8,E9,E10,E11,E12,E13,E14,E15,E16,E17,E18]
+                    # rowx = [E3,E4,E5,E6,E7,E8,E9,E10,E11,E12,E13,E14,E15,E16,E17,E18]
+                    # rowx = [E3,E4,E5,E6,E7,E8,E9,E10,E7b,E8b,E9b,E10b,E11,E12,E13,E14,E15,E16,E17,E18,E19,E20,E21]
+                    rowx = [E3,E4,E5,E6,E7,E8,E9,E10,E7b,E8b,E9b,E10b,Es1,Es2,Es3,Es4,Es5,Es6,Es7,Es8,E13,E14,E15,E16,E17,E18,E19,E20,E21]
                     row = row + rowx
                 
                 toListofNumber = [float(x) for x in row]
                 X = np.array([toListofNumber])
-                predictions_ = loaded_model_tp_a.predict(X)        
+                predictions_ = loaded_model_tp_ag.predict(X)   
+                # predictions_ = loaded_model_tr_a.predict(X)     
                 return jsonify({"prediction":str(predictions_[0])}) 
-
+            else:
+                return jsonify({"prediction":str(2)}) 
 
     # except:
     except Exception as e: 
