@@ -1696,7 +1696,7 @@ def predict_gait_stab():
 #  ----------------------------------------
 #   
 #  ----------------------------------------
-    
+
 @app.route('/predict_gait_walk', methods=['POST'])  
 def predict_gait_walk():
     try:
@@ -1784,7 +1784,7 @@ def predict_gait_walk():
             
             toListofNumber = [float(x) for x in row]
             X = np.array([toListofNumber])
-            predictions_ = loaded_model_gw.predict(X)        
+            predictions_ = loaded_model_gw_a.predict(X)        
             return jsonify({"prediction":str(predictions_[0])}) 
     except:
         return jsonify({"prediction":str(2)}) 
