@@ -1751,7 +1751,7 @@ def predict_gait_walk():
             acZ=acZ-np.mean(acZ)
             acZ=acZ/np.std(acZ)
                 
-            row = []
+            row = [] 
             for testsig in (acX,acY,acZ):
             # for testsig in (acX,acY,acZ):
                 testsig_filt = signal.sosfilt(sos, testsig)
