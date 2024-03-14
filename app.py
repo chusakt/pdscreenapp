@@ -93,7 +93,7 @@ model_pkl_file = "model_tremorPost_a_and_g_wihtpreprocess_001.pkl"
 with open(model_pkl_file, 'rb') as file:  
     loaded_model_tp_ag = pickle.load(file) 
 # --- load model ---
-model_pkl_file = "model_tremor_rest_005.pkl"  
+model_pkl_file = "model_tremor_rest_006.pkl"  
 with open(model_pkl_file, 'rb') as file:  
     loaded_model_tr_ag = pickle.load(file) 
 #========================================
@@ -1092,7 +1092,7 @@ def predict_tremor_rest():
 
                 tst = [item - tStamp[0] for item in tStamp]
                 # print(len(tst))
-                f.close()
+                # f.close()
                 
                 
                 # ------------  handle the oversampling to 200 samples in 20 sec
@@ -1225,8 +1225,8 @@ def predict_tremor_rest():
                 
                 toListofNumber = [float(x) for x in row]
                 X = np.array([toListofNumber])
-                # predictions_ = loaded_model_tr_ag.predict(X)   
-                predictions_ = loaded_model_tr_a.predict(X)     
+                predictions_ = loaded_model_tr_ag.predict(X)   
+                # predictions_ = loaded_model_tr_a.predict(X)     
                 return jsonify({"prediction":str(predictions_[0])}) 
             else:
 
