@@ -1200,11 +1200,11 @@ def predict_tremor_rest():
                     # rowx = [E1,E3,E4,E5,E6,E7]
                     row = row + rowx
                     
-                    toListofNumber = [float(x) for x in row]
-                    X = np.array([toListofNumber])
-                    predictions_ = loaded_model_tr_ag.predict(X)   
-                    # predictions_ = loaded_model_tr_a.predict(X)     
-                    return jsonify({"prediction":str(predictions_[0])}) 
+                toListofNumber = [float(x) for x in row]
+                X = np.array([toListofNumber])
+                predictions_ = loaded_model_tr_ag.predict(X)   
+                # predictions_ = loaded_model_tr_a.predict(X)     
+                return jsonify({"prediction":str(predictions_[0])}) 
             else:
                 return jsonify({"prediction":str(2)}) 
 
