@@ -1786,5 +1786,11 @@ def predict_gait_walk():
             X = np.array([toListofNumber])
             predictions_ = loaded_model_gw_a.predict(X)        
             return jsonify({"prediction":str(predictions_[0])}) 
-    except:
-        return jsonify({"prediction":str(2)}) 
+        
+    except Exception as e: 
+        print(e)
+        print('--------')
+        print(rowx)
+        print('--------')
+        return jsonify({"prediction":str(2)})         
+
