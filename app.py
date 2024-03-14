@@ -1723,12 +1723,12 @@ def predict_gait_walk():
                 acY.append(acYC)
                 acZ.append(acZC) 
 
-                # agXC = i['data'][3]
-                # agYC = i['data'][4]
-                # agZC = i['data'][5]    
-                # agX.append(agXC)
-                # agY.append(agYC)
-                # agZ.append(agZC) 
+                agXC = i['data'][3]
+                agYC = i['data'][4]
+                agZC = i['data'][5]    
+                agX.append(agXC)
+                agY.append(agYC)
+                agZ.append(agZC) 
 
             tst = [item - tStamp[0] for item in tStamp]
 
@@ -1739,9 +1739,9 @@ def predict_gait_walk():
                 acX, x1 = signal.resample(acX,toBeSamp,np.arange(len(acX)))  # resampled at 200
                 acY, x1 = signal.resample(acY,toBeSamp,np.arange(len(acY)))  # resampled 
                 acZ, x1 = signal.resample(acZ,toBeSamp,np.arange(len(acZ)))  # resampled 
-                # agX, x1 = signal.resample(agX,toBeSamp,np.arange(len(agX)))  # resampled 
-                # agY, x1 = signal.resample(agY,toBeSamp,np.arange(len(agY)))  # resampled
-                # agZ, x1 = signal.resample(agZ,toBeSamp,np.arange(len(agZ)))  # resampled
+                agX, x1 = signal.resample(agX,toBeSamp,np.arange(len(agX)))  # resampled 
+                agY, x1 = signal.resample(agY,toBeSamp,np.arange(len(agY)))  # resampled
+                agZ, x1 = signal.resample(agZ,toBeSamp,np.arange(len(agZ)))  # resampled
 
             # # ------------ transform to unit variance
             acX=acX-np.mean(acX)
@@ -1750,9 +1750,16 @@ def predict_gait_walk():
             acY=acY/np.std(acY)
             acZ=acZ-np.mean(acZ)
             acZ=acZ/np.std(acZ)
-                
+
+            agX=agX-np.mean(agX)
+            agX=agX/np.std(agX)
+            agY=agY-np.mean(agY)
+            agY=agY/np.std(agY)
+            agZ=agZ-np.mean(agZ)
+            agZ=agZ/np.std(agZ)
+
             row = [] 
-            for testsig in (acX,acY,acZ):
+            for testsig in (acX,acY,acZ,agX,agY,agZ):
             # for testsig in (acX,acY,acZ):
                 testsig_filt = signal.sosfilt(sos, testsig)
                 res = np.array(testsig_filt)
@@ -1793,7 +1800,7 @@ def predict_gait_walk():
             
             toListofNumber = [float(x) for x in row]
             X = np.array([toListofNumber])
-            predictions_ = loaded_model_gw_a.predict(X)        
+            predictions_ = loaded_model_gw_ag.predict(X)        
             return jsonify({"prediction":str(predictions_[0])}) 
         
     except Exception as e: 
