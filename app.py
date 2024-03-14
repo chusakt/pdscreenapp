@@ -1058,36 +1058,36 @@ def predict_tremor_rest():
                     tsC = i['ts']
                     tStamp.append(tsC)
                     # -- read from cupd dataset
-                    # acXC = i['data'][0]
-                    # acYC = i['data'][1]
-                    # acZC = i['data'][2]    
-                    # acX.append(acXC)
-                    # acY.append(acYC)
-                    # acZ.append(acZC) 
-
-                    # agXC = i['data'][3]
-                    # agYC = i['data'][4]
-                    # agZC = i['data'][5]    
-                    # agX.append(agXC)
-                    # agY.append(agYC)
-                    # agZ.append(agZC) 
-
-                    # -- read from cupd dataset / then
-                    # -- corrent order of accelero, gyro
-                    # --- read from zo app
-                    acXC = i['data'][3]
-                    acYC = i['data'][4]
-                    acZC = i['data'][5]    
+                    acXC = i['data'][0]
+                    acYC = i['data'][1]
+                    acZC = i['data'][2]    
                     acX.append(acXC)
                     acY.append(acYC)
                     acZ.append(acZC) 
 
-                    agXC = i['data'][0]
-                    agYC = i['data'][1]
-                    agZC = i['data'][2]    
+                    agXC = i['data'][3]
+                    agYC = i['data'][4]
+                    agZC = i['data'][5]    
                     agX.append(agXC)
                     agY.append(agYC)
                     agZ.append(agZC) 
+
+                    # -- read from cupd dataset / then
+                    # -- corrent order of accelero, gyro
+                    # --- read from zo app
+                    # acXC = i['data'][3]
+                    # acYC = i['data'][4]
+                    # acZC = i['data'][5]    
+                    # acX.append(acXC)
+                    # acY.append(acYC)
+                    # acZ.append(acZC) 
+
+                    # agXC = i['data'][0]
+                    # agYC = i['data'][1]
+                    # agZC = i['data'][2]    
+                    # agX.append(agXC)
+                    # agY.append(agYC)
+                    # agZ.append(agZC) 
 
 
                 tst = [item - tStamp[0] for item in tStamp]
@@ -1096,15 +1096,15 @@ def predict_tremor_rest():
                 
                 
                 # ------------  handle the oversampling to 200 samples in 20 sec
-                # if len(acX) > 200:
-                toBeSamp = 200
-                # print('----> ' + str(filepath))
-                acX, x1 = signal.resample(acX,toBeSamp,np.arange(len(acX)))  # resampled at 200
-                acY, x1 = signal.resample(acY,toBeSamp,np.arange(len(acY)))  # resampled 
-                acZ, x1 = signal.resample(acZ,toBeSamp,np.arange(len(acZ)))  # resampled 
-                agX, x1 = signal.resample(agX,toBeSamp,np.arange(len(agX)))  # resampled 
-                agY, x1 = signal.resample(agY,toBeSamp,np.arange(len(agY)))  # resampled
-                agZ, x1 = signal.resample(agZ,toBeSamp,np.arange(len(agZ)))  # resampled
+                if len(acX) > 200:
+                    toBeSamp = 200
+                    # print('----> ' + str(filepath))
+                    acX, x1 = signal.resample(acX,toBeSamp,np.arange(len(acX)))  # resampled at 200
+                    acY, x1 = signal.resample(acY,toBeSamp,np.arange(len(acY)))  # resampled 
+                    acZ, x1 = signal.resample(acZ,toBeSamp,np.arange(len(acZ)))  # resampled 
+                    agX, x1 = signal.resample(agX,toBeSamp,np.arange(len(agX)))  # resampled 
+                    agY, x1 = signal.resample(agY,toBeSamp,np.arange(len(agY)))  # resampled
+                    agZ, x1 = signal.resample(agZ,toBeSamp,np.arange(len(agZ)))  # resampled
 
 
 
@@ -1264,36 +1264,36 @@ def predict_tremor_post():
                     tsC = i['ts']
                     tStamp.append(tsC)
                     # -- read from cupd dataset
-                    # acXC = i['data'][0]
-                    # acYC = i['data'][1]
-                    # acZC = i['data'][2]    
-                    # acX.append(acXC)
-                    # acY.append(acYC)
-                    # acZ.append(acZC) 
-
-                    # agXC = i['data'][3]
-                    # agYC = i['data'][4]
-                    # agZC = i['data'][5]    
-                    # agX.append(agXC)
-                    # agY.append(agYC)
-                    # agZ.append(agZC) 
-
-                    # -- read from cupd dataset / then
-                    # -- corrent order of accelero, gyro
-                    # --- read from zo app
-                    acXC = i['data'][3]
-                    acYC = i['data'][4]
-                    acZC = i['data'][5]    
+                    acXC = i['data'][0]
+                    acYC = i['data'][1]
+                    acZC = i['data'][2]    
                     acX.append(acXC)
                     acY.append(acYC)
                     acZ.append(acZC) 
 
-                    agXC = i['data'][0]
-                    agYC = i['data'][1]
-                    agZC = i['data'][2]    
+                    agXC = i['data'][3]
+                    agYC = i['data'][4]
+                    agZC = i['data'][5]    
                     agX.append(agXC)
                     agY.append(agYC)
                     agZ.append(agZC) 
+
+                    # -- read from cupd dataset / then
+                    # -- corrent order of accelero, gyro
+                    # --- read from zo app
+                    # acXC = i['data'][3]
+                    # acYC = i['data'][4]
+                    # acZC = i['data'][5]    
+                    # acX.append(acXC)
+                    # acY.append(acYC)
+                    # acZ.append(acZC) 
+
+                    # agXC = i['data'][0]
+                    # agYC = i['data'][1]
+                    # agZC = i['data'][2]    
+                    # agX.append(agXC)
+                    # agY.append(agYC)
+                    # agZ.append(agZC) 
 
 
                 tst = [item - tStamp[0] for item in tStamp]
@@ -1302,15 +1302,15 @@ def predict_tremor_post():
                 
                 
                 # ------------  handle the oversampling to 200 samples in 20 sec
-                # if len(acX) > 200:
-                toBeSamp = 200
-                # print('----> ' + str(filepath))
-                acX, x1 = signal.resample(acX,toBeSamp,np.arange(len(acX)))  # resampled at 200
-                acY, x1 = signal.resample(acY,toBeSamp,np.arange(len(acY)))  # resampled 
-                acZ, x1 = signal.resample(acZ,toBeSamp,np.arange(len(acZ)))  # resampled 
-                agX, x1 = signal.resample(agX,toBeSamp,np.arange(len(agX)))  # resampled 
-                agY, x1 = signal.resample(agY,toBeSamp,np.arange(len(agY)))  # resampled
-                agZ, x1 = signal.resample(agZ,toBeSamp,np.arange(len(agZ)))  # resampled
+                if len(acX) > 200:
+                    toBeSamp = 200
+                    # print('----> ' + str(filepath))
+                    acX, x1 = signal.resample(acX,toBeSamp,np.arange(len(acX)))  # resampled at 200
+                    acY, x1 = signal.resample(acY,toBeSamp,np.arange(len(acY)))  # resampled 
+                    acZ, x1 = signal.resample(acZ,toBeSamp,np.arange(len(acZ)))  # resampled 
+                    agX, x1 = signal.resample(agX,toBeSamp,np.arange(len(agX)))  # resampled 
+                    agY, x1 = signal.resample(agY,toBeSamp,np.arange(len(agY)))  # resampled
+                    agZ, x1 = signal.resample(agZ,toBeSamp,np.arange(len(agZ)))  # resampled
 
 
 
