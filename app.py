@@ -93,7 +93,7 @@ model_pkl_file = "model_tremor_post_006.pkl"
 with open(model_pkl_file, 'rb') as file:  
     loaded_model_tp_ag = pickle.load(file) 
 # --- load model ---
-model_pkl_file = "model_tremor_rest_006.pkl"  
+model_pkl_file = "model_tremor_rest_007.pkl"  
 with open(model_pkl_file, 'rb') as file:  
     loaded_model_tr_ag = pickle.load(file) 
 #========================================
@@ -1106,6 +1106,12 @@ def predict_tremor_rest():
                     agY, x1 = signal.resample(agY,toBeSamp,np.arange(len(agY)))  # resampled
                     agZ, x1 = signal.resample(agZ,toBeSamp,np.arange(len(agZ)))  # resampled
 
+                acX = acX[20:180]
+                acY = acY[20:180]
+                acZ = acZ[20:180]
+                agX = agX[20:180]
+                agY = agY[20:180]
+                agZ = agZ[20:180] 
 
 
                 # # # ------------ handle preprocessing
@@ -1137,19 +1143,19 @@ def predict_tremor_rest():
                     # testsig_filt = signal.sosfilt(sos, testsig)
                     res = np.array(testsig_filt)
                     fourier = fft(testsig_filt)
-                    fab = np.abs(fourier)[105:195]
+                    fab = np.abs(fourier)[82:160]
                     # ------------ 
                     Esum = sum(np.square(fab))
                     # Esum = 1.0
                     # base = 2  # work in units of bits
-                    F1 = sum(np.square(fab[1:13]))
-                    F2 = sum(np.square(fab[13:25]))
-                    F3 = sum(np.square(fab[25:37]))
-                    F4 = sum(np.square(fab[37:49]))
-                    F5 = sum(np.square(fab[49:61]))
-                    F6 = sum(np.square(fab[61:73]))
-                    F7 = sum(np.square(fab[73:85]))
-                    F8 = sum(np.square(fab[85:97]))
+                    F1 = sum(np.square(fab[1:11]))
+                    F2 = sum(np.square(fab[11:21]))
+                    F3 = sum(np.square(fab[21:31]))
+                    F4 = sum(np.square(fab[31:41]))
+                    F5 = sum(np.square(fab[41:51]))
+                    F6 = sum(np.square(fab[51:61]))
+                    F7 = sum(np.square(fab[61:71]))
+                    F8 = sum(np.square(fab[71:78]))
                     # F5 = sum(np.square(fab[80:100]))
                     # F6 = sum(np.square(fab[50:60]))
                     # F7 = sum(np.square(fab[60:70]))
