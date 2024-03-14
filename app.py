@@ -1505,6 +1505,16 @@ def predict_gait_stab():
 
                 tst = [item - tStamp[0] for item in tStamp]
                 # ------------  handle the oversampling to 200 samples in 20 sec
+
+                toBeSamp = 200
+                # print('----> ' + str(filepath))
+                acX, x1 = signal.resample(acX,toBeSamp,np.arange(len(acX)))  # resampled at 200
+                acY, x1 = signal.resample(acY,toBeSamp,np.arange(len(acY)))  # resampled 
+                acZ, x1 = signal.resample(acZ,toBeSamp,np.arange(len(acZ)))  # resampled 
+                agX, x1 = signal.resample(agX,toBeSamp,np.arange(len(agX)))  # resampled 
+                agY, x1 = signal.resample(agY,toBeSamp,np.arange(len(agY)))  # resampled
+                agZ, x1 = signal.resample(agZ,toBeSamp,np.arange(len(agZ)))  # resampled
+
                 if tst[-1] >= 10:
                     acX = acX[0:100]
                     acY = acY[0:100]
