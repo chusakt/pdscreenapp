@@ -1743,6 +1743,14 @@ def predict_gait_walk():
                 # agY, x1 = signal.resample(agY,toBeSamp,np.arange(len(agY)))  # resampled
                 # agZ, x1 = signal.resample(agZ,toBeSamp,np.arange(len(agZ)))  # resampled
 
+            # # ------------ transform to unit variance
+            acX=acX-np.mean(acX)
+            acX=acX/np.std(acX)
+            acY=acY-np.mean(acY)
+            acY=acY/np.std(acY)
+            acZ=acZ-np.mean(acZ)
+            acZ=acZ/np.std(acZ)
+                
             row = []
             for testsig in (acX,acY,acZ):
             # for testsig in (acX,acY,acZ):
@@ -1779,7 +1787,8 @@ def predict_gait_walk():
                 E11 = '%.5f'%(F2/Esum)
                 E12 = '%.5f'%(F3/Esum)
                 E13 = '%.5f'%(np.var(resdif2))
-                rowx = [E1,E2,E3,E4,E5,E6,E7,E8,E9,E10,E11,E12,E13]
+                # rowx = [E1,E2,E3,E4,E5,E6,E7,E8,E9,E10,E11,E12,E13]
+                rowx = [E3,E4,E5,E6,E7,E8,E9,E10,E11,E12,E13]
                 row = row + rowx
             
             toListofNumber = [float(x) for x in row]
