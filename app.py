@@ -93,7 +93,7 @@ model_pkl_file = "model_tremorPost_a_and_g_wihtpreprocess_001.pkl"
 with open(model_pkl_file, 'rb') as file:  
     loaded_model_tp_ag = pickle.load(file) 
 # --- load model ---
-model_pkl_file = "model_tremor_rest_004.pkl"  
+model_pkl_file = "model_tremor_rest_005.pkl"  
 with open(model_pkl_file, 'rb') as file:  
     loaded_model_tr_ag = pickle.load(file) 
 #========================================
@@ -1137,19 +1137,19 @@ def predict_tremor_rest():
                     # testsig_filt = signal.sosfilt(sos, testsig)
                     res = np.array(testsig_filt)
                     fourier = fft(testsig_filt)
-                    fab = np.abs(fourier)[5:95]
+                    fab = np.abs(fourier)[105:195]
                     # ------------ 
                     Esum = sum(np.square(fab))
                     # Esum = 1.0
                     # base = 2  # work in units of bits
-                    F1 = sum(np.square(fab[105:117]))
-                    F2 = sum(np.square(fab[117:129]))
-                    F3 = sum(np.square(fab[129:141]))
-                    F4 = sum(np.square(fab[141:153]))
-                    F5 = sum(np.square(fab[153:165]))
-                    F6 = sum(np.square(fab[165:177]))
-                    F7 = sum(np.square(fab[177:189]))
-                    F8 = sum(np.square(fab[189:195]))
+                    F1 = sum(np.square(fab[1:13]))
+                    F2 = sum(np.square(fab[13:25]))
+                    F3 = sum(np.square(fab[25:37]))
+                    F4 = sum(np.square(fab[37:49]))
+                    F5 = sum(np.square(fab[49:61]))
+                    F6 = sum(np.square(fab[61:73]))
+                    F7 = sum(np.square(fab[73:85]))
+                    F8 = sum(np.square(fab[85:97]))
                     # F5 = sum(np.square(fab[80:100]))
                     # F6 = sum(np.square(fab[50:60]))
                     # F7 = sum(np.square(fab[60:70]))
@@ -1183,8 +1183,18 @@ def predict_tremor_rest():
                     E8b = '%.5f'%(F6) 
                     E9b = '%.5f'%(F7) 
                     E10b = '%.5f'%(F8)                 
-                    E11 = '%.5f'%(F2/Esum)
-                    E12 = '%.5f'%(F3/Esum)
+                    # E11 = '%.5f'%(F2/Esum)
+                    # E12 = '%.5f'%(F3/Esum)
+                    
+                    Es1 = '%.5f'%(F1/Esum)
+                    Es2 = '%.5f'%(F2/Esum)
+                    Es3 = '%.5f'%(F3/Esum)
+                    Es4 = '%.5f'%(F4/Esum)
+                    Es5 = '%.5f'%(F5/Esum)
+                    Es6 = '%.5f'%(F6/Esum)
+                    Es7 = '%.5f'%(F7/Esum)
+                    Es8 = '%.5f'%(F8/Esum)
+
                     # E5 = '%.5f'%(np.percentile(testsig, 50))
                     # .SampEn(X, m = 4)
                     # xx = EH.SampEn(res,m=2)
@@ -1209,7 +1219,8 @@ def predict_tremor_rest():
 
                     # rowx = [tStamp[-1]-tStamp[0],len(tst),len(acX),E3,E4,E5,E6,E7,E8,E9,E10,E11,E12,E13,E14,E15,E16,E17,E18]
                     # rowx = [E3,E4,E5,E6,E7,E8,E9,E10,E11,E12,E13,E14,E15,E16,E17,E18]
-                    rowx = [E3,E4,E5,E6,E7,E8,E9,E10,E7b,E8b,E9b,E10b,E11,E12,E13,E14,E15,E16,E17,E18,E19,E20,E21]
+                    # rowx = [E3,E4,E5,E6,E7,E8,E9,E10,E7b,E8b,E9b,E10b,E11,E12,E13,E14,E15,E16,E17,E18,E19,E20,E21]
+                    rowx = [E3,E4,E5,E6,E7,E8,E9,E10,E7b,E8b,E9b,E10b,Es1,Es2,Es3,Es4,Es5,Es6,Es7,Es8,E13,E14,E15,E16,E17,E18,E19,E20,E21]
                     row = row + rowx
                 
                 toListofNumber = [float(x) for x in row]
