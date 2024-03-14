@@ -1138,73 +1138,73 @@ def predict_tremor_rest():
                 # # agZ=agZ/np.std(agZ)
                 # # ------------ 
                 row = []
-            for testsig in (acX,acY,acZ,agX,agY,agZ):
-            # for testsig in (acX,acY,acZ):
-                testsig_filt = signal.sosfilt(sos, testsig)
-                res = np.array(testsig_filt)
-                fourier = fft(testsig_filt)
-                fab = np.abs(fourier)[0:100]
-                # ------------ 
-                Esum = sum(np.square(fab))
-                # Esum = 1.0
-                # base = 2  # work in units of bits
-                F1 = sum(np.square(fab[0:25]))
-                F2 = sum(np.square(fab[25:50]))
-                F3 = sum(np.square(fab[50:75]))
-                F4 = sum(np.square(fab[75:80]))
-                # F5 = sum(np.square(fab[80:100]))
-                # F6 = sum(np.square(fab[50:60]))
-                # F7 = sum(np.square(fab[60:70]))
-                # F8 = sum(np.square(fab[70:80]))
-                # F9 = sum(np.square(fab[80:90]))
-                # F10 = sum(np.square(fab[90:100]))
+                for testsig in (acX,acY,acZ,agX,agY,agZ):
+                # for testsig in (acX,acY,acZ):
+                    testsig_filt = signal.sosfilt(sos, testsig)
+                    res = np.array(testsig_filt)
+                    fourier = fft(testsig_filt)
+                    fab = np.abs(fourier)[0:100]
+                    # ------------ 
+                    Esum = sum(np.square(fab))
+                    # Esum = 1.0
+                    # base = 2  # work in units of bits
+                    F1 = sum(np.square(fab[0:25]))
+                    F2 = sum(np.square(fab[25:50]))
+                    F3 = sum(np.square(fab[50:75]))
+                    F4 = sum(np.square(fab[75:80]))
+                    # F5 = sum(np.square(fab[80:100]))
+                    # F6 = sum(np.square(fab[50:60]))
+                    # F7 = sum(np.square(fab[60:70]))
+                    # F8 = sum(np.square(fab[70:80]))
+                    # F9 = sum(np.square(fab[80:90]))
+                    # F10 = sum(np.square(fab[90:100]))
 
-                kur = kurtosis(testsig_filt, fisher=True)
-                ske = skew(testsig_filt, bias=False)
-                resdif = res[1:]-res[0:-1]
-                Mobi = np.sqrt(np.var(resdif)/np.var(res))
-                resdif2 = resdif[1:]-resdif[0:-1]
-                compx = np.sqrt(np.var(resdif2)*np.var(res)/(np.var(resdif)*np.var(resdif)))
-                
-                # E1 = '%.5f'%(F1/Esum)
-                E1 = '%.5f'%(np.std(testsig_filt))           
-                E2 = '%.5f'%(np.mean(testsig_filt))                     
-                E3 = '%.5f'%(kur)
-                E4 = '%.5f'%(ske)
-                E5 = '%.5f'%(Mobi)   
-                E6 = '%.5f'%(compx)                              
-                E7 = '%.5f'%(F1) 
-                E8 = '%.5f'%(F2) 
-                E9 = '%.5f'%(F3) 
-                E10 = '%.5f'%(F4) 
-                E11 = '%.5f'%(F2/Esum)
-                E12 = '%.5f'%(F3/Esum)
-                # E5 = '%.5f'%(np.percentile(testsig, 50))
-                # .SampEn(X, m = 4)
-                # xx = EH.SampEn(res,m=2)
-                # Samp = EH.SampEn(res, m = 4)
-                Samp, Phi1, Phi2 = EH.SampEn(res, m = 2, tau = 2)
-                # print(Samp)
-                E13 = '%.5f'%(Samp[0])
-                E14 = '%.5f'%(Samp[1])
-                E15 = '%.5f'%(Samp[2])
-                E16 = '%.5f'%(np.percentile(testsig_filt, 25))
-                E17 = '%.5f'%(np.percentile(testsig_filt, 50))
-                E18 = '%.5f'%(np.percentile(testsig_filt, 75))
+                    kur = kurtosis(testsig_filt, fisher=True)
+                    ske = skew(testsig_filt, bias=False)
+                    resdif = res[1:]-res[0:-1]
+                    Mobi = np.sqrt(np.var(resdif)/np.var(res))
+                    resdif2 = resdif[1:]-resdif[0:-1]
+                    compx = np.sqrt(np.var(resdif2)*np.var(res)/(np.var(resdif)*np.var(resdif)))
+                    
+                    # E1 = '%.5f'%(F1/Esum)
+                    E1 = '%.5f'%(np.std(testsig_filt))           
+                    E2 = '%.5f'%(np.mean(testsig_filt))                     
+                    E3 = '%.5f'%(kur)
+                    E4 = '%.5f'%(ske)
+                    E5 = '%.5f'%(Mobi)   
+                    E6 = '%.5f'%(compx)                              
+                    E7 = '%.5f'%(F1) 
+                    E8 = '%.5f'%(F2) 
+                    E9 = '%.5f'%(F3) 
+                    E10 = '%.5f'%(F4) 
+                    E11 = '%.5f'%(F2/Esum)
+                    E12 = '%.5f'%(F3/Esum)
+                    # E5 = '%.5f'%(np.percentile(testsig, 50))
+                    # .SampEn(X, m = 4)
+                    # xx = EH.SampEn(res,m=2)
+                    # Samp = EH.SampEn(res, m = 4)
+                    Samp, Phi1, Phi2 = EH.SampEn(res, m = 2, tau = 2)
+                    # print(Samp)
+                    E13 = '%.5f'%(Samp[0])
+                    E14 = '%.5f'%(Samp[1])
+                    E15 = '%.5f'%(Samp[2])
+                    E16 = '%.5f'%(np.percentile(testsig_filt, 25))
+                    E17 = '%.5f'%(np.percentile(testsig_filt, 50))
+                    E18 = '%.5f'%(np.percentile(testsig_filt, 75))
 
-                # zero_crossing
-                # E19 = '%.5f'%(len(np.where(np.diff(np.sign(testsig)))[0]))
+                    # zero_crossing
+                    # E19 = '%.5f'%(len(np.where(np.diff(np.sign(testsig)))[0]))
 
 
-                rowx = [E1,E2,E3,E4,E5,E6,E7,E8,E9,E10,E11,E12,E13,E14,E15,E16,E17,E18]
-                # rowx = [E1,E3,E4,E5,E6,E7]
-                row = row + rowx
-                
-                toListofNumber = [float(x) for x in row]
-                X = np.array([toListofNumber])
-                predictions_ = loaded_model_tr_ag.predict(X)   
-                # predictions_ = loaded_model_tr_a.predict(X)     
-                return jsonify({"prediction":str(predictions_[0])}) 
+                    rowx = [E1,E2,E3,E4,E5,E6,E7,E8,E9,E10,E11,E12,E13,E14,E15,E16,E17,E18]
+                    # rowx = [E1,E3,E4,E5,E6,E7]
+                    row = row + rowx
+                    
+                    toListofNumber = [float(x) for x in row]
+                    X = np.array([toListofNumber])
+                    predictions_ = loaded_model_tr_ag.predict(X)   
+                    # predictions_ = loaded_model_tr_a.predict(X)     
+                    return jsonify({"prediction":str(predictions_[0])}) 
             else:
                 return jsonify({"prediction":str(2)}) 
 
