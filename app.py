@@ -65,6 +65,21 @@ import math
 def moving_average(x, w):
     return np.convolve(x, np.ones(w), 'valid') / w
 
+def window_rms(a, window_size):
+  a2 = np.power(a,2)
+  window = np.ones(window_size)/float(window_size)
+  return np.sqrt(np.convolve(a2, window, 'valid'))
+
+# def load_data(csv_path):
+#     return pd.read_csv(csv_path)
+
+def every_nth(nums, nth):
+    # Use list slicing to return elements starting from the (nth-1) index, with a step of 'nth'.
+    return nums[nth - 1::nth]
+
+def runningMeanFast(x, N):
+    return np.convolve(x, np.ones((N,))/N)[(N-1):]
+
 # design hipass filter
 sos = signal.butter(0, 1, 'hp', fs=10, output='sos')
 
@@ -93,7 +108,7 @@ model_pkl_file = "model_tremor_post_006.pkl"
 with open(model_pkl_file, 'rb') as file:  
     loaded_model_tp_ag = pickle.load(file) 
 # --- load model ---
-model_pkl_file = "model_tremor_rest_008.pkl"  
+model_pkl_file = "model_tremor_rest_009.pkl"  
 with open(model_pkl_file, 'rb') as file:  
     loaded_model_tr_ag = pickle.load(file) 
 #========================================
@@ -1057,7 +1072,7 @@ def predict_tremor_rest():
                 for i in data['recording']['recordedData']:
                     tsC = i['ts']
                     tStamp.append(tsC)
-                    # -- read from cupd dataset
+                    # -- read from cupd dataset FORMAT
                     acXC = i['data'][0]
                     acYC = i['data'][1]
                     acZC = i['data'][2]    
@@ -1072,133 +1087,134 @@ def predict_tremor_rest():
                     agY.append(agYC)
                     agZ.append(agZC) 
 
-                    # -- read from cupd dataset / then
-                    # -- corrent order of accelero, gyro
-                    # --- read from zo app
-                    # acXC = i['data'][3]
-                    # acYC = i['data'][4]
-                    # acZC = i['data'][5]    
-                    # acX.append(acXC)
-                    # acY.append(acYC)
-                    # acZ.append(acZC) 
-
-                    # agXC = i['data'][0]
-                    # agYC = i['data'][1]
-                    # agZC = i['data'][2]    
-                    # agX.append(agXC)
-                    # agY.append(agYC)
-                    # agZ.append(agZC) 
-
 
                 tst = [item - tStamp[0] for item in tStamp]
                 # print(len(tst))
                 # f.close()
                 
-                
-                # ------------  handle the oversampling to 200 samples in 20 sec
-                if len(acX) > 200:
-                    toBeSamp = 200
-                    # print('----> ' + str(filepath))
-                    acX, x1 = signal.resample(acX,toBeSamp,np.arange(len(acX)))  # resampled at 200
-                    acY, x1 = signal.resample(acY,toBeSamp,np.arange(len(acY)))  # resampled 
-                    acZ, x1 = signal.resample(acZ,toBeSamp,np.arange(len(acZ)))  # resampled 
-                    agX, x1 = signal.resample(agX,toBeSamp,np.arange(len(agX)))  # resampled 
-                    agY, x1 = signal.resample(agY,toBeSamp,np.arange(len(agY)))  # resampled
-                    agZ, x1 = signal.resample(agZ,toBeSamp,np.arange(len(agZ)))  # resampled
+                    
+                # resampl to 10Hz from 40Hz
+                acX = every_nth(acX,4)
+                acY = every_nth(acY,4)
+                acZ = every_nth(acZ,4)
+                agX = every_nth(agX,4)
+                agY = every_nth(agY,4)
+                agZ = every_nth(agZ,4)
+                tst = every_nth(tst,4)
 
-                acX = acX[20:180]
-                acY = acY[20:180]
-                acZ = acZ[20:180]
-                agX = agX[20:180]
-                agY = agY[20:180]
-                agZ = agZ[20:180] 
+                # -- do some pre process
+                N = 5
+                acXMa = runningMeanFast(acX, N)
+                acYMa = runningMeanFast(acY, N)
+                acZMa = runningMeanFast(acZ, N)
+                agXMa = runningMeanFast(agX, N)
+                agYMa = runningMeanFast(agY, N)
+                agZMa = runningMeanFast(agZ, N)
+
+                acX = acX - acXMa
+                acY = acY - acYMa
+                acZ = acZ - acZMa
+                agX = agX - agXMa
+                agY = agY - agYMa
+                agZ = agZ - agZMa
+
+                setLen = 185
+                acX = acX[:setLen]
+                acY = acY[:setLen]
+                acZ = acZ[:setLen]
+                agX = agX[:setLen]
+                agY = agY[:setLen]
+                agZ = agZ[:setLen]
+                tst = tst[:setLen]
+
+                # -- store for further analysis (time domain, data minus moving average)
+                acX_hf = acX
+                acY_hf = acY
+                acZ_hf = acZ
+                agX_hf = agX
+                agY_hf = agY
+                agZ_hf = agZ
+                tst_hf = tst
+
+                # ------- normalize ---------
+                acX=acX-np.mean(acX)
+                acX=acX/np.std(acX)
+                acY=acY-np.mean(acY)
+                acY=acY/np.std(acY)
+                acZ=acZ-np.mean(acZ)
+                acZ=acZ/np.std(acZ)
+
+                agX=agX-np.mean(agX)
+                agX=agX/np.std(agX)
+                agY=agY-np.mean(agY)
+                agY=agY/np.std(agY)
+                agZ=agZ-np.mean(agZ)
+                agZ=agZ/np.std(agZ)
 
 
-                # # # ------------ handle preprocessing
-                acX = signal.sosfilt(sos, acX)
-                acY = signal.sosfilt(sos, acY)
-                acZ = signal.sosfilt(sos, acZ)
-                agX = signal.sosfilt(sos, agX)
-                agY = signal.sosfilt(sos, agY)
-                agZ = signal.sosfilt(sos, agZ)
+                # ----------- fft
+                fab_acX = np.abs(fft(acX))[94:-1]
+                fab_acY = np.abs(fft(acY))[94:-1]
+                fab_acZ = np.abs(fft(acZ))[94:-1]
+                fab_agX = np.abs(fft(agX))[94:-1]
+                fab_agY = np.abs(fft(agY))[94:-1]
+                fab_agZ = np.abs(fft(agZ))[94:-1]
 
-                # # # # # ------------ transform to unit variance
-                # acX=acX-np.mean(acX)
-                # # acX=acX/np.std(acX)
-                # acY=acY-np.mean(acY)
-                # # acY=acY/np.std(acY)
-                # acZ=acZ-np.mean(acZ)
-                # # acZ=acZ/np.std(acZ)
-
-                # agX=agX-np.mean(agX)
-                # # agX=agX/np.std(agX)
-                # agY=agY-np.mean(agY)
-                # # agY=agY/np.std(agY)
-                # agZ=agZ-np.mean(agZ)
-                # # agZ=agZ/np.std(agZ)
-                # # ------------ 
+                # -- Data ready for extract features
                 row = []
-                for testsig in (acX,acY,acZ,agX,agY,agZ):
-                # for testsig in (acX,acY,acZ):
-                    testsig_filt = signal.sosfilt(sos, testsig)
-                    res = np.array(testsig_filt)
-                    fourier = fft(testsig_filt)
-                    fab = np.abs(fourier)[0:100]
-                    # ------------ 
-                    Esum = sum(np.square(fab))
-                    # Esum = 1.0
-                    # base = 2  # work in units of bits
-                    F1 = sum(np.square(fab[0:25]))
-                    F2 = sum(np.square(fab[25:50]))
-                    F3 = sum(np.square(fab[50:75]))
-                    F4 = sum(np.square(fab[75:80]))
-                    # F5 = sum(np.square(fab[80:100]))
-                    # F6 = sum(np.square(fab[50:60]))
-                    # F7 = sum(np.square(fab[60:70]))
-                    # F8 = sum(np.square(fab[70:80]))
-                    # F9 = sum(np.square(fab[80:90]))
-                    # F10 = sum(np.square(fab[90:100]))
-
-                    kur = kurtosis(testsig_filt, fisher=True)
-                    ske = skew(testsig_filt, bias=False)
+                for testsig in (acX_hf,acY_hf,acZ_hf,agX_hf,agY_hf,agZ_hf):
+                    f1 =window_rms(testsig,len(testsig))
+                    res = np.array(testsig)
+                    kur = kurtosis(testsig, fisher=True)
+                    ske = skew(testsig, bias=False)
                     resdif = res[1:]-res[0:-1]
                     Mobi = np.sqrt(np.var(resdif)/np.var(res))
                     resdif2 = resdif[1:]-resdif[0:-1]
                     compx = np.sqrt(np.var(resdif2)*np.var(res)/(np.var(resdif)*np.var(resdif)))
-                    
-                    # E1 = '%.5f'%(F1/Esum)
-                    E1 = '%.5f'%(np.std(testsig_filt))           
-                    E2 = '%.5f'%(np.mean(testsig_filt))                     
-                    E3 = '%.5f'%(kur)
-                    E4 = '%.5f'%(ske)
-                    E5 = '%.5f'%(Mobi)   
-                    E6 = '%.5f'%(compx)                              
-                    E7 = '%.5f'%(F1) 
-                    E8 = '%.5f'%(F2) 
-                    E9 = '%.5f'%(F3) 
-                    E10 = '%.5f'%(F4) 
-                    E11 = '%.5f'%(F2/Esum)
-                    E12 = '%.5f'%(F3/Esum)
-                    # E5 = '%.5f'%(np.percentile(testsig, 50))
-                    # .SampEn(X, m = 4)
-                    # xx = EH.SampEn(res,m=2)
-                    # Samp = EH.SampEn(res, m = 4)
                     Samp, Phi1, Phi2 = EH.SampEn(res, m = 2, tau = 2)
-                    # print(Samp)
-                    E13 = '%.5f'%(Samp[0])
-                    E14 = '%.5f'%(Samp[1])
-                    E15 = '%.5f'%(Samp[2])
-                    E16 = '%.5f'%(np.percentile(testsig_filt, 25))
-                    E17 = '%.5f'%(np.percentile(testsig_filt, 50))
-                    E18 = '%.5f'%(np.percentile(testsig_filt, 75))
 
-                    # zero_crossing
-                    # E19 = '%.5f'%(len(np.where(np.diff(np.sign(testsig)))[0]))
+                    E1 = '%.5f'%(np.std(testsig))           
+                    E2 = '%.5f'%(np.mean(testsig))  
+                    E3 = '%.5f'%(f1)
+                    E4 = '%.5f'%(kur)
+                    E5 = '%.5f'%(ske)
+                    E6 = '%.5f'%(Mobi)   
+                    E7 = '%.5f'%(compx)                              
+                    E8 = '%.5f'%(Samp[0])
+                    E9 = '%.5f'%(Samp[1])
+                    E10 = '%.5f'%(Samp[2])
+                    E11 = '%.5f'%(np.percentile(testsig, 25))
+                    E12 = '%.5f'%(np.percentile(testsig, 50))
+                    E13 = '%.5f'%(np.percentile(testsig, 75))
 
+                    rowx = [E1,E2,E3,E4,E5,E6,E7,E8,E9,E10,E11,E12,E13]
+                    row = row + rowx
 
-                    rowx = [E1,E2,E3,E4,E5,E6,E7,E8,E9,E10,E11,E12,E13,E14,E15,E16,E17,E18]
+                for testsig in (fab_acX,fab_acY,fab_acZ,fab_agX,fab_agY,fab_agZ):
+                    # Note testsig len = 90
+                    # ------------ 
+                    Esum = sum(np.square(testsig))
+                    # Esum = 1.0
+                    # base = 2  # work in units of bits
+                    F1 = sum(np.square(testsig[0:15]))
+                    F2 = sum(np.square(testsig[15:30]))
+                    F3 = sum(np.square(testsig[30:45]))
+                    F4 = sum(np.square(testsig[45:60]))
+                    F5 = sum(np.square(testsig[60:75]))
+                    F6 = sum(np.square(testsig[75:90]))                
+                    # E11 = '%.5f'%(F2/Esum)
+                    # E12 = '%.5f'%(F3/Esum)
+                    E1 = '%.5f'%(F1)
+                    E2 = '%.5f'%(F2)
+                    E3 = '%.5f'%(F3)
+                    E4 = '%.5f'%(F4)
+                    E5 = '%.5f'%(F5)
+                    E6 = '%.5f'%(F6)
+
+                    rowx = [E1,E2,E3,E4,E5,E6]
                     # rowx = [E1,E3,E4,E5,E6,E7]
                     row = row + rowx
+
                     
                 toListofNumber = [float(x) for x in row]
                 X = np.array([toListofNumber])
