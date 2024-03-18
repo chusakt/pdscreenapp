@@ -471,7 +471,8 @@ def predict_pinchtosize():
                         # mcx.append(m_inkdata['center']['x'])
                         # mcy.append(m_inkdata['center']['y'])
                     # -- try some smooth
-                    mvWindow = 25
+                    # mvWindow = 25
+                    mvWindow = 50
                     if len(mdia) > mvWindow+1:
                         # fig, ax = plt.subplots()
                         # fig.set_size_inches(3, 3)
