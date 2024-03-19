@@ -151,6 +151,12 @@ with open(model_pkl_file, 'rb') as file:
 model_pkl_file = "model_gaitWalk_009.pkl"  
 with open(model_pkl_file, 'rb') as file:  
     loaded_model_gw_ag = pickle.load(file) 
+
+# test only --- load model ---
+model_pkl_file = "model_gaitWalk_ag_wihtpreprocess_002.pkl"  
+with open(model_pkl_file, 'rb') as file:  
+    loaded_model_gw_ag_100Hz = pickle.load(file) 
+
 # --- load model ---
 model_pkl_file = "model_gaitWalk_a_only_wihtpreprocess_002.pkl"  
 with open(model_pkl_file, 'rb') as file:  
@@ -2092,7 +2098,8 @@ def predict_gait_walk_():
             
             toListofNumber = [float(x) for x in row]
             X = np.array([toListofNumber])
-            predictions_ = loaded_model_gw_ag.predict(X)        
+            
+            predictions_ = loaded_model_gw_ag_100Hz.predict(X)        
             return jsonify({"prediction":str(predictions_[0])}) 
         
     except Exception as e: 
