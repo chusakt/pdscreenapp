@@ -161,6 +161,13 @@ with open(model_pkl_file, 'rb') as file:
 model_pkl_file = "model_gaitWalk_a_only_wihtpreprocess_002.pkl"  
 with open(model_pkl_file, 'rb') as file:  
     loaded_model_gw_a = pickle.load(file) 
+
+# --- load model ---
+model_pkl_file = "model_gaitwalk20Hz_a.pkl"  
+with open(model_pkl_file, 'rb') as file:  
+    loaded_model_gw_ag_20Hz = pickle.load(file) 
+ 
+
 #========================================
     
 
@@ -2236,3 +2243,124 @@ def predict_gait_walk_app():
         print(rowx)
         print('--------')
         return jsonify({"prediction":str(2)})      
+    
+#  ----------------------------------------
+#   
+#  ----------------------------------------
+
+@app.route('/predict_gait_walk_20Hz', methods=['POST'])  
+def predict_gait_walk_20Hz():
+    try:
+        if request.is_json:
+            data = request.get_json()
+            tStamp = []
+            acX = []
+            acY = []
+            acZ = []
+            agX = []
+            agY = []
+            agZ = []
+
+            # for i in data['motion']:
+            for i in data['recording']['recordedData']:
+                # tsC = i['ts']
+                # tStamp.append(tsC)
+                tsC = i['ts']
+                tStamp.append(tsC)
+                acXC = i['data'][0]
+                acYC = i['data'][1]
+                acZC = i['data'][2]    
+                acX.append(acXC)
+                acY.append(acYC)
+                acZ.append(acZC) 
+
+                agXC = i['data'][3]
+                agYC = i['data'][4]
+                agZC = i['data'][5]    
+                agX.append(agXC)
+                agY.append(agYC)
+                agZ.append(agZC) 
+
+            tst = [item - tStamp[0] for item in tStamp]
+
+            # ------------  handle the downsample 40 to 20
+            if len(acX) > 10:
+                # toBeSamp = 200
+                # print('----> ' + str(filepath))
+                limitlento = 800
+                acX = every_nth(acX[0:limitlento],2)
+                acY = every_nth(acY[0:limitlento],2)
+                acZ = every_nth(acZ[0:limitlento],2)
+                agX = every_nth(agX[0:limitlento],2)
+                agY = every_nth(agY[0:limitlento],2)
+                agZ = every_nth(agZ[0:limitlento],2)
+
+
+            # # # ------------ transform to unit variance
+            # acX=acX-np.mean(acX)
+            # acX=acX/np.std(acX)
+            # acY=acY-np.mean(acY)
+            # acY=acY/np.std(acY)
+            # acZ=acZ-np.mean(acZ)
+            # acZ=acZ/np.std(acZ)
+
+            # agX=agX-np.mean(agX)
+            # agX=agX/np.std(agX)
+            # agY=agY-np.mean(agY)
+            # agY=agY/np.std(agY)
+            # agZ=agZ-np.mean(agZ)
+            # agZ=agZ/np.std(agZ)
+
+                row = [] 
+                for testsig in (acX,acY,acZ,agX,agY,agZ):
+                # for testsig in (acX,acY,acZ):
+                    testsig_filt = testsig
+                    res = np.array(testsig_filt)
+                    fourier = fft(testsig_filt)
+                    fab = np.abs(fourier[80:160])
+                    # ------------ 
+                    Esum = sum(np.square(fab))
+                    # Esum = 1.0
+                    # base = 2  # work in units of bits
+                    F1 = sum(np.square(fab[0:20]))
+                    F2 = sum(np.square(fab[20:40]))
+                    F3 = sum(np.square(fab[40:60]))
+                    F4 = sum(np.square(fab[60:80]))
+
+                    kur = kurtosis(testsig_filt, fisher=True)
+                    ske = skew(testsig_filt, bias=False)
+                    resdif = res[1:]-res[0:-1]
+                    Mobi = np.sqrt(np.var(resdif)/np.var(res))
+                    resdif2 = resdif[1:]-resdif[0:-1]
+                    compx = np.sqrt(np.var(resdif2)*np.var(res)/(np.var(resdif)*np.var(resdif)))
+
+                    E1 = '%.5f'%(np.std(testsig_filt))           
+                    E2 = '%.5f'%(np.mean(testsig_filt))                     
+                    E3 = '%.5f'%(kur)
+                    E4 = '%.5f'%(ske)
+                    E5 = '%.5f'%(Mobi)   
+                    E6 = '%.5f'%(compx)                              
+                    E7 = '%.5f'%(F1) 
+                    E8 = '%.5f'%(F2) 
+                    E9 = '%.5f'%(F3) 
+                    E10 = '%.5f'%(F4) 
+                    E11 = '%.5f'%(F2/Esum)
+                    E12 = '%.5f'%(F3/Esum)
+                    E13 = '%.5f'%(np.var(resdif2))
+                    # rowx = [E1,E2,E3,E4,E5,E6,E7,E8,E9,E10,E11,E12,E13]
+                    rowx = [E3,E4,E5,E6,E7,E8,E9,E10,E11,E12,E13]
+                    row = row + rowx
+            
+                toListofNumber = [float(x) for x in row]
+                X = np.array([toListofNumber])
+                
+                predictions_ = loaded_model_gw_ag_20Hz.predict(X)      
+                return jsonify({"prediction":str(predictions_[0])}) 
+        
+    except Exception as e: 
+        print(e)
+        print('--------')
+        print(rowx)
+        print('--------')
+        return jsonify({"prediction":str(2)})     
+    
