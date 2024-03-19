@@ -2360,7 +2360,7 @@ def predict_gait_walk_20Hz_app_data():
     except Exception as e: 
         print(e)
         print('--------')
-        print(rowx)
+        # print(rowx)
         print('--------')
         return jsonify({"prediction":str(2)})     
     
