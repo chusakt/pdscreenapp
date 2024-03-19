@@ -82,6 +82,7 @@ def runningMeanFast(x, N):
 
 # design hipass filter
 sos = signal.butter(0, 1, 'hp', fs=10, output='sos')
+sos_gwag = signal.butter(0, 1, 'hp', fs=40, output='sos')
 
 # load key
 f = open("readke", mode="rb")
@@ -147,7 +148,7 @@ model_pkl_file = "model_gaitStbl_a_only_wihtpreprocess002.pkl"
 with open(model_pkl_file, 'rb') as file:  
     loaded_model_gs_a = pickle.load(file) 
 # --- load model ---
-model_pkl_file = "model_gaitWalk_ag_wihtpreprocess_002.pkl"  
+model_pkl_file = "model_gaitWalk_009.pkl"  
 with open(model_pkl_file, 'rb') as file:  
     loaded_model_gw_ag = pickle.load(file) 
 # --- load model ---
@@ -1903,15 +1904,15 @@ def predict_gait_walk():
             tst = [item - tStamp[0] for item in tStamp]
 
             # ------------  handle the oversampling to 200 samples in 20 sec
-            if len(acX) > 200:
-                toBeSamp = 200
-                # print('----> ' + str(filepath))
-                acX, x1 = signal.resample(acX,toBeSamp,np.arange(len(acX)))  # resampled at 200
-                acY, x1 = signal.resample(acY,toBeSamp,np.arange(len(acY)))  # resampled 
-                acZ, x1 = signal.resample(acZ,toBeSamp,np.arange(len(acZ)))  # resampled 
-                agX, x1 = signal.resample(agX,toBeSamp,np.arange(len(agX)))  # resampled 
-                agY, x1 = signal.resample(agY,toBeSamp,np.arange(len(agY)))  # resampled
-                agZ, x1 = signal.resample(agZ,toBeSamp,np.arange(len(agZ)))  # resampled
+            # if len(acX) > 200:
+            #     toBeSamp = 200
+            #     # print('----> ' + str(filepath))
+            #     acX, x1 = signal.resample(acX,toBeSamp,np.arange(len(acX)))  # resampled at 200
+            #     acY, x1 = signal.resample(acY,toBeSamp,np.arange(len(acY)))  # resampled 
+            #     acZ, x1 = signal.resample(acZ,toBeSamp,np.arange(len(acZ)))  # resampled 
+            #     agX, x1 = signal.resample(agX,toBeSamp,np.arange(len(agX)))  # resampled 
+            #     agY, x1 = signal.resample(agY,toBeSamp,np.arange(len(agY)))  # resampled
+            #     agZ, x1 = signal.resample(agZ,toBeSamp,np.arange(len(agZ)))  # resampled
 
             # # ------------ transform to unit variance
             acX=acX-np.mean(acX)
@@ -1931,7 +1932,7 @@ def predict_gait_walk():
             row = [] 
             for testsig in (acX,acY,acZ,agX,agY,agZ):
             # for testsig in (acX,acY,acZ):
-                testsig_filt = signal.sosfilt(sos, testsig)
+                testsig_filt = signal.sosfilt(sos_gwag, testsig)
                 res = np.array(testsig_filt)
                 fourier = fft(testsig_filt)
                 fab = np.abs(fourier)[0:100]
