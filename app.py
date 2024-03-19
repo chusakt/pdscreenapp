@@ -2480,6 +2480,6 @@ def predict_gait_walk_20Hz_cupd_data():
     except Exception as e: 
         print(e)
         print('--------')
-        print(rowx)
+        # print(rowx)
         print('--------')
         return jsonify({"prediction":str(2)})     
