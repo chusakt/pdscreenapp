@@ -1947,10 +1947,10 @@ def predict_gait_walk():
                 Esum = sum(np.square(fab))
                 # Esum = 1.0
                 # base = 2  # work in units of bits
-                F1 = sum(np.square(fab[0:25]))
-                F2 = sum(np.square(fab[25:50]))
-                F3 = sum(np.square(fab[50:75]))
-                F4 = sum(np.square(fab[75:80]))
+                F1 = sum(np.square(fab[0:10]))
+                F2 = sum(np.square(fab[10:20]))
+                F3 = sum(np.square(fab[20:30]))
+                F4 = sum(np.square(fab[30:40]))
 
                 kur = kurtosis(testsig_filt, fisher=True)
                 ske = skew(testsig_filt, bias=False)
