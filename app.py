@@ -2344,11 +2344,11 @@ def predict_gait_walk_20Hz_app_data():
                     E8 = '%.5f'%(F2) 
                     E9 = '%.5f'%(F3) 
                     E10 = '%.5f'%(F4) 
-                    E11 = '%.5f'%(F2/Esum)
-                    E12 = '%.5f'%(F3/Esum)
+                    # E11 = '%.5f'%(F2/Esum)
+                    # E12 = '%.5f'%(F3/Esum)
                     E13 = '%.5f'%(np.var(resdif2))
-                    # rowx = [E1,E2,E3,E4,E5,E6,E7,E8,E9,E10,E11,E12,E13]
-                    rowx = [E3,E4,E5,E6,E7,E8,E9,E10,E11,E12,E13]
+                    rowx = [E1,E2,E3,E4,E5,E6,E7,E8,E9,E10,E13]
+                    # rowx = [E3,E4,E5,E6,E7,E8,E9,E10,E11,E12,E13]
                     row = row + rowx
             
                 toListofNumber = [float(x) for x in row]
@@ -2464,11 +2464,11 @@ def predict_gait_walk_20Hz_cupd_data():
                     E8 = '%.5f'%(F2) 
                     E9 = '%.5f'%(F3) 
                     E10 = '%.5f'%(F4) 
-                    E11 = '%.5f'%(F2/Esum)
-                    E12 = '%.5f'%(F3/Esum)
+                    # E11 = '%.5f'%(F2/Esum)
+                    # E12 = '%.5f'%(F3/Esum)
                     E13 = '%.5f'%(np.var(resdif2))
-                    # rowx = [E1,E2,E3,E4,E5,E6,E7,E8,E9,E10,E11,E12,E13]
-                    rowx = [E3,E4,E5,E6,E7,E8,E9,E10,E11,E12,E13]
+                    rowx = [E1,E2,E3,E4,E5,E6,E7,E8,E9,E10,E13]
+                    # rowx = [E3,E4,E5,E6,E7,E8,E9,E10,E11,E12,E13]
                     row = row + rowx
             
                 toListofNumber = [float(x) for x in row]
