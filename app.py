@@ -148,7 +148,7 @@ model_pkl_file = "model_gaitStbl_a_only_wihtpreprocess002.pkl"
 with open(model_pkl_file, 'rb') as file:  
     loaded_model_gs_a = pickle.load(file) 
 # --- load model ---
-model_pkl_file = "model_gaitWalk_009.pkl"  
+model_pkl_file = "model_gaitwalk_10Hz_b.pkl"  
 with open(model_pkl_file, 'rb') as file:  
     loaded_model_gw_ag = pickle.load(file) 
 
@@ -1878,7 +1878,158 @@ def predict_gait_stab():
 
 
 #  ----------------------------------------
-#   
+#   gw for data from cupd
+#  ----------------------------------------
+
+@app.route('/predict_gait_walk_cu', methods=['POST'])  
+def predict_gait_walk_cu():
+    try:
+        if request.is_json:
+            data = request.get_json()
+            tStamp = []
+            acX = []
+            acY = []
+            acZ = []
+            agX = []
+            agY = []
+            agZ = []
+
+            # for i in data['motion']:
+            for i in data['recording']['recordedData']:
+                # tsC = i['ts']
+                # tStamp.append(tsC)
+                tsC = i['ts']
+                tStamp.append(tsC)
+                acXC = i['data'][0]
+                acYC = i['data'][1]
+                acZC = i['data'][2]    
+                acX.append(acXC)
+                acY.append(acYC)
+                acZ.append(acZC) 
+
+                agXC = i['data'][3]
+                agYC = i['data'][4]
+                agZC = i['data'][5]    
+                agX.append(agXC)
+                agY.append(agYC)
+                agZ.append(agZC) 
+
+            tst = [item - tStamp[0] for item in tStamp]
+            acX = acX[0:80]
+            acY = acY[0:80]
+            acZ = acZ[0:80]
+            agX = agX[0:80]
+            agY = agY[0:80]
+            agZ = agZ[0:80] 
+            # ------------  handle the oversampling to 200 samples in 20 sec
+            # if len(acX) > 200:
+            #     toBeSamp = 200
+            #     # print('----> ' + str(filepath))
+            #     acX, x1 = signal.resample(acX,toBeSamp,np.arange(len(acX)))  # resampled at 200
+            #     acY, x1 = signal.resample(acY,toBeSamp,np.arange(len(acY)))  # resampled 
+            #     acZ, x1 = signal.resample(acZ,toBeSamp,np.arange(len(acZ)))  # resampled 
+            #     agX, x1 = signal.resample(agX,toBeSamp,np.arange(len(agX)))  # resampled 
+            #     agY, x1 = signal.resample(agY,toBeSamp,np.arange(len(agY)))  # resampled
+            #     agZ, x1 = signal.resample(agZ,toBeSamp,np.arange(len(agZ)))  # resampled
+
+            # # ------------ transform to unit variance
+            acX=acX-np.mean(acX)
+            acX=acX/np.std(acX)
+            acY=acY-np.mean(acY)
+            acY=acY/np.std(acY)
+            acZ=acZ-np.mean(acZ)
+            acZ=acZ/np.std(acZ)
+
+            agX=agX-np.mean(agX)
+            agX=agX/np.std(agX)
+            agY=agY-np.mean(agY)
+            agY=agY/np.std(agY)
+            agZ=agZ-np.mean(agZ)
+            agZ=agZ/np.std(agZ)
+
+            row = [] 
+            for testsig in (acX,acY,acZ,agX,agY,agZ):
+                testsig_filt = signal.sosfilt(sos, testsig)
+                res = np.array(testsig_filt)
+                fourier = fft(testsig_filt)
+                fourier, x1 = signal.resample(fourier,40,np.arange(len(fourier)))  # resampled to 40
+                fab = np.abs(fourier)[0:40]
+                # ------------ 
+                Esum = sum(np.square(fab))
+                # Esum = 1.0
+                # base = 2  # work in units of bits
+                F1 = sum(np.square(fab[0:10]))
+                F2 = sum(np.square(fab[10:20]))
+                F3 = sum(np.square(fab[20:30]))
+                F4 = sum(np.square(fab[30:40]))
+                # F5 = sum(np.square(fab[80:100]))
+                # F6 = sum(np.square(fab[50:60]))
+                # F7 = sum(np.square(fab[60:70]))
+                # F8 = sum(np.square(fab[70:80]))
+                # F9 = sum(np.square(fab[80:90]))
+                # F10 = sum(np.square(fab[90:100]))
+
+                kur = kurtosis(testsig_filt, fisher=True)
+                ske = skew(testsig_filt, bias=False)
+                resdif = res[1:]-res[0:-1]
+                Mobi = np.sqrt(np.var(resdif)/np.var(res))
+                resdif2 = resdif[1:]-resdif[0:-1]
+                compx = np.sqrt(np.var(resdif2)*np.var(res)/(np.var(resdif)*np.var(resdif)))
+                
+                # E1 = '%.5f'%(F1/Esum)
+                # E1 = '%.5f'%(np.std(testsig_filt))           
+                # E2 = '%.5f'%(np.mean(testsig_filt))                     
+                E3 = '%.5f'%(kur)
+                E4 = '%.5f'%(ske)
+                E5 = '%.5f'%(Mobi)   
+                E6 = '%.5f'%(compx)                              
+                E7 = '%.5f'%(F1) 
+                E8 = '%.5f'%(F2) 
+                E9 = '%.5f'%(F3) 
+                E10 = '%.5f'%(F4) 
+                E11 = '%.5f'%(F2/Esum)
+                E12 = '%.5f'%(F3/Esum)
+                # E5 = '%.5f'%(np.percentile(testsig, 50))
+                # .SampEn(X, m = 4)
+                # xx = EH.SampEn(res,m=2)
+                # Samp = EH.SampEn(res, m = 4)
+                # Samp, Phi1, Phi2 = EH.SampEn(res, m = 2, tau = 2)
+                # # print(Samp)
+                # E13 = '%.5f'%(Samp[0])
+                # E14 = '%.5f'%(Samp[1])
+                # E15 = '%.5f'%(Samp[2])
+                # E16 = '%.5f'%(np.percentile(testsig_filt, 25))
+                # E17 = '%.5f'%(np.percentile(testsig_filt, 50))
+                # E18 = '%.5f'%(np.percentile(testsig_filt, 75))
+                E13 = '%.5f'%(np.var(resdif2))
+
+                # zero_crossing
+                # E19 = '%.5f'%(len(np.where(np.diff(np.sign(testsig)))[0]))
+
+
+                rowx = [E3,E4,E5,E6,E7,E8,E9,E10,E11,E12,E13]
+                # rowx = [tst[-1],len(tst),len(acX),E3,E4,E5,E6,E7,E8,E9,E10,E11,E12,E13]
+                # rowx = [E1,E3,E4,E5,E6,E7]
+                row = row + rowx
+            
+            toListofNumber = [float(x) for x in row]
+            X = np.array([toListofNumber])
+            predictions_ = loaded_model_gw_ag.predict(X)        
+            return jsonify({"prediction":str(predictions_[0])}) 
+        
+    except Exception as e: 
+        print(e)
+        print('--------')
+        print(rowx)
+        print('--------')
+        return jsonify({"prediction":str(2)})         
+
+
+
+
+
+#  ----------------------------------------
+#   gw for data from cupd
 #  ----------------------------------------
 
 @app.route('/predict_gait_walk', methods=['POST'])  
@@ -1914,8 +2065,24 @@ def predict_gait_walk():
                 agY.append(agYC)
                 agZ.append(agZC) 
 
-            tst = [item - tStamp[0] for item in tStamp]
 
+            # --- downsample 40 to 10
+            acX = every_nth(acX,4)
+            acY = every_nth(acY,4)
+            acZ = every_nth(acZ,4)
+            agX = every_nth(agX,4)
+            agY = every_nth(agY,4)
+            agZ = every_nth(agZ,4)
+            tst = every_nth(tst,4)
+
+
+            tst = [item - tStamp[0] for item in tStamp]
+            acX = acX[0:80]
+            acY = acY[0:80]
+            acZ = acZ[0:80]
+            agX = agX[0:80]
+            agY = agY[0:80]
+            agZ = agZ[0:80] 
             # ------------  handle the oversampling to 200 samples in 20 sec
             # if len(acX) > 200:
             #     toBeSamp = 200
@@ -1944,8 +2111,7 @@ def predict_gait_walk():
 
             row = [] 
             for testsig in (acX,acY,acZ,agX,agY,agZ):
-            # for testsig in (acX,acY,acZ):
-                testsig_filt = signal.sosfilt(sos_gwag, testsig)
+                testsig_filt = signal.sosfilt(sos, testsig)
                 res = np.array(testsig_filt)
                 fourier = fft(testsig_filt)
                 fourier, x1 = signal.resample(fourier,40,np.arange(len(fourier)))  # resampled to 40
@@ -1958,6 +2124,12 @@ def predict_gait_walk():
                 F2 = sum(np.square(fab[10:20]))
                 F3 = sum(np.square(fab[20:30]))
                 F4 = sum(np.square(fab[30:40]))
+                # F5 = sum(np.square(fab[80:100]))
+                # F6 = sum(np.square(fab[50:60]))
+                # F7 = sum(np.square(fab[60:70]))
+                # F8 = sum(np.square(fab[70:80]))
+                # F9 = sum(np.square(fab[80:90]))
+                # F10 = sum(np.square(fab[90:100]))
 
                 kur = kurtosis(testsig_filt, fisher=True)
                 ske = skew(testsig_filt, bias=False)
@@ -1965,9 +2137,10 @@ def predict_gait_walk():
                 Mobi = np.sqrt(np.var(resdif)/np.var(res))
                 resdif2 = resdif[1:]-resdif[0:-1]
                 compx = np.sqrt(np.var(resdif2)*np.var(res)/(np.var(resdif)*np.var(resdif)))
-
-                E1 = '%.5f'%(np.std(testsig_filt))           
-                E2 = '%.5f'%(np.mean(testsig_filt))                     
+                
+                # E1 = '%.5f'%(F1/Esum)
+                # E1 = '%.5f'%(np.std(testsig_filt))           
+                # E2 = '%.5f'%(np.mean(testsig_filt))                     
                 E3 = '%.5f'%(kur)
                 E4 = '%.5f'%(ske)
                 E5 = '%.5f'%(Mobi)   
@@ -1978,9 +2151,27 @@ def predict_gait_walk():
                 E10 = '%.5f'%(F4) 
                 E11 = '%.5f'%(F2/Esum)
                 E12 = '%.5f'%(F3/Esum)
+                # E5 = '%.5f'%(np.percentile(testsig, 50))
+                # .SampEn(X, m = 4)
+                # xx = EH.SampEn(res,m=2)
+                # Samp = EH.SampEn(res, m = 4)
+                # Samp, Phi1, Phi2 = EH.SampEn(res, m = 2, tau = 2)
+                # # print(Samp)
+                # E13 = '%.5f'%(Samp[0])
+                # E14 = '%.5f'%(Samp[1])
+                # E15 = '%.5f'%(Samp[2])
+                # E16 = '%.5f'%(np.percentile(testsig_filt, 25))
+                # E17 = '%.5f'%(np.percentile(testsig_filt, 50))
+                # E18 = '%.5f'%(np.percentile(testsig_filt, 75))
                 E13 = '%.5f'%(np.var(resdif2))
-                # rowx = [E1,E2,E3,E4,E5,E6,E7,E8,E9,E10,E11,E12,E13]
+
+                # zero_crossing
+                # E19 = '%.5f'%(len(np.where(np.diff(np.sign(testsig)))[0]))
+
+
                 rowx = [E3,E4,E5,E6,E7,E8,E9,E10,E11,E12,E13]
+                # rowx = [tst[-1],len(tst),len(acX),E3,E4,E5,E6,E7,E8,E9,E10,E11,E12,E13]
+                # rowx = [E1,E3,E4,E5,E6,E7]
                 row = row + rowx
             
             toListofNumber = [float(x) for x in row]
@@ -1999,487 +2190,487 @@ def predict_gait_walk():
 
 
 
-#  ----------------------------------------
-#   
-#  ----------------------------------------
+# #  ----------------------------------------
+# #   
+# #  ----------------------------------------
 
-@app.route('/predict_gait_walk_', methods=['POST'])  
-def predict_gait_walk_():
-    try:
-        if request.is_json:
-            data = request.get_json()
-            tStamp = []
-            acX = []
-            acY = []
-            acZ = []
-            agX = []
-            agY = []
-            agZ = []
+# @app.route('/predict_gait_walk_', methods=['POST'])  
+# def predict_gait_walk_():
+#     try:
+#         if request.is_json:
+#             data = request.get_json()
+#             tStamp = []
+#             acX = []
+#             acY = []
+#             acZ = []
+#             agX = []
+#             agY = []
+#             agZ = []
 
-            for i in data['motion']:
-            # for i in data['recording']['recordedData']:
-                # tsC = i['ts']
-                # tStamp.append(tsC)
-                tsC = i['ts']
-                tStamp.append(tsC)
-                acXC = i['data'][0]
-                acYC = i['data'][1]
-                acZC = i['data'][2]    
-                acX.append(acXC)
-                acY.append(acYC)
-                acZ.append(acZC) 
+#             for i in data['motion']:
+#             # for i in data['recording']['recordedData']:
+#                 # tsC = i['ts']
+#                 # tStamp.append(tsC)
+#                 tsC = i['ts']
+#                 tStamp.append(tsC)
+#                 acXC = i['data'][0]
+#                 acYC = i['data'][1]
+#                 acZC = i['data'][2]    
+#                 acX.append(acXC)
+#                 acY.append(acYC)
+#                 acZ.append(acZC) 
 
-                agXC = i['data'][3]
-                agYC = i['data'][4]
-                agZC = i['data'][5]    
-                agX.append(agXC)
-                agY.append(agYC)
-                agZ.append(agZC) 
+#                 agXC = i['data'][3]
+#                 agYC = i['data'][4]
+#                 agZC = i['data'][5]    
+#                 agX.append(agXC)
+#                 agY.append(agYC)
+#                 agZ.append(agZC) 
 
-            tst = [item - tStamp[0] for item in tStamp]
+#             tst = [item - tStamp[0] for item in tStamp]
 
-            # ------------  handle the oversampling to 200 samples in 20 sec
-            if len(acX) > 200:
-                toBeSamp = 200
-                # print('----> ' + str(filepath))
-                acX, x1 = signal.resample(acX,toBeSamp,np.arange(len(acX)))  # resampled at 200
-                acY, x1 = signal.resample(acY,toBeSamp,np.arange(len(acY)))  # resampled 
-                acZ, x1 = signal.resample(acZ,toBeSamp,np.arange(len(acZ)))  # resampled 
-                agX, x1 = signal.resample(agX,toBeSamp,np.arange(len(agX)))  # resampled 
-                agY, x1 = signal.resample(agY,toBeSamp,np.arange(len(agY)))  # resampled
-                agZ, x1 = signal.resample(agZ,toBeSamp,np.arange(len(agZ)))  # resampled
+#             # ------------  handle the oversampling to 200 samples in 20 sec
+#             if len(acX) > 200:
+#                 toBeSamp = 200
+#                 # print('----> ' + str(filepath))
+#                 acX, x1 = signal.resample(acX,toBeSamp,np.arange(len(acX)))  # resampled at 200
+#                 acY, x1 = signal.resample(acY,toBeSamp,np.arange(len(acY)))  # resampled 
+#                 acZ, x1 = signal.resample(acZ,toBeSamp,np.arange(len(acZ)))  # resampled 
+#                 agX, x1 = signal.resample(agX,toBeSamp,np.arange(len(agX)))  # resampled 
+#                 agY, x1 = signal.resample(agY,toBeSamp,np.arange(len(agY)))  # resampled
+#                 agZ, x1 = signal.resample(agZ,toBeSamp,np.arange(len(agZ)))  # resampled
 
-            # # ------------ transform to unit variance
-            acX=acX-np.mean(acX)
-            acX=acX/np.std(acX)
-            acY=acY-np.mean(acY)
-            acY=acY/np.std(acY)
-            acZ=acZ-np.mean(acZ)
-            acZ=acZ/np.std(acZ)
+#             # # ------------ transform to unit variance
+#             acX=acX-np.mean(acX)
+#             acX=acX/np.std(acX)
+#             acY=acY-np.mean(acY)
+#             acY=acY/np.std(acY)
+#             acZ=acZ-np.mean(acZ)
+#             acZ=acZ/np.std(acZ)
 
-            agX=agX-np.mean(agX)
-            agX=agX/np.std(agX)
-            agY=agY-np.mean(agY)
-            agY=agY/np.std(agY)
-            agZ=agZ-np.mean(agZ)
-            agZ=agZ/np.std(agZ)
+#             agX=agX-np.mean(agX)
+#             agX=agX/np.std(agX)
+#             agY=agY-np.mean(agY)
+#             agY=agY/np.std(agY)
+#             agZ=agZ-np.mean(agZ)
+#             agZ=agZ/np.std(agZ)
 
-            row = [] 
-            for testsig in (acX,acY,acZ,agX,agY,agZ):
-            # for testsig in (acX,acY,acZ):
-                testsig_filt = signal.sosfilt(sos, testsig)
-                res = np.array(testsig_filt)
-                fourier = fft(testsig_filt)
-                fab = np.abs(fourier)[0:100]
-                # ------------ 
-                Esum = sum(np.square(fab))
-                # Esum = 1.0
-                # base = 2  # work in units of bits
-                F1 = sum(np.square(fab[0:25]))
-                F2 = sum(np.square(fab[25:50]))
-                F3 = sum(np.square(fab[50:75]))
-                F4 = sum(np.square(fab[75:80]))
+#             row = [] 
+#             for testsig in (acX,acY,acZ,agX,agY,agZ):
+#             # for testsig in (acX,acY,acZ):
+#                 testsig_filt = signal.sosfilt(sos, testsig)
+#                 res = np.array(testsig_filt)
+#                 fourier = fft(testsig_filt)
+#                 fab = np.abs(fourier)[0:100]
+#                 # ------------ 
+#                 Esum = sum(np.square(fab))
+#                 # Esum = 1.0
+#                 # base = 2  # work in units of bits
+#                 F1 = sum(np.square(fab[0:25]))
+#                 F2 = sum(np.square(fab[25:50]))
+#                 F3 = sum(np.square(fab[50:75]))
+#                 F4 = sum(np.square(fab[75:80]))
 
-                kur = kurtosis(testsig_filt, fisher=True)
-                ske = skew(testsig_filt, bias=False)
-                resdif = res[1:]-res[0:-1]
-                Mobi = np.sqrt(np.var(resdif)/np.var(res))
-                resdif2 = resdif[1:]-resdif[0:-1]
-                compx = np.sqrt(np.var(resdif2)*np.var(res)/(np.var(resdif)*np.var(resdif)))
+#                 kur = kurtosis(testsig_filt, fisher=True)
+#                 ske = skew(testsig_filt, bias=False)
+#                 resdif = res[1:]-res[0:-1]
+#                 Mobi = np.sqrt(np.var(resdif)/np.var(res))
+#                 resdif2 = resdif[1:]-resdif[0:-1]
+#                 compx = np.sqrt(np.var(resdif2)*np.var(res)/(np.var(resdif)*np.var(resdif)))
 
-                E1 = '%.5f'%(np.std(testsig_filt))           
-                E2 = '%.5f'%(np.mean(testsig_filt))                     
-                E3 = '%.5f'%(kur)
-                E4 = '%.5f'%(ske)
-                E5 = '%.5f'%(Mobi)   
-                E6 = '%.5f'%(compx)                              
-                E7 = '%.5f'%(F1) 
-                E8 = '%.5f'%(F2) 
-                E9 = '%.5f'%(F3) 
-                E10 = '%.5f'%(F4) 
-                E11 = '%.5f'%(F2/Esum)
-                E12 = '%.5f'%(F3/Esum)
-                E13 = '%.5f'%(np.var(resdif2))
-                # rowx = [E1,E2,E3,E4,E5,E6,E7,E8,E9,E10,E11,E12,E13]
-                rowx = [E3,E4,E5,E6,E7,E8,E9,E10,E11,E12,E13]
-                row = row + rowx
+#                 E1 = '%.5f'%(np.std(testsig_filt))           
+#                 E2 = '%.5f'%(np.mean(testsig_filt))                     
+#                 E3 = '%.5f'%(kur)
+#                 E4 = '%.5f'%(ske)
+#                 E5 = '%.5f'%(Mobi)   
+#                 E6 = '%.5f'%(compx)                              
+#                 E7 = '%.5f'%(F1) 
+#                 E8 = '%.5f'%(F2) 
+#                 E9 = '%.5f'%(F3) 
+#                 E10 = '%.5f'%(F4) 
+#                 E11 = '%.5f'%(F2/Esum)
+#                 E12 = '%.5f'%(F3/Esum)
+#                 E13 = '%.5f'%(np.var(resdif2))
+#                 # rowx = [E1,E2,E3,E4,E5,E6,E7,E8,E9,E10,E11,E12,E13]
+#                 rowx = [E3,E4,E5,E6,E7,E8,E9,E10,E11,E12,E13]
+#                 row = row + rowx
             
-            toListofNumber = [float(x) for x in row]
-            X = np.array([toListofNumber])
+#             toListofNumber = [float(x) for x in row]
+#             X = np.array([toListofNumber])
             
-            predictions_ = loaded_model_gw_ag_100Hz.predict(X)        
-            return jsonify({"prediction":str(predictions_[0])}) 
+#             predictions_ = loaded_model_gw_ag_100Hz.predict(X)        
+#             return jsonify({"prediction":str(predictions_[0])}) 
         
-    except Exception as e: 
-        print(e)
-        print('--------')
-        print(rowx)
-        print('--------')
-        return jsonify({"prediction":str(2)})         
+#     except Exception as e: 
+#         print(e)
+#         print('--------')
+#         print(rowx)
+#         print('--------')
+#         return jsonify({"prediction":str(2)})         
 
 
-#  ----------------------------------------
-#   
-#  ----------------------------------------
+# #  ----------------------------------------
+# #   
+# #  ----------------------------------------
 
-@app.route('/predict_gait_walk_app', methods=['POST'])  
-def predict_gait_walk_app():
-    try:
-        if request.is_json:
-            data = request.get_json()
-            tStamp = []
-            acX = []
-            acY = []
-            acZ = []
-            agX = []
-            agY = []
-            agZ = []
+# @app.route('/predict_gait_walk_app', methods=['POST'])  
+# def predict_gait_walk_app():
+#     try:
+#         if request.is_json:
+#             data = request.get_json()
+#             tStamp = []
+#             acX = []
+#             acY = []
+#             acZ = []
+#             agX = []
+#             agY = []
+#             agZ = []
 
-            # for i in data['motion']:
-            for i in data['recording']['recordedData']:
-                # tsC = i['ts']
-                # tStamp.append(tsC)
-                tsC = i['ts']
-                tStamp.append(tsC)
-                acXC = i['data'][0]
-                acYC = i['data'][1]
-                acZC = i['data'][2]    
-                acX.append(acXC)
-                acY.append(acYC)
-                acZ.append(acZC) 
+#             # for i in data['motion']:
+#             for i in data['recording']['recordedData']:
+#                 # tsC = i['ts']
+#                 # tStamp.append(tsC)
+#                 tsC = i['ts']
+#                 tStamp.append(tsC)
+#                 acXC = i['data'][0]
+#                 acYC = i['data'][1]
+#                 acZC = i['data'][2]    
+#                 acX.append(acXC)
+#                 acY.append(acYC)
+#                 acZ.append(acZC) 
 
-                agXC = i['data'][3]
-                agYC = i['data'][4]
-                agZC = i['data'][5]    
-                agX.append(agXC)
-                agY.append(agYC)
-                agZ.append(agZC) 
+#                 agXC = i['data'][3]
+#                 agYC = i['data'][4]
+#                 agZC = i['data'][5]    
+#                 agX.append(agXC)
+#                 agY.append(agYC)
+#                 agZ.append(agZC) 
 
-            tst = [item - tStamp[0] for item in tStamp]
+#             tst = [item - tStamp[0] for item in tStamp]
 
-            # ------------  handle the oversampling to 200 samples in 20 sec
-            if len(acX) > 80:
-                toBeSamp = 100
-                # # print('----> ' + str(filepath))
-                # acX, x1 = signal.resample(acX,toBeSamp,np.arange(len(acX)))  # resampled at 200
-                # acY, x1 = signal.resample(acY,toBeSamp,np.arange(len(acY)))  # resampled 
-                # acZ, x1 = signal.resample(acZ,toBeSamp,np.arange(len(acZ)))  # resampled 
-                # agX, x1 = signal.resample(agX,toBeSamp,np.arange(len(agX)))  # resampled 
-                # agY, x1 = signal.resample(agY,toBeSamp,np.arange(len(agY)))  # resampled
-                # agZ, x1 = signal.resample(agZ,toBeSamp,np.arange(len(agZ)))  # resampled
+#             # ------------  handle the oversampling to 200 samples in 20 sec
+#             if len(acX) > 80:
+#                 toBeSamp = 100
+#                 # # print('----> ' + str(filepath))
+#                 # acX, x1 = signal.resample(acX,toBeSamp,np.arange(len(acX)))  # resampled at 200
+#                 # acY, x1 = signal.resample(acY,toBeSamp,np.arange(len(acY)))  # resampled 
+#                 # acZ, x1 = signal.resample(acZ,toBeSamp,np.arange(len(acZ)))  # resampled 
+#                 # agX, x1 = signal.resample(agX,toBeSamp,np.arange(len(agX)))  # resampled 
+#                 # agY, x1 = signal.resample(agY,toBeSamp,np.arange(len(agY)))  # resampled
+#                 # agZ, x1 = signal.resample(agZ,toBeSamp,np.arange(len(agZ)))  # resampled
 
-                acX, x1 = signal.resample(acX,round(len(acX)*toBeSamp),np.arange(len(acX)))  # resampled to 40
-                acY, x1 = signal.resample(acY,round(len(acY)*toBeSamp),np.arange(len(acY)))  # resampled to 40
-                acZ, x1 = signal.resample(acZ,round(len(acZ)*toBeSamp),np.arange(len(acZ)))  # resampled to 40
-                agX, x1 = signal.resample(agX,round(len(agX)*toBeSamp),np.arange(len(agX)))  # resampled to 40
-                agY, x1 = signal.resample(agY,round(len(agY)*toBeSamp),np.arange(len(agY)))  # resampled to 40
-                agZ, x1 = signal.resample(agZ,round(len(agZ)*toBeSamp),np.arange(len(agZ)))  # 
+#                 acX, x1 = signal.resample(acX,round(len(acX)*toBeSamp),np.arange(len(acX)))  # resampled to 40
+#                 acY, x1 = signal.resample(acY,round(len(acY)*toBeSamp),np.arange(len(acY)))  # resampled to 40
+#                 acZ, x1 = signal.resample(acZ,round(len(acZ)*toBeSamp),np.arange(len(acZ)))  # resampled to 40
+#                 agX, x1 = signal.resample(agX,round(len(agX)*toBeSamp),np.arange(len(agX)))  # resampled to 40
+#                 agY, x1 = signal.resample(agY,round(len(agY)*toBeSamp),np.arange(len(agY)))  # resampled to 40
+#                 agZ, x1 = signal.resample(agZ,round(len(agZ)*toBeSamp),np.arange(len(agZ)))  # 
 
 
-            # # ------------ transform to unit variance
-            acX=acX-np.mean(acX)
-            acX=acX/np.std(acX)
-            acY=acY-np.mean(acY)
-            acY=acY/np.std(acY)
-            acZ=acZ-np.mean(acZ)
-            acZ=acZ/np.std(acZ)
+#             # # ------------ transform to unit variance
+#             acX=acX-np.mean(acX)
+#             acX=acX/np.std(acX)
+#             acY=acY-np.mean(acY)
+#             acY=acY/np.std(acY)
+#             acZ=acZ-np.mean(acZ)
+#             acZ=acZ/np.std(acZ)
 
-            agX=agX-np.mean(agX)
-            agX=agX/np.std(agX)
-            agY=agY-np.mean(agY)
-            agY=agY/np.std(agY)
-            agZ=agZ-np.mean(agZ)
-            agZ=agZ/np.std(agZ)
+#             agX=agX-np.mean(agX)
+#             agX=agX/np.std(agX)
+#             agY=agY-np.mean(agY)
+#             agY=agY/np.std(agY)
+#             agZ=agZ-np.mean(agZ)
+#             agZ=agZ/np.std(agZ)
 
-            row = [] 
-            for testsig in (acX,acY,acZ,agX,agY,agZ):
-            # for testsig in (acX,acY,acZ):
-                testsig_filt = signal.sosfilt(sos, testsig)
-                res = np.array(testsig_filt)
-                fourier = fft(testsig_filt)
-                fab = np.abs(fourier)[0:100]
-                # ------------ 
-                Esum = sum(np.square(fab))
-                # Esum = 1.0
-                # base = 2  # work in units of bits
-                F1 = sum(np.square(fab[0:25]))
-                F2 = sum(np.square(fab[25:50]))
-                F3 = sum(np.square(fab[50:75]))
-                F4 = sum(np.square(fab[75:80]))
+#             row = [] 
+#             for testsig in (acX,acY,acZ,agX,agY,agZ):
+#             # for testsig in (acX,acY,acZ):
+#                 testsig_filt = signal.sosfilt(sos, testsig)
+#                 res = np.array(testsig_filt)
+#                 fourier = fft(testsig_filt)
+#                 fab = np.abs(fourier)[0:100]
+#                 # ------------ 
+#                 Esum = sum(np.square(fab))
+#                 # Esum = 1.0
+#                 # base = 2  # work in units of bits
+#                 F1 = sum(np.square(fab[0:25]))
+#                 F2 = sum(np.square(fab[25:50]))
+#                 F3 = sum(np.square(fab[50:75]))
+#                 F4 = sum(np.square(fab[75:80]))
 
-                kur = kurtosis(testsig_filt, fisher=True)
-                ske = skew(testsig_filt, bias=False)
-                resdif = res[1:]-res[0:-1]
-                Mobi = np.sqrt(np.var(resdif)/np.var(res))
-                resdif2 = resdif[1:]-resdif[0:-1]
-                compx = np.sqrt(np.var(resdif2)*np.var(res)/(np.var(resdif)*np.var(resdif)))
+#                 kur = kurtosis(testsig_filt, fisher=True)
+#                 ske = skew(testsig_filt, bias=False)
+#                 resdif = res[1:]-res[0:-1]
+#                 Mobi = np.sqrt(np.var(resdif)/np.var(res))
+#                 resdif2 = resdif[1:]-resdif[0:-1]
+#                 compx = np.sqrt(np.var(resdif2)*np.var(res)/(np.var(resdif)*np.var(resdif)))
 
-                E1 = '%.5f'%(np.std(testsig_filt))           
-                E2 = '%.5f'%(np.mean(testsig_filt))                     
-                E3 = '%.5f'%(kur)
-                E4 = '%.5f'%(ske)
-                E5 = '%.5f'%(Mobi)   
-                E6 = '%.5f'%(compx)                              
-                E7 = '%.5f'%(F1) 
-                E8 = '%.5f'%(F2) 
-                E9 = '%.5f'%(F3) 
-                E10 = '%.5f'%(F4) 
-                E11 = '%.5f'%(F2/Esum)
-                E12 = '%.5f'%(F3/Esum)
-                E13 = '%.5f'%(np.var(resdif2))
-                # rowx = [E1,E2,E3,E4,E5,E6,E7,E8,E9,E10,E11,E12,E13]
-                rowx = [E3,E4,E5,E6,E7,E8,E9,E10,E11,E12,E13]
-                row = row + rowx
+#                 E1 = '%.5f'%(np.std(testsig_filt))           
+#                 E2 = '%.5f'%(np.mean(testsig_filt))                     
+#                 E3 = '%.5f'%(kur)
+#                 E4 = '%.5f'%(ske)
+#                 E5 = '%.5f'%(Mobi)   
+#                 E6 = '%.5f'%(compx)                              
+#                 E7 = '%.5f'%(F1) 
+#                 E8 = '%.5f'%(F2) 
+#                 E9 = '%.5f'%(F3) 
+#                 E10 = '%.5f'%(F4) 
+#                 E11 = '%.5f'%(F2/Esum)
+#                 E12 = '%.5f'%(F3/Esum)
+#                 E13 = '%.5f'%(np.var(resdif2))
+#                 # rowx = [E1,E2,E3,E4,E5,E6,E7,E8,E9,E10,E11,E12,E13]
+#                 rowx = [E3,E4,E5,E6,E7,E8,E9,E10,E11,E12,E13]
+#                 row = row + rowx
             
-            toListofNumber = [float(x) for x in row]
-            X = np.array([toListofNumber])
+#             toListofNumber = [float(x) for x in row]
+#             X = np.array([toListofNumber])
             
-            predictions_ = loaded_model_gw_ag_100Hz.predict(X)        
-            return jsonify({"prediction":str(predictions_[0])}) 
+#             predictions_ = loaded_model_gw_ag_100Hz.predict(X)        
+#             return jsonify({"prediction":str(predictions_[0])}) 
         
-    except Exception as e: 
-        print(e)
-        print('--------')
-        print(rowx)
-        print('--------')
-        return jsonify({"prediction":str(2)})      
+#     except Exception as e: 
+#         print(e)
+#         print('--------')
+#         print(rowx)
+#         print('--------')
+#         return jsonify({"prediction":str(2)})      
     
-#  ----------------------------------------
-#   
-#  ----------------------------------------
+# #  ----------------------------------------
+# #   
+# #  ----------------------------------------
 
-@app.route('/predict_gait_walk_20Hz_app_data', methods=['POST'])  
-def predict_gait_walk_20Hz_app_data():
-    try:
-        if request.is_json:
-            data = request.get_json()
-            tStamp = []
-            acX = []
-            acY = []
-            acZ = []
-            agX = []
-            agY = []
-            agZ = []
+# @app.route('/predict_gait_walk_20Hz_app_data', methods=['POST'])  
+# def predict_gait_walk_20Hz_app_data():
+#     try:
+#         if request.is_json:
+#             data = request.get_json()
+#             tStamp = []
+#             acX = []
+#             acY = []
+#             acZ = []
+#             agX = []
+#             agY = []
+#             agZ = []
 
-            # for i in data['motion']:
-            for i in data['recording']['recordedData']:
-                # tsC = i['ts']
-                # tStamp.append(tsC)
-                tsC = i['ts']
-                tStamp.append(tsC)
-                acXC = i['data'][0]
-                acYC = i['data'][1]
-                acZC = i['data'][2]    
-                acX.append(acXC)
-                acY.append(acYC)
-                acZ.append(acZC) 
+#             # for i in data['motion']:
+#             for i in data['recording']['recordedData']:
+#                 # tsC = i['ts']
+#                 # tStamp.append(tsC)
+#                 tsC = i['ts']
+#                 tStamp.append(tsC)
+#                 acXC = i['data'][0]
+#                 acYC = i['data'][1]
+#                 acZC = i['data'][2]    
+#                 acX.append(acXC)
+#                 acY.append(acYC)
+#                 acZ.append(acZC) 
 
-                agXC = i['data'][3]
-                agYC = i['data'][4]
-                agZC = i['data'][5]    
-                agX.append(agXC)
-                agY.append(agYC)
-                agZ.append(agZC) 
+#                 agXC = i['data'][3]
+#                 agYC = i['data'][4]
+#                 agZC = i['data'][5]    
+#                 agX.append(agXC)
+#                 agY.append(agYC)
+#                 agZ.append(agZC) 
 
-            tst = [item - tStamp[0] for item in tStamp]
+#             tst = [item - tStamp[0] for item in tStamp]
 
-            # ------------  handle the downsample 40 to 20
-            if len(acX) > 10:
-                # toBeSamp = 200
-                # print('----> ' + str(filepath))
-                limitlento = 800
-                acX = every_nth(acX[0:limitlento],2)
-                acY = every_nth(acY[0:limitlento],2)
-                acZ = every_nth(acZ[0:limitlento],2)
-                agX = every_nth(agX[0:limitlento],2)
-                agY = every_nth(agY[0:limitlento],2)
-                agZ = every_nth(agZ[0:limitlento],2)
+#             # ------------  handle the downsample 40 to 20
+#             if len(acX) > 10:
+#                 # toBeSamp = 200
+#                 # print('----> ' + str(filepath))
+#                 limitlento = 800
+#                 acX = every_nth(acX[0:limitlento],2)
+#                 acY = every_nth(acY[0:limitlento],2)
+#                 acZ = every_nth(acZ[0:limitlento],2)
+#                 agX = every_nth(agX[0:limitlento],2)
+#                 agY = every_nth(agY[0:limitlento],2)
+#                 agZ = every_nth(agZ[0:limitlento],2)
 
 
-            # # # ------------ transform to unit variance
-            # acX=acX-np.mean(acX)
-            # acX=acX/np.std(acX)
-            # acY=acY-np.mean(acY)
-            # acY=acY/np.std(acY)
-            # acZ=acZ-np.mean(acZ)
-            # acZ=acZ/np.std(acZ)
+#             # # # ------------ transform to unit variance
+#             # acX=acX-np.mean(acX)
+#             # acX=acX/np.std(acX)
+#             # acY=acY-np.mean(acY)
+#             # acY=acY/np.std(acY)
+#             # acZ=acZ-np.mean(acZ)
+#             # acZ=acZ/np.std(acZ)
 
-            # agX=agX-np.mean(agX)
-            # agX=agX/np.std(agX)
-            # agY=agY-np.mean(agY)
-            # agY=agY/np.std(agY)
-            # agZ=agZ-np.mean(agZ)
-            # agZ=agZ/np.std(agZ)
+#             # agX=agX-np.mean(agX)
+#             # agX=agX/np.std(agX)
+#             # agY=agY-np.mean(agY)
+#             # agY=agY/np.std(agY)
+#             # agZ=agZ-np.mean(agZ)
+#             # agZ=agZ/np.std(agZ)
 
-                row = [] 
-                for testsig in (acX,acY,acZ,agX,agY,agZ):
-                # for testsig in (acX,acY,acZ):
-                    testsig_filt = testsig
-                    res = np.array(testsig_filt)
-                    fourier = fft(testsig_filt)
-                    fab = np.abs(fourier[80:160])
-                    # ------------ 
-                    Esum = sum(np.square(fab))
-                    # Esum = 1.0
-                    # base = 2  # work in units of bits
-                    F1 = sum(np.square(fab[0:20]))
-                    F2 = sum(np.square(fab[20:40]))
-                    F3 = sum(np.square(fab[40:60]))
-                    F4 = sum(np.square(fab[60:80]))
+#                 row = [] 
+#                 for testsig in (acX,acY,acZ,agX,agY,agZ):
+#                 # for testsig in (acX,acY,acZ):
+#                     testsig_filt = testsig
+#                     res = np.array(testsig_filt)
+#                     fourier = fft(testsig_filt)
+#                     fab = np.abs(fourier[80:160])
+#                     # ------------ 
+#                     Esum = sum(np.square(fab))
+#                     # Esum = 1.0
+#                     # base = 2  # work in units of bits
+#                     F1 = sum(np.square(fab[0:20]))
+#                     F2 = sum(np.square(fab[20:40]))
+#                     F3 = sum(np.square(fab[40:60]))
+#                     F4 = sum(np.square(fab[60:80]))
 
-                    kur = kurtosis(testsig_filt, fisher=True)
-                    ske = skew(testsig_filt, bias=False)
-                    resdif = res[1:]-res[0:-1]
-                    Mobi = np.sqrt(np.var(resdif)/np.var(res))
-                    resdif2 = resdif[1:]-resdif[0:-1]
-                    compx = np.sqrt(np.var(resdif2)*np.var(res)/(np.var(resdif)*np.var(resdif)))
+#                     kur = kurtosis(testsig_filt, fisher=True)
+#                     ske = skew(testsig_filt, bias=False)
+#                     resdif = res[1:]-res[0:-1]
+#                     Mobi = np.sqrt(np.var(resdif)/np.var(res))
+#                     resdif2 = resdif[1:]-resdif[0:-1]
+#                     compx = np.sqrt(np.var(resdif2)*np.var(res)/(np.var(resdif)*np.var(resdif)))
 
-                    E1 = '%.5f'%(np.std(testsig_filt))           
-                    E2 = '%.5f'%(np.mean(testsig_filt))                     
-                    E3 = '%.5f'%(kur)
-                    E4 = '%.5f'%(ske)
-                    E5 = '%.5f'%(Mobi)   
-                    E6 = '%.5f'%(compx)                              
-                    E7 = '%.5f'%(F1) 
-                    E8 = '%.5f'%(F2) 
-                    E9 = '%.5f'%(F3) 
-                    E10 = '%.5f'%(F4) 
-                    # E11 = '%.5f'%(F2/Esum)
-                    # E12 = '%.5f'%(F3/Esum)
-                    E13 = '%.5f'%(np.var(resdif2))
-                    rowx = [E1,E2,E3,E4,E5,E6,E7,E8,E9,E10,E13]
-                    # rowx = [E3,E4,E5,E6,E7,E8,E9,E10,E11,E12,E13]
-                    row = row + rowx
+#                     E1 = '%.5f'%(np.std(testsig_filt))           
+#                     E2 = '%.5f'%(np.mean(testsig_filt))                     
+#                     E3 = '%.5f'%(kur)
+#                     E4 = '%.5f'%(ske)
+#                     E5 = '%.5f'%(Mobi)   
+#                     E6 = '%.5f'%(compx)                              
+#                     E7 = '%.5f'%(F1) 
+#                     E8 = '%.5f'%(F2) 
+#                     E9 = '%.5f'%(F3) 
+#                     E10 = '%.5f'%(F4) 
+#                     # E11 = '%.5f'%(F2/Esum)
+#                     # E12 = '%.5f'%(F3/Esum)
+#                     E13 = '%.5f'%(np.var(resdif2))
+#                     rowx = [E1,E2,E3,E4,E5,E6,E7,E8,E9,E10,E13]
+#                     # rowx = [E3,E4,E5,E6,E7,E8,E9,E10,E11,E12,E13]
+#                     row = row + rowx
             
-                toListofNumber = [float(x) for x in row]
-                X = np.array([toListofNumber])
+#                 toListofNumber = [float(x) for x in row]
+#                 X = np.array([toListofNumber])
                 
-                predictions_ = loaded_model_gw_ag_20Hz.predict(X)      
-                return jsonify({"prediction":str(predictions_[0])}) 
+#                 predictions_ = loaded_model_gw_ag_20Hz.predict(X)      
+#                 return jsonify({"prediction":str(predictions_[0])}) 
         
-    except Exception as e: 
-        print(e)
-        print('--------')
-        # print(rowx)
-        print('--------')
-        return jsonify({"prediction":str(2)})     
+#     except Exception as e: 
+#         print(e)
+#         print('--------')
+#         # print(rowx)
+#         print('--------')
+#         return jsonify({"prediction":str(2)})     
     
-#  ----------------------------------------
-#   
-#  ----------------------------------------
+# #  ----------------------------------------
+# #   
+# #  ----------------------------------------
 
-@app.route('/predict_gait_walk_20Hz_cupd_data', methods=['POST'])  
-def predict_gait_walk_20Hz_cupd_data():
-    try:
-        if request.is_json:
-            data = request.get_json()
-            tStamp = []
-            acX = []
-            acY = []
-            acZ = []
-            agX = []
-            agY = []
-            agZ = []
+# @app.route('/predict_gait_walk_20Hz_cupd_data', methods=['POST'])  
+# def predict_gait_walk_20Hz_cupd_data():
+#     try:
+#         if request.is_json:
+#             data = request.get_json()
+#             tStamp = []
+#             acX = []
+#             acY = []
+#             acZ = []
+#             agX = []
+#             agY = []
+#             agZ = []
 
-            # for i in data['motion']:
-            for i in data['recording']['recordedData']:
-                # tsC = i['ts']
-                # tStamp.append(tsC)
-                tsC = i['ts']
-                tStamp.append(tsC)
-                acXC = i['data'][0]
-                acYC = i['data'][1]
-                acZC = i['data'][2]    
-                acX.append(acXC)
-                acY.append(acYC)
-                acZ.append(acZC) 
+#             # for i in data['motion']:
+#             for i in data['recording']['recordedData']:
+#                 # tsC = i['ts']
+#                 # tStamp.append(tsC)
+#                 tsC = i['ts']
+#                 tStamp.append(tsC)
+#                 acXC = i['data'][0]
+#                 acYC = i['data'][1]
+#                 acZC = i['data'][2]    
+#                 acX.append(acXC)
+#                 acY.append(acYC)
+#                 acZ.append(acZC) 
 
-                agXC = i['data'][3]
-                agYC = i['data'][4]
-                agZC = i['data'][5]    
-                agX.append(agXC)
-                agY.append(agYC)
-                agZ.append(agZC) 
+#                 agXC = i['data'][3]
+#                 agYC = i['data'][4]
+#                 agZC = i['data'][5]    
+#                 agX.append(agXC)
+#                 agY.append(agYC)
+#                 agZ.append(agZC) 
 
-            tst = [item - tStamp[0] for item in tStamp]
+#             tst = [item - tStamp[0] for item in tStamp]
 
-            # ------------  handle the downsample 40 to 20
-            if len(acX) > 10:
-                # toBeSamp = 200
-                # print('----> ' + str(filepath))
-                limitlento = 800
-                acX = every_nth(acX[0:limitlento],5)
-                acY = every_nth(acY[0:limitlento],5)
-                acZ = every_nth(acZ[0:limitlento],5)
-                agX = every_nth(agX[0:limitlento],5)
-                agY = every_nth(agY[0:limitlento],5)
-                agZ = every_nth(agZ[0:limitlento],5)
+#             # ------------  handle the downsample 40 to 20
+#             if len(acX) > 10:
+#                 # toBeSamp = 200
+#                 # print('----> ' + str(filepath))
+#                 limitlento = 800
+#                 acX = every_nth(acX[0:limitlento],5)
+#                 acY = every_nth(acY[0:limitlento],5)
+#                 acZ = every_nth(acZ[0:limitlento],5)
+#                 agX = every_nth(agX[0:limitlento],5)
+#                 agY = every_nth(agY[0:limitlento],5)
+#                 agZ = every_nth(agZ[0:limitlento],5)
 
 
-            # # # ------------ transform to unit variance
-            # acX=acX-np.mean(acX)
-            # acX=acX/np.std(acX)
-            # acY=acY-np.mean(acY)
-            # acY=acY/np.std(acY)
-            # acZ=acZ-np.mean(acZ)
-            # acZ=acZ/np.std(acZ)
+#             # # # ------------ transform to unit variance
+#             # acX=acX-np.mean(acX)
+#             # acX=acX/np.std(acX)
+#             # acY=acY-np.mean(acY)
+#             # acY=acY/np.std(acY)
+#             # acZ=acZ-np.mean(acZ)
+#             # acZ=acZ/np.std(acZ)
 
-            # agX=agX-np.mean(agX)
-            # agX=agX/np.std(agX)
-            # agY=agY-np.mean(agY)
-            # agY=agY/np.std(agY)
-            # agZ=agZ-np.mean(agZ)
-            # agZ=agZ/np.std(agZ)
+#             # agX=agX-np.mean(agX)
+#             # agX=agX/np.std(agX)
+#             # agY=agY-np.mean(agY)
+#             # agY=agY/np.std(agY)
+#             # agZ=agZ-np.mean(agZ)
+#             # agZ=agZ/np.std(agZ)
 
-                row = [] 
-                for testsig in (acX,acY,acZ,agX,agY,agZ):
-                # for testsig in (acX,acY,acZ):
-                    testsig_filt = testsig
-                    res = np.array(testsig_filt)
-                    fourier = fft(testsig_filt)
-                    fab = np.abs(fourier[80:160])
-                    # ------------ 
-                    Esum = sum(np.square(fab))
-                    # Esum = 1.0
-                    # base = 2  # work in units of bits
-                    F1 = sum(np.square(fab[0:20]))
-                    F2 = sum(np.square(fab[20:40]))
-                    F3 = sum(np.square(fab[40:60]))
-                    F4 = sum(np.square(fab[60:80]))
+#                 row = [] 
+#                 for testsig in (acX,acY,acZ,agX,agY,agZ):
+#                 # for testsig in (acX,acY,acZ):
+#                     testsig_filt = testsig
+#                     res = np.array(testsig_filt)
+#                     fourier = fft(testsig_filt)
+#                     fab = np.abs(fourier[80:160])
+#                     # ------------ 
+#                     Esum = sum(np.square(fab))
+#                     # Esum = 1.0
+#                     # base = 2  # work in units of bits
+#                     F1 = sum(np.square(fab[0:20]))
+#                     F2 = sum(np.square(fab[20:40]))
+#                     F3 = sum(np.square(fab[40:60]))
+#                     F4 = sum(np.square(fab[60:80]))
 
-                    kur = kurtosis(testsig_filt, fisher=True)
-                    ske = skew(testsig_filt, bias=False)
-                    resdif = res[1:]-res[0:-1]
-                    Mobi = np.sqrt(np.var(resdif)/np.var(res))
-                    resdif2 = resdif[1:]-resdif[0:-1]
-                    compx = np.sqrt(np.var(resdif2)*np.var(res)/(np.var(resdif)*np.var(resdif)))
+#                     kur = kurtosis(testsig_filt, fisher=True)
+#                     ske = skew(testsig_filt, bias=False)
+#                     resdif = res[1:]-res[0:-1]
+#                     Mobi = np.sqrt(np.var(resdif)/np.var(res))
+#                     resdif2 = resdif[1:]-resdif[0:-1]
+#                     compx = np.sqrt(np.var(resdif2)*np.var(res)/(np.var(resdif)*np.var(resdif)))
 
-                    E1 = '%.5f'%(np.std(testsig_filt))           
-                    E2 = '%.5f'%(np.mean(testsig_filt))                     
-                    E3 = '%.5f'%(kur)
-                    E4 = '%.5f'%(ske)
-                    E5 = '%.5f'%(Mobi)   
-                    E6 = '%.5f'%(compx)                              
-                    E7 = '%.5f'%(F1) 
-                    E8 = '%.5f'%(F2) 
-                    E9 = '%.5f'%(F3) 
-                    E10 = '%.5f'%(F4) 
-                    # E11 = '%.5f'%(F2/Esum)
-                    # E12 = '%.5f'%(F3/Esum)
-                    E13 = '%.5f'%(np.var(resdif2))
-                    rowx = [E1,E2,E3,E4,E5,E6,E7,E8,E9,E10,E13]
-                    # rowx = [E3,E4,E5,E6,E7,E8,E9,E10,E11,E12,E13]
-                    row = row + rowx
+#                     E1 = '%.5f'%(np.std(testsig_filt))           
+#                     E2 = '%.5f'%(np.mean(testsig_filt))                     
+#                     E3 = '%.5f'%(kur)
+#                     E4 = '%.5f'%(ske)
+#                     E5 = '%.5f'%(Mobi)   
+#                     E6 = '%.5f'%(compx)                              
+#                     E7 = '%.5f'%(F1) 
+#                     E8 = '%.5f'%(F2) 
+#                     E9 = '%.5f'%(F3) 
+#                     E10 = '%.5f'%(F4) 
+#                     # E11 = '%.5f'%(F2/Esum)
+#                     # E12 = '%.5f'%(F3/Esum)
+#                     E13 = '%.5f'%(np.var(resdif2))
+#                     rowx = [E1,E2,E3,E4,E5,E6,E7,E8,E9,E10,E13]
+#                     # rowx = [E3,E4,E5,E6,E7,E8,E9,E10,E11,E12,E13]
+#                     row = row + rowx
             
-                toListofNumber = [float(x) for x in row]
-                X = np.array([toListofNumber])
+#                 toListofNumber = [float(x) for x in row]
+#                 X = np.array([toListofNumber])
                 
-                predictions_ = loaded_model_gw_ag_20Hz.predict(X)      
-                return jsonify({"prediction":str(predictions_[0])}) 
+#                 predictions_ = loaded_model_gw_ag_20Hz.predict(X)      
+#                 return jsonify({"prediction":str(predictions_[0])}) 
         
-    except Exception as e: 
-        print(e)
-        print('--------')
-        # print(rowx)
-        print('--------')
-        return jsonify({"prediction":str(2)})     
+#     except Exception as e: 
+#         print(e)
+#         print('--------')
+#         # print(rowx)
+#         print('--------')
+#         return jsonify({"prediction":str(2)})     
