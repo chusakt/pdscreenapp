@@ -1941,7 +1941,8 @@ def predict_gait_walk():
                 testsig_filt = signal.sosfilt(sos_gwag, testsig)
                 res = np.array(testsig_filt)
                 fourier = fft(testsig_filt)
-                fab = np.abs(fourier)[0:100]
+                fourier, x1 = signal.resample(fourier,40,np.arange(len(fourier)))  # resampled to 40
+                fab = np.abs(fourier)[0:40]
                 # ------------ 
                 Esum = sum(np.square(fab))
                 # Esum = 1.0
