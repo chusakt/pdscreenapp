@@ -140,7 +140,7 @@ with open(model_pkl_file, 'rb') as file:
 
 #========================================
 # --- load model ---
-model_pkl_file = "model_gaitStbl_ag_wihtpreprocess002.pkl"  
+model_pkl_file = "model_0326_gaitStab.pkl"  
 with open(model_pkl_file, 'rb') as file:  
     loaded_model_gs_ag = pickle.load(file) 
 # --- load model ---
@@ -1803,27 +1803,27 @@ def predict_gait_stab():
 
 
                 # # ------------ handle preprocessing
-                # acX = signal.sosfilt(sos, acX)
-                # acY = signal.sosfilt(sos, acY)
-                # acZ = signal.sosfilt(sos, acZ)
-                # agX = signal.sosfilt(sos, agX)
-                # agY = signal.sosfilt(sos, agY)
-                # agZ = signal.sosfilt(sos, agZ)
+                acX = signal.sosfilt(sos, acX)
+                acY = signal.sosfilt(sos, acY)
+                acZ = signal.sosfilt(sos, acZ)
+                agX = signal.sosfilt(sos, agX)
+                agY = signal.sosfilt(sos, agY)
+                agZ = signal.sosfilt(sos, agZ)
 
                 # # ------------ transform to unit variance
-                acX=acX-np.mean(acX)
-                acX=acX/np.std(acX)
-                acY=acY-np.mean(acY)
-                acY=acY/np.std(acY)
-                acZ=acZ-np.mean(acZ)
-                acZ=acZ/np.std(acZ)
+                # acX=acX-np.mean(acX)
+                # acX=acX/np.std(acX)
+                # acY=acY-np.mean(acY)
+                # acY=acY/np.std(acY)
+                # acZ=acZ-np.mean(acZ)
+                # acZ=acZ/np.std(acZ)
 
-                agX=agX-np.mean(agX)
-                agX=agX/np.std(agX)
-                agY=agY-np.mean(agY)
-                agY=agY/np.std(agY)
-                agZ=agZ-np.mean(agZ)
-                agZ=agZ/np.std(agZ)
+                # agX=agX-np.mean(agX)
+                # agX=agX/np.std(agX)
+                # agY=agY-np.mean(agY)
+                # agY=agY/np.std(agY)
+                # agZ=agZ-np.mean(agZ)
+                # agZ=agZ/np.std(agZ)
                 # ------------ 
 
 
@@ -1840,6 +1840,7 @@ def predict_gait_stab():
                 F2 = sum(np.square(fab[25:50]))
                 F3 = sum(np.square(fab[50:75]))
                 F4 = sum(np.square(fab[75:80]))
+                
                 kur = kurtosis(testsig_filt, fisher=True)
                 ske = skew(testsig_filt, bias=False)
                 resdif = res[1:]-res[0:-1]
@@ -1865,7 +1866,7 @@ def predict_gait_stab():
                 # zero_crossing
                 # E19 = '%.5f'%(len(np.where(np.diff(np.sign(testsig)))[0]))
 
-                rowx = [E3,E4,E5,E6,E7,E8,E9,E10,E11,E12,E13]
+                rowx = [E1,E2,E3,E4,E5,E6,E7,E8,E9,E10,E11,E12,E13]
                 row = row + rowx
             
             toListofNumber = [float(x) for x in row]
