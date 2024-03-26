@@ -1129,12 +1129,12 @@ def predict_tremor_rest():
                 # agYMa = runningMeanFast(agY, N)
                 # agZMa = runningMeanFast(agZ, N)
 
-                acX = acX - acXMa
-                acY = acY - acYMa
-                acZ = acZ - acZMa
-                agX = agX - agXMa
-                agY = agY - agYMa
-                agZ = agZ - agZMa
+                # acX = acX - acXMa
+                # acY = acY - acYMa
+                # acZ = acZ - acZMa
+                # agX = agX - agXMa
+                # agY = agY - agYMa
+                # agZ = agZ - agZMa
 
                 setLen = 185
                 acX = acX[:setLen]
@@ -1267,7 +1267,7 @@ def predict_tremor_rest():
                 return jsonify({"prediction":str(predictions_[0])}) 
             else:
                 return jsonify({"prediction":str(2)}) 
-
+ 
     # except:
     except Exception as e: 
         print(e)
