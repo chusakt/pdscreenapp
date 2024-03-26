@@ -109,7 +109,7 @@ model_pkl_file = "model_tremor_post_006.pkl"
 with open(model_pkl_file, 'rb') as file:  
     loaded_model_tp_ag = pickle.load(file) 
 # --- load model ---
-model_pkl_file = "model_0326_tremorrest_1.pkl"  
+model_pkl_file = "model_0326_tremorrest_2.pkl"  
 with open(model_pkl_file, 'rb') as file:  
     loaded_model_tr_ag = pickle.load(file) 
 #========================================
@@ -1121,13 +1121,13 @@ def predict_tremor_rest():
                 tst = every_nth(tst,4)
 
                 # -- do some pre process
-                N = 5
-                acXMa = runningMeanFast(acX, N)
-                acYMa = runningMeanFast(acY, N)
-                acZMa = runningMeanFast(acZ, N)
-                agXMa = runningMeanFast(agX, N)
-                agYMa = runningMeanFast(agY, N)
-                agZMa = runningMeanFast(agZ, N)
+                # N = 5
+                # acXMa = runningMeanFast(acX, N)
+                # acYMa = runningMeanFast(acY, N)
+                # acZMa = runningMeanFast(acZ, N)
+                # agXMa = runningMeanFast(agX, N)
+                # agYMa = runningMeanFast(agY, N)
+                # agZMa = runningMeanFast(agZ, N)
 
                 acX = acX - acXMa
                 acY = acY - acYMa
