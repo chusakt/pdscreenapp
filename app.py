@@ -109,7 +109,7 @@ model_pkl_file = "model_tremor_post_006.pkl"
 with open(model_pkl_file, 'rb') as file:  
     loaded_model_tp_ag = pickle.load(file) 
 # --- load model ---
-model_pkl_file = "model_tremor_rest_009.pkl"  
+model_pkl_file = "model_0326_tremorrest_1.pkl"  
 with open(model_pkl_file, 'rb') as file:  
     loaded_model_tr_ag = pickle.load(file) 
 #========================================
@@ -1145,6 +1145,27 @@ def predict_tremor_rest():
                 agZ = agZ[:setLen]
                 tst = tst[:setLen]
 
+
+                noise = np.random.normal(0,1,185)
+                noise = 0.0001*noise
+                acX = acX + noise
+                noise = np.random.normal(0,1,185)
+                noise = 0.0001*noise            
+                acY = acY + noise
+                noise = np.random.normal(0,1,185)
+                noise = 0.0001*noise            
+                acZ = acZ + noise
+                noise = np.random.normal(0,1,185)
+                noise = 0.001*noise            
+                agX = agX + noise
+                noise = np.random.normal(0,1,185)
+                noise = 0.001*noise            
+                agY = agY + noise
+                noise = np.random.normal(0,1,185)
+                noise = 0.001*noise            
+                agZ = agZ + noise 
+
+
                 # -- store for further analysis (time domain, data minus moving average)
                 acX_hf = acX
                 acY_hf = acY
@@ -1155,19 +1176,19 @@ def predict_tremor_rest():
                 tst_hf = tst
 
                 # ------- normalize ---------
-                acX=acX-np.mean(acX)
-                acX=acX/np.std(acX)
-                acY=acY-np.mean(acY)
-                acY=acY/np.std(acY)
-                acZ=acZ-np.mean(acZ)
-                acZ=acZ/np.std(acZ)
+                # acX=acX-np.mean(acX)
+                # acX=acX/np.std(acX)
+                # acY=acY-np.mean(acY)
+                # acY=acY/np.std(acY)
+                # acZ=acZ-np.mean(acZ)
+                # acZ=acZ/np.std(acZ)
 
-                agX=agX-np.mean(agX)
-                agX=agX/np.std(agX)
-                agY=agY-np.mean(agY)
-                agY=agY/np.std(agY)
-                agZ=agZ-np.mean(agZ)
-                agZ=agZ/np.std(agZ)
+                # agX=agX-np.mean(agX)
+                # agX=agX/np.std(agX)
+                # agY=agY-np.mean(agY)
+                # agY=agY/np.std(agY)
+                # agZ=agZ-np.mean(agZ)
+                # agZ=agZ/np.std(agZ)
 
 
                 # ----------- fft
@@ -1228,8 +1249,13 @@ def predict_tremor_rest():
                     E4 = '%.5f'%(F4)
                     E5 = '%.5f'%(F5)
                     E6 = '%.5f'%(F6)
-
-                    rowx = [E1,E2,E3,E4,E5,E6]
+                    E1x = '%.5f'%(F1/F4)
+                    E2x = '%.5f'%(F2/F5)
+                    E3x = '%.5f'%(F3/F6)
+                    E4x = '%.5f'%(F4/F3)
+                    E5x = '%.5f'%(F5/F2)
+                    E6x = '%.5f'%(F6/F1)
+                    rowx = [E1,E2,E3,E4,E5,E6,E1x,E2x,E3x,E4x,E5x,E6x]
                     # rowx = [E1,E3,E4,E5,E6,E7]
                     row = row + rowx
 
