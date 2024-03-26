@@ -140,7 +140,7 @@ with open(model_pkl_file, 'rb') as file:
 
 #========================================
 # --- load model ---
-model_pkl_file = "model_0326_gaitStab.pkl"  
+model_pkl_file = "model_0326_gaitStab_2.pkl"  
 with open(model_pkl_file, 'rb') as file:  
     loaded_model_gs_ag = pickle.load(file) 
 # --- load model ---
@@ -1794,12 +1794,12 @@ def predict_gait_stab():
                 # agX = agX[0:100]
                 # agY = agY[0:100]
                 # agZ = agZ[0:100] 
-                acX = acX[10:110]
-                acY = acY[10:110]
-                acZ = acZ[10:110]
-                agX = agX[10:110]
-                agY = agY[10:110]
-                agZ = agZ[10:110] 
+                acX = acX[10:190]
+                acY = acY[10:190]
+                acZ = acZ[10:190]
+                agX = agX[10:190]
+                agY = agY[10:190]
+                agZ = agZ[10:190] 
 
 
                 # # ------------ handle preprocessing
