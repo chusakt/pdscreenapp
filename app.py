@@ -140,7 +140,7 @@ with open(model_pkl_file, 'rb') as file:
 
 #========================================
 # --- load model ---
-model_pkl_file = "model_0326_gaitStab_2.pkl"  
+model_pkl_file = "model_0326_gaitStab_3.pkl"  
 with open(model_pkl_file, 'rb') as file:  
     loaded_model_gs_ag = pickle.load(file) 
 # --- load model ---
@@ -1800,7 +1800,14 @@ def predict_gait_stab():
                 agX = agX[10:190]
                 agY = agY[10:190]
                 agZ = agZ[10:190] 
-
+                noise = np.random.normal(0,1,180)
+                noise = 0.001*noise
+                acX = acX + noise
+                acY = acY + noise
+                acZ = acZ + noise
+                agX = agX + noise
+                agY = agY + noise
+                agZ = agZ + noise 
 
                 # # ------------ handle preprocessing
                 acX = signal.sosfilt(sos, acX)
@@ -1937,7 +1944,14 @@ def predict_gait_stab_cudata():
                 agX = agX[10:190]
                 agY = agY[10:190]
                 agZ = agZ[10:190] 
-
+                noise = np.random.normal(0,1,180)
+                noise = 0.001*noise
+                acX = acX + noise
+                acY = acY + noise
+                acZ = acZ + noise
+                agX = agX + noise
+                agY = agY + noise
+                agZ = agZ + noise 
 
                 # # ------------ handle preprocessing
                 acX = signal.sosfilt(sos, acX)
