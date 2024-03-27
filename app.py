@@ -179,9 +179,15 @@ with open(model_pkl_file, 'rb') as file:
 # with open(model_pkl_file, 'rb') as file:  
 #     loaded_model_va = pickle.load(file) 
 # --- load model ---
-model_pkl_file = "Model_pickle_voice_ypl_1.pkl"  
+model_pkl_file = "model_0327_voiceYPL_1.pkl"  
 with open(model_pkl_file, 'rb') as file:  
     loaded_model_vy = pickle.load(file) 
+
+
+# --- load model ---
+model_pkl_file = "model_0327_voiceAHH_1.pkl"  
+with open(model_pkl_file, 'rb') as file:  
+    loaded_model_va = pickle.load(file) 
 
 
 # --- load model --- > modified/improved model ahh voice
@@ -887,7 +893,7 @@ def predict_voice_ahh():
                                                         ])
 
             X = np.array(df)
-            predictions_ = loaded_model_va_imp.predict(X)        
+            predictions_ = loaded_model_va.predict(X)        
             # return jsonify({"show something":str('this is something')}) 
             return jsonify({"prediction":str(predictions_[0])}) 
     except:
@@ -1042,7 +1048,7 @@ def predict_voice_ypl():
                                                         ])
 
             X = np.array(df)
-            predictions_ = loaded_model_vy_imp.predict(X)        
+            predictions_ = loaded_model_vy.predict(X)        
             # return jsonify({"show something":str('this is something')}) 
             return jsonify({"prediction":str(predictions_[0])}) 
     except:
