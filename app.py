@@ -140,7 +140,7 @@ with open(model_pkl_file, 'rb') as file:
 
 #========================================
 # --- load model ---
-model_pkl_file = "model_0326_gaitStab_3.pkl"  
+model_pkl_file = "model_0327_gaitstab_1.pkl"  
 with open(model_pkl_file, 'rb') as file:  
     loaded_model_gs_ag = pickle.load(file) 
 # --- load model ---
