@@ -124,7 +124,7 @@ model_pkl_file = "Model_pickle_dualtap_1_only_va.pkl"
 with open(model_pkl_file, 'rb') as file:  
     loaded_model_d = pickle.load(file) 
 # --- load model ---
-model_pkl_file = "Model_pinchtosize_dia_only_001.pkl"  
+model_pkl_file = "model_0327_pinch_1.pkl"  
 with open(model_pkl_file, 'rb') as file:  
     loaded_model_p = pickle.load(file) 
 # # --- load model ---
@@ -489,7 +489,7 @@ def predict_pinchtosize():
                         # mcy.append(m_inkdata['center']['y'])
                     # -- try some smooth
                     # mvWindow = 25
-                    mvWindow = 50
+                    mvWindow = 25
                     if len(mdia) > mvWindow+1:
                         # fig, ax = plt.subplots()
                         # fig.set_size_inches(3, 3)
