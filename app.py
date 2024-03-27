@@ -109,7 +109,7 @@ model_pkl_file = "model_tremor_post_006.pkl"
 with open(model_pkl_file, 'rb') as file:  
     loaded_model_tp_ag = pickle.load(file) 
 # --- load model ---
-model_pkl_file = "model_0326_tremorrest_1.pkl"  
+model_pkl_file = "model_0327_tremorrest_1.pkl"  
 with open(model_pkl_file, 'rb') as file:  
     loaded_model_tr_ag = pickle.load(file) 
 #========================================
@@ -1120,21 +1120,22 @@ def predict_tremor_rest():
                 agZ = every_nth(agZ,4)
                 tst = every_nth(tst,4)
 
-                # -- do some pre process
-                N = 5
-                acXMa = runningMeanFast(acX, N)
-                acYMa = runningMeanFast(acY, N)
-                acZMa = runningMeanFast(acZ, N)
-                agXMa = runningMeanFast(agX, N)
-                agYMa = runningMeanFast(agY, N)
-                agZMa = runningMeanFast(agZ, N)
 
-                acX = acX - acXMa
-                acY = acY - acYMa
-                acZ = acZ - acZMa
-                agX = agX - agXMa
-                agY = agY - agYMa
-                agZ = agZ - agZMa
+                # # -- do some pre process
+                # N = 5
+                # acXMa = runningMeanFast(acX, N)
+                # acYMa = runningMeanFast(acY, N)
+                # acZMa = runningMeanFast(acZ, N)
+                # agXMa = runningMeanFast(agX, N)
+                # agYMa = runningMeanFast(agY, N)
+                # agZMa = runningMeanFast(agZ, N)
+
+                # acX = acX - acXMa
+                # acY = acY - acYMa
+                # acZ = acZ - acZMa
+                # agX = agX - agXMa
+                # agY = agY - agYMa
+                # agZ = agZ - agZMa
 
                 setLen = 185
                 acX = acX[:setLen]
@@ -1145,27 +1146,25 @@ def predict_tremor_rest():
                 agZ = agZ[:setLen]
                 tst = tst[:setLen]
 
-
-                noise = np.random.normal(0,1,185)
-                noise = 0.0001*noise
-                acX = acX + noise
-                noise = np.random.normal(0,1,185)
-                noise = 0.0001*noise            
-                acY = acY + noise
-                noise = np.random.normal(0,1,185)
-                noise = 0.0001*noise            
-                acZ = acZ + noise
-                noise = np.random.normal(0,1,185)
-                noise = 0.001*noise            
-                agX = agX + noise
-                noise = np.random.normal(0,1,185)
-                noise = 0.001*noise            
-                agY = agY + noise
-                noise = np.random.normal(0,1,185)
-                noise = 0.001*noise            
-                agZ = agZ + noise 
-
-
+                # noise = np.random.normal(0,1,185)
+                # noise = 0.001*noise
+                # acX = acX + noise
+                # # noise = np.random.normal(0,1,185)
+                # # noise = 0.0001*noise            
+                # acY = acY + noise
+                # # noise = np.random.normal(0,1,185)
+                # # noise = 0.0001*noise            
+                # acZ = acZ + noise
+                # # noise = np.random.normal(0,1,185)
+                # # noise = 0.001*noise            
+                # agX = agX + noise
+                # # noise = np.random.normal(0,1,185)
+                # # noise = 0.001*noise            
+                # agY = agY + noise
+                # # noise = np.random.normal(0,1,185)
+                # # noise = 0.001*noise            
+                # agZ = agZ + noise 
+            
                 # -- store for further analysis (time domain, data minus moving average)
                 acX_hf = acX
                 acY_hf = acY
@@ -1191,17 +1190,18 @@ def predict_tremor_rest():
                 # agZ=agZ/np.std(agZ)
 
 
-                # ----------- fft
-                fab_acX = np.abs(fft(acX))[94:-1]
-                fab_acY = np.abs(fft(acY))[94:-1]
-                fab_acZ = np.abs(fft(acZ))[94:-1]
-                fab_agX = np.abs(fft(agX))[94:-1]
-                fab_agY = np.abs(fft(agY))[94:-1]
-                fab_agZ = np.abs(fft(agZ))[94:-1]
+                # # ----------- fft
+                # fab_acX = np.abs(fft(acX))[94:-1]
+                # fab_acY = np.abs(fft(acY))[94:-1]
+                # fab_acZ = np.abs(fft(acZ))[94:-1]
+                # fab_agX = np.abs(fft(agX))[94:-1]
+                # fab_agY = np.abs(fft(agY))[94:-1]
+                # fab_agZ = np.abs(fft(agZ))[94:-1]
 
                 # -- Data ready for extract features
                 row = []
                 for testsig in (acX_hf,acY_hf,acZ_hf,agX_hf,agY_hf,agZ_hf):
+                # for testsig in (acX_hf,acY_hf,agZ_hf):
                     f1 =window_rms(testsig,len(testsig))
                     res = np.array(testsig)
                     kur = kurtosis(testsig, fisher=True)
@@ -1226,9 +1226,52 @@ def predict_tremor_rest():
                     E12 = '%.5f'%(np.percentile(testsig, 50))
                     E13 = '%.5f'%(np.percentile(testsig, 75))
 
-                    rowx = [E1,E2,E3,E4,E5,E6,E7,E8,E9,E10,E11,E12,E13]
+                    # rowx = [E1,E2,E3,E4,E5,E6,E7,E8,E9,E10,E11,E12,E13]
+                    rowx = [E1,E2,E3,E4,E5,E6,E7,E8,E9,E10]
+                    # rowx = [E1,E2,E3,E4,E5,E6,E7]
                     row = row + rowx
 
+                # ------- normalize ---------
+                # acX=acX-np.mean(acX)
+                # acX=acX/np.std(acX)
+                # acY=acY-np.mean(acY)
+                # acY=acY/np.std(acY)
+                # acZ=acZ-np.mean(acZ)
+                # acZ=acZ/np.std(acZ)
+
+                # agX=agX-np.mean(agX)
+                # agX=agX/np.std(agX)
+                # agY=agY-np.mean(agY)
+                # agY=agY/np.std(agY)
+                # agZ=agZ-np.mean(agZ)
+                # agZ=agZ/np.std(agZ)
+
+
+                # -- do some pre process
+                N = 5
+                acXMa = runningMeanFast(acX, N)
+                acYMa = runningMeanFast(acY, N)
+                acZMa = runningMeanFast(acZ, N)
+                agXMa = runningMeanFast(agX, N)
+                agYMa = runningMeanFast(agY, N)
+                agZMa = runningMeanFast(agZ, N)
+
+                acX = acX - acXMa
+                acY = acY - acYMa
+                acZ = acZ - acZMa
+                agX = agX - agXMa
+                agY = agY - agYMa
+                agZ = agZ - agZMa
+                    
+
+                # ----------- fft
+                fab_acX = np.abs(fft(acX))[94:-1]
+                fab_acY = np.abs(fft(acY))[94:-1]
+                fab_acZ = np.abs(fft(acZ))[94:-1]
+                fab_agX = np.abs(fft(agX))[94:-1]
+                fab_agY = np.abs(fft(agY))[94:-1]
+                fab_agZ = np.abs(fft(agZ))[94:-1]
+                    
                 for testsig in (fab_acX,fab_acY,fab_acZ,fab_agX,fab_agY,fab_agZ):
                     # Note testsig len = 90
                     # ------------ 
@@ -1255,9 +1298,12 @@ def predict_tremor_rest():
                     E4x = '%.5f'%(F4/F3)
                     E5x = '%.5f'%(F5/F2)
                     E6x = '%.5f'%(F6/F1)
+
                     rowx = [E1,E2,E3,E4,E5,E6,E1x,E2x,E3x,E4x,E5x,E6x]
                     # rowx = [E1,E3,E4,E5,E6,E7]
                     row = row + rowx
+
+
 
                     
                 toListofNumber = [float(x) for x in row]
