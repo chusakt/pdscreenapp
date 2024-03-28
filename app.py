@@ -1669,6 +1669,13 @@ def predict_tremor_post():
                 print('check rms')
                 print(row[0],row[10],row[20])
                 print(row[2],row[12],row[22])
+                if float(row[0]) < 0.05 and float(row[10]) < 0.05 and float(row[20]) < 0.05:
+                    print('case 1')
+                    return jsonify({"prediction":str(0)}) 
+                # elif float(row[2])  >= 0.001 and float(row[2])  < 0.2:
+                #     print('case 2')
+                #     return jsonify({"prediction":str(0)}) 
+                
 
 
                 # ------- normalize ---------
@@ -1746,7 +1753,8 @@ def predict_tremor_post():
                 toListofNumber = [float(x) for x in row]
                 X = np.array([toListofNumber])
                 predictions_ = loaded_model_tp_ag.predict(X)   
-                # predictions_ = loaded_model_tr_a.predict(X)     
+                # predictions_ = loaded_model_tr_a.predict(X)
+                print('processed by model: -- ')     
                 return jsonify({"prediction":str(predictions_[0])}) 
             else:
                 return jsonify({"prediction":str(2)}) 
