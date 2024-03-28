@@ -1385,6 +1385,8 @@ def predict_tremor_rest():
 
                 if row[11] < 0.001:
                     return jsonify({"prediction":str(2)}) 
+                elif row[11] < 0.2:
+                    return jsonify({"prediction":str(0)}) 
                 
                 # ------- normalize ---------
                 # acX=acX-np.mean(acX)
