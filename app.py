@@ -1202,6 +1202,7 @@ def predict_tremor_rest():
                 # predictions_ = loaded_model_tr_ag.predict(X)   
                 # predictions_ = loaded_model_tr_a.predict(X)   
                 print(row)  
+                return jsonify({"prediction":str(2)}) 
                 # return jsonify({"prediction":str(predictions_[0])}) 
             else:
                 return jsonify({"prediction":str(2)}) 
