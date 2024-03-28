@@ -1666,6 +1666,11 @@ def predict_tremor_post():
                     # rowx = [E1,E2,E3,E4,E5,E6,E7]
                     row = row + rowx
 
+                print('check rms')
+                print(row[0],row[10],row[20])
+                print(row[2],row[12],row[22])
+
+
                 # ------- normalize ---------
                 # acX=acX-np.mean(acX)
                 # acX=acX/np.std(acX)
