@@ -168,7 +168,7 @@ with open(model_pkl_file, 'rb') as file:
 #     loaded_model_gw_ag_20Hz = pickle.load(file) 
  
 # --- load model ---
-model_pkl_file = "model_gaitwalk_10Hz_e.pkl"  
+model_pkl_file = "model_0328_walk_1.pkl"  
 with open(model_pkl_file, 'rb') as file:  
     loaded_model_gw_ag_10Hz = pickle.load(file) 
 #========================================
@@ -2401,7 +2401,22 @@ def predict_gait_walk():
             agZ = every_nth(agZ,4)
             # tst = every_nth(tst,4)
 
+            # -- do some pre process
+            N = 5
+            acXMa = runningMeanFast(acX, N)
+            acYMa = runningMeanFast(acY, N)
+            acZMa = runningMeanFast(acZ, N)
+            agXMa = runningMeanFast(agX, N)
+            agYMa = runningMeanFast(agY, N)
+            agZMa = runningMeanFast(agZ, N)
 
+            acX = acX - acXMa
+            acY = acY - acYMa
+            acZ = acZ - acZMa
+            agX = agX - agXMa
+            agY = agY - agYMa
+            agZ = agZ - agZMa
+            
             acX = acX[9:90]
             acY = acY[9:90]
             acZ = acZ[9:90]
@@ -2420,34 +2435,35 @@ def predict_gait_walk():
             #     agZ, x1 = signal.resample(agZ,toBeSamp,np.arange(len(agZ)))  # resampled
 
             # # ------------ transform to unit variance
-            acX=acX-np.mean(acX)
-            acX=acX/np.std(acX)
-            acY=acY-np.mean(acY)
-            acY=acY/np.std(acY)
-            acZ=acZ-np.mean(acZ)
-            acZ=acZ/np.std(acZ)
+            # acX=acX-np.mean(acX)
+            # acX=acX/np.std(acX)
+            # acY=acY-np.mean(acY)
+            # acY=acY/np.std(acY)
+            # acZ=acZ-np.mean(acZ)
+            # acZ=acZ/np.std(acZ)
 
-            agX=agX-np.mean(agX)
-            agX=agX/np.std(agX)
-            agY=agY-np.mean(agY)
-            agY=agY/np.std(agY)
-            agZ=agZ-np.mean(agZ)
-            agZ=agZ/np.std(agZ)
+            # agX=agX-np.mean(agX)
+            # agX=agX/np.std(agX)
+            # agY=agY-np.mean(agY)
+            # agY=agY/np.std(agY)
+            # agZ=agZ-np.mean(agZ)
+            # agZ=agZ/np.std(agZ)
 
             row = [] 
             for testsig in (acX,acY,acZ,agX,agY,agZ):
-                testsig_filt = signal.sosfilt(sos_gwag, testsig)
-                # print('testsig_filt', len(testsig_filt))
-                res = np.array(testsig_filt)
-                fourier = fft(testsig_filt)
-                # print('fourier', len(fourier))
+            # for testsig in (acX,acY,acZ):
+                # testsig_filt = signal.sosfilt(sos, testsig)
+                print('testsig_filt', len(testsig))
+                res = np.array(testsig)
+                fourier = fft(testsig)
+                print('fourier', len(fourier))
                 # fourier, x1 = signal.resample(fourier,40,np.arange(len(fourier)))  # resampled to 40
                 # print('fourier after resampled', len(fourier))
                 fab = np.abs(fourier)[42:80]
-                # print('abs(fourier)[42:80]', len(fab))
+                print('abs(fourier)[42:80]', len(fab))
                 # ------------ 
                 Esum = sum(np.square(fab))
-                # print('Esum', Esum)
+                print('Esum', Esum)
                 
                 # Esum = 1.0
                 # base = 2  # work in units of bits
@@ -2462,8 +2478,8 @@ def predict_gait_walk():
                 # F9 = sum(np.square(fab[80:90]))
                 # F10 = sum(np.square(fab[90:100]))
 
-                kur = kurtosis(testsig_filt, fisher=True)
-                ske = skew(testsig_filt, bias=False)
+                kur = kurtosis(testsig, fisher=True)
+                ske = skew(testsig, bias=False)
                 resdif = res[1:]-res[0:-1]
                 Mobi = np.sqrt(np.var(resdif)/np.var(res))
                 resdif2 = resdif[1:]-resdif[0:-1]
@@ -2471,7 +2487,9 @@ def predict_gait_walk():
                 
                 # E1 = '%.5f'%(F1/Esum)
                 # E1 = '%.5f'%(np.std(testsig_filt))           
-                # E2 = '%.5f'%(np.mean(testsig_filt))                     
+                # E2 = '%.5f'%(np.mean(testsig_filt))                   
+                E1 = '%.5f'%(np.std(testsig))           
+                E2 = '%.5f'%(np.mean(testsig))                 
                 E3 = '%.5f'%(kur)
                 E4 = '%.5f'%(ske)
                 E5 = '%.5f'%(Mobi)   
@@ -2500,7 +2518,15 @@ def predict_gait_walk():
                 # E19 = '%.5f'%(len(np.where(np.diff(np.sign(testsig)))[0]))
 
 
-                rowx = [E3,E4,E5,E6,E7,E8,E9,E10,E11,E12,E13]
+                rowx = [E1,E2,E3,E4,E5,E6,E7,E8,E9,E10,E11,E12,E13]
+                
+                print('--- [][][] ----')
+                print(rowx[0],rowx[1],rowx[2],rowx[7],rowx[8],rowx[9],rowx[10])
+
+            # if float(row[0]) < 0.05 and float(row[13]) < 0.05 and float(row[2*13]) < 0.05:
+            #     print('case 1')
+            #     return jsonify({"prediction":str(0)}) 
+                
                 # rowx = [tst[-1],len(tst),len(acX),E3,E4,E5,E6,E7,E8,E9,E10,E11,E12,E13]
                 # rowx = [E1,E3,E4,E5,E6,E7]
                 row = row + rowx
