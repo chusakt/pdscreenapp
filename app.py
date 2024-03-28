@@ -1383,9 +1383,9 @@ def predict_tremor_rest():
                     # rowx = [E1,E2,E3,E4,E5,E6,E7]
                     row = row + rowx
 
-                if row[11] < 0.001:
+                if float(row[11]) < 0.001:
                     return jsonify({"prediction":str(2)}) 
-                elif row[11] < 0.2:
+                elif float(row[11])  < 0.2:
                     return jsonify({"prediction":str(0)}) 
                 
                 # ------- normalize ---------
