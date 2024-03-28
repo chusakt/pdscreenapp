@@ -2186,7 +2186,17 @@ def predict_gait_stab():
 
                 rowx = [E1,E2,E3,E4,E5,E6,E7,E8,E9,E10,E11,E12,E13]
                 row = row + rowx
-            
+
+            print('check rms')
+            print(row[0],row[13],row[2*13])
+            print(row[0+1],row[13+1],row[(2*13)+1])
+            # if float(row[0]) < 0.05 and float(row[10]) < 0.05 and float(row[20]) < 0.05:
+            #     print('case 1')
+            #     return jsonify({"prediction":str(0)}) 
+            # # elif float(row[2])  >= 0.001 and float(row[2])  < 0.2:
+            # #     print('case 2')
+            # #     return jsonify({"prediction":str(0)}) 
+                            
             toListofNumber = [float(x) for x in row]
             X = np.array([toListofNumber])
             predictions_ = loaded_model_gs_ag.predict(X)        
