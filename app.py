@@ -1389,7 +1389,7 @@ def predict_tremor_rest():
                 if float(row[11]) < 0.001:
                     print('line 1')
                     return jsonify({"prediction":str(2)}) 
-                elif float(row[11])  >= 0.01 and float(row[11])  < 0.2:
+                elif float(row[11])  >= 0.001 and float(row[11])  < 0.2:
                     print('line 2')
                     return jsonify({"prediction":str(0)}) 
                 
