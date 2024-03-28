@@ -1059,15 +1059,160 @@ def predict_voice_ypl():
 #  predict_tremor_rest_checkgx : 
 #  ----------------------------------------
     
-@app.route('/predict_tremor_rest_checkgx', methods=['POST'])  
-def predict_tremor_rest_checkgx():
-    if request.is_json:
-        data = request.get_json()
-        gyroIn = data['recording']['recordingFormat']
-        if "gx" in gyroIn:
-            return jsonify({"prediction":str(100)}) 
-        else:
-            return jsonify({"prediction":str(200)}) 
+@app.route('/predict_tremor_rest', methods=['POST'])  
+def predict_tremor_rest():
+    try:
+        if request.is_json:
+            data = request.get_json()
+            gyroIn = data['recording']['recordingFormat']
+            if "gx" in gyroIn:
+
+                tStamp = []
+                acX = []
+                acY = []
+                acZ = []
+                agX = []
+                agY = []
+                agZ = []
+
+                for i in data['recording']['recordedData']:
+                    tsC = i['ts']
+                    tStamp.append(tsC)
+                    # -- read from cupd dataset FORMAT
+                    acXC = i['data'][0]
+                    acYC = i['data'][1]
+                    acZC = i['data'][2]    
+                    acX.append(acXC)
+                    acY.append(acYC)
+                    acZ.append(acZC) 
+
+                    agXC = i['data'][3]
+                    agYC = i['data'][4]
+                    agZC = i['data'][5]    
+                    agX.append(agXC)
+                    agY.append(agYC)
+                    agZ.append(agZC) 
+
+
+                tst = [item - tStamp[0] for item in tStamp]
+                # print(len(tst))
+                # f.close()
+                
+                    
+                # resampl to 10Hz from 40Hz
+                acX = every_nth(acX,4)
+                acY = every_nth(acY,4)
+                acZ = every_nth(acZ,4)
+                agX = every_nth(agX,4)
+                agY = every_nth(agY,4)
+                agZ = every_nth(agZ,4)
+                tst = every_nth(tst,4)
+
+
+                # # -- do some pre process
+                # N = 5
+                # acXMa = runningMeanFast(acX, N)
+                # acYMa = runningMeanFast(acY, N)
+                # acZMa = runningMeanFast(acZ, N)
+                # agXMa = runningMeanFast(agX, N)
+                # agYMa = runningMeanFast(agY, N)
+                # agZMa = runningMeanFast(agZ, N)
+
+                # acX = acX - acXMa
+                # acY = acY - acYMa
+                # acZ = acZ - acZMa
+                # agX = agX - agXMa
+                # agY = agY - agYMa
+                # agZ = agZ - agZMa
+
+                setLen = 185
+                acX = acX[:setLen]
+                acY = acY[:setLen]
+                acZ = acZ[:setLen]
+                agX = agX[:setLen]
+                agY = agY[:setLen]
+                agZ = agZ[:setLen]
+                tst = tst[:setLen]
+
+                # noise = np.random.normal(0,1,185)
+                # noise = 0.001*noise
+                # acX = acX + noise
+                # # noise = np.random.normal(0,1,185)
+                # # noise = 0.0001*noise            
+                # acY = acY + noise
+                # # noise = np.random.normal(0,1,185)
+                # # noise = 0.0001*noise            
+                # acZ = acZ + noise
+                # # noise = np.random.normal(0,1,185)
+                # # noise = 0.001*noise            
+                # agX = agX + noise
+                # # noise = np.random.normal(0,1,185)
+                # # noise = 0.001*noise            
+                # agY = agY + noise
+                # # noise = np.random.normal(0,1,185)
+                # # noise = 0.001*noise            
+                # agZ = agZ + noise 
+            
+                # -- store for further analysis (time domain, data minus moving average)
+                acX_hf = acX
+                acY_hf = acY
+                acZ_hf = acZ
+                agX_hf = agX
+                agY_hf = agY
+                agZ_hf = agZ
+                tst_hf = tst
+
+                # ------- normalize ---------
+                # acX=acX-np.mean(acX)
+                # acX=acX/np.std(acX)
+                # acY=acY-np.mean(acY)
+                # acY=acY/np.std(acY)
+                # acZ=acZ-np.mean(acZ)
+                # acZ=acZ/np.std(acZ)
+
+                # agX=agX-np.mean(agX)
+                # agX=agX/np.std(agX)
+                # agY=agY-np.mean(agY)
+                # agY=agY/np.std(agY)
+                # agZ=agZ-np.mean(agZ)
+                # agZ=agZ/np.std(agZ)
+
+
+                # # ----------- fft
+                # fab_acX = np.abs(fft(acX))[94:-1]
+                # fab_acY = np.abs(fft(acY))[94:-1]
+                # fab_acZ = np.abs(fft(acZ))[94:-1]
+                # fab_agX = np.abs(fft(agX))[94:-1]
+                # fab_agY = np.abs(fft(agY))[94:-1]
+                # fab_agZ = np.abs(fft(agZ))[94:-1]
+
+                # -- Data ready for extract features
+                row = []
+                for testsig in (acX_hf,acY_hf,acZ_hf,agX_hf,agY_hf,agZ_hf):
+                # for testsig in (acX_hf,acY_hf,agZ_hf):
+                    f1 =window_rms(testsig,len(testsig))
+                    E3 = '%.5f'%(f1)
+                    rowx = [E3]
+                    # rowx = [E1,E2,E3,E4,E5,E6,E7]
+                    row = row + rowx
+
+                    
+                # toListofNumber = [float(x) for x in row]
+                # X = np.array([toListofNumber])
+                # predictions_ = loaded_model_tr_ag.predict(X)   
+                # predictions_ = loaded_model_tr_a.predict(X)   
+                print(row)  
+                # return jsonify({"prediction":str(predictions_[0])}) 
+            else:
+                return jsonify({"prediction":str(2)}) 
+ 
+    # except:
+    except Exception as e: 
+        print(e)
+        print('--------')
+        print(row)
+        print('--------')
+        return jsonify({"prediction":str(2)}) 
             
 
 
@@ -1077,8 +1222,8 @@ def predict_tremor_rest_checkgx():
 #  predict_tremor_rest : loaded_model_tr_a, loaded_model_tr_ag
 #  ----------------------------------------
     
-@app.route('/predict_tremor_rest', methods=['POST'])  
-def predict_tremor_rest():
+@app.route('/predict_tremor_restx', methods=['POST'])  
+def predict_tremor_restx():
     try:
         if request.is_json:
             data = request.get_json()
