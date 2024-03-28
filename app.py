@@ -1471,7 +1471,8 @@ def predict_tremor_rest():
                 toListofNumber = [float(x) for x in row]
                 X = np.array([toListofNumber])
                 predictions_ = loaded_model_tr_ag.predict(X)   
-                # predictions_ = loaded_model_tr_a.predict(X)     
+                # predictions_ = loaded_model_tr_a.predict(X)
+                print('processed by model: -- ')     
                 return jsonify({"prediction":str(predictions_[0])}) 
             else:
                 return jsonify({"prediction":str(2)}) 
