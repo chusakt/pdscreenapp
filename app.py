@@ -1384,13 +1384,13 @@ def predict_tremor_rest():
                     row = row + rowx
 
                 print('check rms')
-                print(row[11])
-                print(type(row[11]))
-                if float(row[1]) < 0.001 and float(row[11]) < 0.001 and float(row[21]) < 0.001:
-                    print('line 1')
+                print(row[2],row[12],row[22])
+                print(type(row[2]))
+                if float(row[2]) < 0.001 and float(row[12]) < 0.001 and float(row[22]) < 0.001:
+                    print('case 1')
                     return jsonify({"prediction":str(2)}) 
-                elif float(row[11])  >= 0.001 and float(row[11])  < 0.2:
-                    print('line 2')
+                elif float(row[2])  >= 0.001 and float(row[2])  < 0.2:
+                    print('case 2')
                     return jsonify({"prediction":str(0)}) 
                 
                 # ------- normalize ---------
