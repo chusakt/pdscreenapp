@@ -813,6 +813,7 @@ def predict_voice_ahh():
                 intensity_ = sound.get_intensity()
                 sound.scale_intensity(70)
             else:
+                print('test Ahh: return 2')
                 return jsonify({"prediction":str(2)}) 
             (duration, meanF0, stdevF0, hnr, localJitter, localabsoluteJitter, rapJitter, ppq5Jitter, ddpJitter, 
             localShimmer, localdbShimmer, apq3Shimmer, aqpq5Shimmer, apq11Shimmer, ddaShimmer) = measurePitch(
@@ -918,8 +919,10 @@ def predict_voice_ahh():
             X = np.array(df)
             predictions_ = loaded_model_va.predict(X)        
             # return jsonify({"show something":str('this is something')}) 
+            print('test Ahh: return '+ str(predictions_[0]))
             return jsonify({"prediction":str(predictions_[0])}) 
     except:
+        print('test Ahh: return 2')
         return jsonify({"prediction":str(2)})     
 
 
