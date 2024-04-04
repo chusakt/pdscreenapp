@@ -174,20 +174,30 @@ with open(model_pkl_file, 'rb') as file:
 #========================================
     
 
-# --- load model ---
-# model_pkl_file = "Model_pickle_voic_ahh_15.pkl"  
+
+#========================================
+#======= voice ==========================
+#========================================
+    
+# model_pkl_file = "model_0327_voiceYPL_1.pkl"  
+# with open(model_pkl_file, 'rb') as file:  
+#     loaded_model_vy = pickle.load(file) 
+# # --- load model ---
+# model_pkl_file = "model_0327_voiceAHH_1.pkl"  
 # with open(model_pkl_file, 'rb') as file:  
 #     loaded_model_va = pickle.load(file) 
-# --- load model ---
-model_pkl_file = "model_0327_voiceYPL_1.pkl"  
+
+
+
+model_pkl_file = "model_0404_voiceypl_1.pkl"  
 with open(model_pkl_file, 'rb') as file:  
     loaded_model_vy = pickle.load(file) 
-
-
 # --- load model ---
-model_pkl_file = "model_0327_voiceAHH_1.pkl"  
+model_pkl_file = "model_0404_voiceahh_1.pkl"  
 with open(model_pkl_file, 'rb') as file:  
     loaded_model_va = pickle.load(file) 
+
+
 
 
 # --- load model --- > modified/improved model ahh voice
@@ -790,7 +800,20 @@ def predict_voice_ahh():
             wavFile.write(voicedecoded)
             wave_file = wavFilename
 
+
+            audioclip = AudioFileClip(wave_file)
             sound = parselmouth.Sound(wave_file)
+            sound = sound.convert_to_mono()
+            duration = sound.get_total_duration()
+            if duration > 4.0:
+                audioclip = audioclip.subclip(1,4)
+                audioclip.write_audiofile(wave_file,codec='pcm_s16le')
+                sound = parselmouth.Sound(wave_file)
+                sound = sound.convert_to_mono()
+                intensity_ = sound.get_intensity()
+                sound.scale_intensity(70)
+            else:
+                return jsonify({"prediction":str(2)}) 
             (duration, meanF0, stdevF0, hnr, localJitter, localabsoluteJitter, rapJitter, ppq5Jitter, ddpJitter, 
             localShimmer, localdbShimmer, apq3Shimmer, aqpq5Shimmer, apq11Shimmer, ddaShimmer) = measurePitch(
                 sound, 75, 300, "Hertz")
@@ -1388,7 +1411,7 @@ def predict_tremor_rest():
                 print(type(row[2]))
                 if float(row[2]) < 0.001 and float(row[12]) < 0.001 and float(row[22]) < 0.001:
                     print('case 1')
-                    return jsonify({"prediction":str(2)}) 
+                    return jsonify({"prediction":str(0)}) 
                 elif float(row[2])  >= 0.001 and float(row[2])  < 0.2:
                     print('case 2')
                     return jsonify({"prediction":str(0)}) 
