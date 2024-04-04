@@ -810,7 +810,7 @@ def predict_voice_ahh():
                 audioclip.write_audiofile(wave_file,codec='pcm_s16le')
                 sound = parselmouth.Sound(wave_file)
                 sound = sound.convert_to_mono()
-                intensity_ = sound.get_intensity()
+                # intensity_ = sound.get_intensity()
                 sound.scale_intensity(70)
             else:
                 print('test Ahh: return 2')
@@ -968,7 +968,22 @@ def predict_voice_ypl():
             wavFile.write(voicedecoded)
             wave_file = wavFilename
 
+
+            audioclip = AudioFileClip(wave_file)
             sound = parselmouth.Sound(wave_file)
+            sound = sound.convert_to_mono()
+            duration = sound.get_total_duration()
+            if duration > 4.0:
+                audioclip = audioclip.subclip(1,4)
+                audioclip.write_audiofile(wave_file,codec='pcm_s16le')
+                sound = parselmouth.Sound(wave_file)
+                sound = sound.convert_to_mono()
+                # intensity_ = sound.get_intensity()
+                sound.scale_intensity(70)
+            else:
+                print('test Ahh: return 2')
+                return jsonify({"prediction":str(2)}) 
+ 
             (duration, meanF0, stdevF0, hnr, localJitter, localabsoluteJitter, rapJitter, ppq5Jitter, ddpJitter, 
             localShimmer, localdbShimmer, apq3Shimmer, aqpq5Shimmer, apq11Shimmer, ddaShimmer) = measurePitch(
                 sound, 75, 300, "Hertz")
