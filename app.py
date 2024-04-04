@@ -981,7 +981,7 @@ def predict_voice_ypl():
                 # intensity_ = sound.get_intensity()
                 sound.scale_intensity(70)
             else:
-                print('test Ahh: return 2')
+                print('test YPL: return 2')
                 return jsonify({"prediction":str(2)}) 
  
             (duration, meanF0, stdevF0, hnr, localJitter, localabsoluteJitter, rapJitter, ppq5Jitter, ddpJitter, 
@@ -1089,10 +1089,14 @@ def predict_voice_ypl():
                                                         ])
 
             X = np.array(df)
-            predictions_ = loaded_model_vy.predict(X)        
+            predictions_ = loaded_model_vy.predict(X)     
+            print('test YPL: return '+ str(predictions_[0]))
+            # return jsonify({"prediction":str(predictions_[0])})                
             # return jsonify({"show something":str('this is something')}) 
+            # print('test YPL: return 2')
             return jsonify({"prediction":str(predictions_[0])}) 
     except:
+        print('test YPL: return 2')
         return jsonify({"prediction":str(2)})     
 
 
