@@ -119,18 +119,58 @@ def send_telegram_message(message):
 # app = Flask(__name__)
 app = Flask(__name__)
 
+# =====================================
 
-# CORS(
-#     app,
-#     resources={r"/*": {"origins": [
-#         "http://localhost:3000",
-#         "http://127.0.0.1:3000",
-#         "https://sea-turtle-app-wajh3.ondigitalocean.app"
-#     ]}},
-#     supports_credentials=True,  # เปลี่ยนเป็น True เฉพาะกรณีใช้ cookie/session
-#     allow_headers=["Content-Type", "Authorization"],
-#     methods=["GET", "POST", "OPTIONS"]
-# )
+
+# --- CORS / Proxy support (required for browser webapps calling this API) ---
+app.wsgi_app = ProxyFix(app.wsgi_app, x_for=1, x_proto=1, x_host=1, x_prefix=1)
+
+cors_origins_env = os.getenv('CORS_ORIGINS', '').strip()
+if cors_origins_env:
+    CORS_ORIGINS = [o.strip() for o in cors_origins_env.split(',') if o.strip()]
+else:
+    # Defaults for local development (set CORS_ORIGINS in production)
+    CORS_ORIGINS = [
+        'http://localhost:3000', 'http://127.0.0.1:3000',
+        'http://localhost:5173', 'http://127.0.0.1:5173',
+    ]
+
+CORS_SUPPORTS_CREDENTIALS = os.getenv('CORS_SUPPORTS_CREDENTIALS', 'false').lower() in ('1','true','yes','y')
+
+# If you enable credentials, you MUST NOT use '*' as an allowed origin.
+if CORS_SUPPORTS_CREDENTIALS and '*' in CORS_ORIGINS:
+    CORS_ORIGINS = [o for o in CORS_ORIGINS if o != '*']
+
+CORS(
+    app,
+    resources={r'/*': {'origins': CORS_ORIGINS}},
+    supports_credentials=CORS_SUPPORTS_CREDENTIALS,
+    allow_headers=['Content-Type', 'Authorization'],
+    methods=['GET', 'POST', 'OPTIONS'],
+)
+
+@app.before_request
+def _handle_preflight_options():
+    # Ensure OPTIONS preflight always succeeds (CORS headers are added by flask-cors).
+    if request.method == 'OPTIONS':
+        return ('', 204)
+
+
+
+CORS(
+    app,
+    resources={r"/*": {"origins": [
+        "http://localhost:3000",
+        "http://127.0.0.1:3000",
+        "https://sea-turtle-app-wajh3.ondigitalocean.app"
+    ]}},
+    supports_credentials=True,  # เปลี่ยนเป็น True เฉพาะกรณีใช้ cookie/session
+    allow_headers=["Content-Type", "Authorization"],
+    methods=["GET", "POST", "OPTIONS"]
+)
+
+
+# =====================================
 
 
 # @app.before_request
