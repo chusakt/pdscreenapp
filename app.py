@@ -120,17 +120,17 @@ def send_telegram_message(message):
 app = Flask(__name__)
 
 
-CORS(
-    app,
-    resources={r"/*": {"origins": [
-        "http://localhost:3000",
-        "http://127.0.0.1:3000",
-        "https://sea-turtle-app-wajh3.ondigitalocean.app"
-    ]}},
-    supports_credentials=True,  # เปลี่ยนเป็น True เฉพาะกรณีใช้ cookie/session
-    allow_headers=["Content-Type", "Authorization"],
-    methods=["GET", "POST", "OPTIONS"]
-)
+# CORS(
+#     app,
+#     resources={r"/*": {"origins": [
+#         "http://localhost:3000",
+#         "http://127.0.0.1:3000",
+#         "https://sea-turtle-app-wajh3.ondigitalocean.app"
+#     ]}},
+#     supports_credentials=True,  # เปลี่ยนเป็น True เฉพาะกรณีใช้ cookie/session
+#     allow_headers=["Content-Type", "Authorization"],
+#     methods=["GET", "POST", "OPTIONS"]
+# )
 
 
 # @app.before_request
