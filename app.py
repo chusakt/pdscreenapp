@@ -48,6 +48,7 @@ import zipfile
 import matplotlib  # <- Add this line
 from werkzeug.exceptions import HTTPException
 import redis
+from flask_cors import CORS
 
 
 from flask_limiter import Limiter
@@ -117,6 +118,20 @@ def send_telegram_message(message):
 
 # app = Flask(__name__)
 app = Flask(__name__)
+
+
+CORS(
+    app,
+    resources={r"/*": {"origins": [
+        "http://localhost:3000",
+        "http://127.0.0.1:3000",
+        "https://sea-turtle-app-wajh3.ondigitalocean.app"
+    ]}},
+    supports_credentials=False,  # เปลี่ยนเป็น True เฉพาะกรณีใช้ cookie/session
+    allow_headers=["Content-Type", "Authorization"],
+    methods=["GET", "POST", "OPTIONS"]
+)
+
 
 # @app.before_request
 # def increment_request_count():
