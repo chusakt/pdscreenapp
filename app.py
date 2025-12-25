@@ -47,6 +47,8 @@ import requests
 import zipfile
 import matplotlib  # <- Add this line
 from werkzeug.exceptions import HTTPException
+from werkzeug.middleware.proxy_fix import ProxyFix
+
 import redis
 from flask_cors import CORS
 
