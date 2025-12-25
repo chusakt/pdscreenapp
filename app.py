@@ -127,7 +127,7 @@ CORS(
         "http://127.0.0.1:3000",
         "https://sea-turtle-app-wajh3.ondigitalocean.app"
     ]}},
-    supports_credentials=False,  # เปลี่ยนเป็น True เฉพาะกรณีใช้ cookie/session
+    supports_credentials=True,  # เปลี่ยนเป็น True เฉพาะกรณีใช้ cookie/session
     allow_headers=["Content-Type", "Authorization"],
     methods=["GET", "POST", "OPTIONS"]
 )
