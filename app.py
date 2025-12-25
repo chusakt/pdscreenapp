@@ -302,7 +302,7 @@ def extract_tapcount_statistics(data):
 # Route for the homepage
 @app.route('/')
 def home():
-    return "<h1>Welcome to god world</h1><p>xxxxxxxxx</p>"
+    return "<h1>Welcome to god world 2</h1><p>xxxxxxxxx</p>"
 
 # Route for the about page
 @app.route('/about')
