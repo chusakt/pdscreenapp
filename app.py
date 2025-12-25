@@ -96,26 +96,26 @@ TELEGRAM_CHAT_ID = '7797940144'  # Replace with your chat ID
 
 last_sent_message = None  # To keep track of the last sent message
 
-def send_telegram_message(message):
-    global last_sent_message
-    try:
-        # Only send the message if it's different from the last sent message
-        if message != last_sent_message:
-            telegram_url = f"https://api.telegram.org/bot{TELEGRAM_BOT_TOKEN}/sendMessage"
-            payload = {
-                'chat_id': TELEGRAM_CHAT_ID,
-                'text': message,  # No special formatting
-            }
-            response = requests.post(telegram_url, json=payload)
-            if response.status_code == 200:
-                print("Message sent successfully via Telegram.")
-                last_sent_message = message  # Update the last sent message
-            else:
-                print(f"Failed to send message: {response.status_code} {response.text}")
-        else:
-            print("Skipped sending duplicate message.")
-    except Exception as e:
-        print(f"Error sending message via Telegram: {e}")
+# def send_telegram_message(message):
+#     global last_sent_message
+#     try:
+#         # Only send the message if it's different from the last sent message
+#         if message != last_sent_message:
+#             telegram_url = f"https://api.telegram.org/bot{TELEGRAM_BOT_TOKEN}/sendMessage"
+#             payload = {
+#                 'chat_id': TELEGRAM_CHAT_ID,
+#                 'text': message,  # No special formatting
+#             }
+#             response = requests.post(telegram_url, json=payload)
+#             if response.status_code == 200:
+#                 print("Message sent successfully via Telegram.")
+#                 last_sent_message = message  # Update the last sent message
+#             else:
+#                 print(f"Failed to send message: {response.status_code} {response.text}")
+#         else:
+#             print("Skipped sending duplicate message.")
+#     except Exception as e:
+#         print(f"Error sending message via Telegram: {e}")
 
 
 # app = Flask(__name__)
@@ -395,14 +395,14 @@ def predict_dualtap():
         response = {
             "prediction": str(y_pred[0])
         }        
-        # Send a Telegram message every 10 successful requests
-        if successful_request_count % 10 == 0:
-            send_telegram_message(f"Completed {successful_request_count} successful predictions.")
+        # # Send a Telegram message every 10 successful requests
+        # if successful_request_count % 10 == 0:
+        #     send_telegram_message(f"Completed {successful_request_count} successful predictions.")
 
-        # Reset the counter after 1,000 successful requests
-        if successful_request_count >= 1000:
-            send_telegram_message(f"Reached {successful_request_count} successful predictions. Resetting the counter.")
-            successful_request_count = 0
+        # # Reset the counter after 1,000 successful requests
+        # if successful_request_count >= 1000:
+        #     send_telegram_message(f"Reached {successful_request_count} successful predictions. Resetting the counter.")
+        #     successful_request_count = 0
                     
         return jsonify(response)
 
@@ -589,13 +589,13 @@ def predict_pinchtosize():
             "prediction": str(y_pred[0])
         }  
         # Send a Telegram message every 10 successful requests
-        if successful_request_count % 10 == 0:
-            send_telegram_message(f"Completed {successful_request_count} successful predictions.")
+        # if successful_request_count % 10 == 0:
+        #     send_telegram_message(f"Completed {successful_request_count} successful predictions.")
 
-        # Reset the counter after 1,000 successful requests
-        if successful_request_count >= 1000:
-            send_telegram_message(f"Reached {successful_request_count} successful predictions. Resetting the counter.")
-            successful_request_count = 0
+        # # Reset the counter after 1,000 successful requests
+        # if successful_request_count >= 1000:
+        #     send_telegram_message(f"Reached {successful_request_count} successful predictions. Resetting the counter.")
+        #     successful_request_count = 0
 
         return jsonify(response)
 
@@ -714,13 +714,13 @@ def predict_tremor():
             "prediction": str(y_pred[0])
         }        
         # Send a Telegram message every 10 successful requests
-        if successful_request_count % 10 == 0:
-            send_telegram_message(f"Completed {successful_request_count} successful predictions.")
+        # if successful_request_count % 10 == 0:
+        #     send_telegram_message(f"Completed {successful_request_count} successful predictions.")
 
-        # Reset the counter after 1,000 successful requests
-        if successful_request_count >= 1000:
-            send_telegram_message(f"Reached {successful_request_count} successful predictions. Resetting the counter.")
-            successful_request_count = 0        
+        # # Reset the counter after 1,000 successful requests
+        # if successful_request_count >= 1000:
+        #     send_telegram_message(f"Reached {successful_request_count} successful predictions. Resetting the counter.")
+        #     successful_request_count = 0        
         return jsonify(response)
 
     # except Exception as e:
@@ -877,13 +877,13 @@ def predict_voice():
         successful_request_count += 1
 
         # Send a Telegram message every 10 successful requests
-        if successful_request_count % 10 == 0:
-            send_telegram_message(f"Completed {successful_request_count} successful predictions.")
+        # if successful_request_count % 10 == 0:
+        #     send_telegram_message(f"Completed {successful_request_count} successful predictions.")
 
-        # Reset the counter after 1,000 successful requests
-        if successful_request_count >= 1000:
-            send_telegram_message(f"Reached {successful_request_count} successful predictions. Resetting the counter.")
-            successful_request_count = 0
+        # # Reset the counter after 1,000 successful requests
+        # if successful_request_count >= 1000:
+        #     send_telegram_message(f"Reached {successful_request_count} successful predictions. Resetting the counter.")
+        #     successful_request_count = 0
 
         return jsonify(response)
 
